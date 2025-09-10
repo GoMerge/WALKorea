@@ -1,0 +1,27 @@
+version: '3.9'
+services:
+  web:
+    build: .
+    ports:
+      - "${HOST_PORT}:8000"
+    volumes:
+      - ./app:/app/app
+    restart: always
+    environment:
+      - ENV=${ENV}
+
+  db:
+    image: mysql:8.0
+    restart: always
+    environment:
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
+      MYSQL_DATABASE: ${MYSQL_DATABASE}
+      MYSQL_USER: ${MYSQL_USER}
+      MYSQL_PASSWORD: ${MYSQL_PASSWORD}
+    ports:
+      - "${DB_PORT}:3306"
+    volumes:
+      - walkorea-db:/var/lib/mysql
+
+volumes:
+  walkorea-db:
