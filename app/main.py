@@ -1,17 +1,19 @@
-# app/main.py
 from fastapi import FastAPI
-from app.routers import hello  # 라우터 임포트
+from app.routers import auth, user, oauth_google, oauth_kakao, oauth_naver
+from app.scheduler import start_scheduler
 
-app = FastAPI(
-    title="WALKorea API",
-    description="WALKorea 프로젝트용 FastAPI 서버",
-    version="0.1.0"
-)
+app = FastAPI()
 
 # 라우터 등록
-app.include_router(hello.router)
+# /auth 그룹
+app.include_router(auth.router, prefix="/auth", tags=["Auth"])
+# /auth/oauth
+app.include_router(oauth_google.router, prefix="/auth/oauth/google", tags=["Auth OAuth"])
+app.include_router(oauth_kakao.router, prefix="/auth/oauth/kakao", tags=["Auth OAuth"])
+app.include_router(oauth_naver.router, prefix="/auth/oauth/naver", tags=["Auth OAuth"])
 
-# 기본 root 엔드포인트
-@app.get("/")
-def root():
-    return {"message": "Welcome to WALKorea API 🚀"}
+# /user 그룹
+app.include_router(user.router, prefix="/user", tags=["User"])
+
+# 스케줄러 시작
+start_scheduler()
