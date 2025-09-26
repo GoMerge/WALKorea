@@ -1,87 +1,45 @@
-from fastapi import APIRouter, Depends, HTTPException, status, BackgroundTasks
-from pydantic import BaseModel, constr, EmailStr
-from datetime import datetime
+from fastapi import APIRouter, Depends
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.user import UserOut, UserUpdate
+from app.schemas.user import UserOut, UserUpdate, ChangePasswordRequest, PasswordResetRequest, PasswordResetConfirm
 from app.models.user import User
-from app.utils.auth import get_current_user, verify_password, hash_password
-from app.utils.email import send_reset_password_email, send_account_deletion_email
-import uuid
+from app.utils.auth import get_current_user
+from app.services.user import get_profile_service, change_password_service, update_profile_service, request_password_reset, confirm_password_reset, delete_user_service
+from app.services.email import EmailService
+from app.services.user import request_password_reset as service_request_password_reset
 
 router = APIRouter()
-
-class ChangePasswordRequest(BaseModel):
-    current_password: constr(min_length=8)
-    new_password: constr(min_length=8)
-
-class ResetPasswordRequest(BaseModel):
-    email: EmailStr
-
-class ResetPasswordConfirm(BaseModel):
-    token: constr(min_length=36, max_length=36)
-    new_password: constr(min_length=8)
-
-class DeleteUserRequest(BaseModel):
-    password: constr(min_length=8)
-
-reset_tokens = {}
+email = EmailService()
 
 @router.get("/profile", response_model=UserOut)
 def get_profile(current_user: User = Depends(get_current_user)):
-    return current_user
+    return get_profile_service(current_user)
+
 
 @router.put("/profile", response_model=UserOut)
-def update_profile(user_in: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
-    if current_user is None:
-        raise HTTPException(status_code=401, detail="Unauthorized user.")
-    for field, value in user_in.dict(exclude_unset=True).items():
-        setattr(current_user, field, value)
-    db.commit()
-    db.refresh(current_user)
-    return current_user
+def update_profile(
+    user_in: UserUpdate, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    return update_profile_service(user_in, db, current_user)
+
 
 @router.post("/change-pw")
-def change_password(request: ChangePasswordRequest, db: Session = Depends(get_db), current_user=Depends(get_current_user)):
-    if not verify_password(request.current_password, current_user.pw_hash):
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="현재 비밀번호가 틀렸습니다.")
-    current_user.pw_hash = hash_password(request.new_password)
-    db.commit()
-    return {"msg": "비밀번호가 변경되었습니다."}
+def change_password(
+    request: ChangePasswordRequest, db: Session = Depends(get_db), current_user: User = Depends(get_current_user)
+):
+    return change_password_service(request, db, current_user)
 
-@router.post("/reset-pw-request")
-def reset_password_request(request: ResetPasswordRequest, background_tasks: BackgroundTasks, db: Session = Depends(get_db)):
-    user = db.query(User).filter(User.email == request.email).first()
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="등록된 이메일이 없습니다.")
-    token = str(uuid.uuid4())
-    reset_tokens[token] = user.id
-    send_reset_password_email(user.email, token)
-    background_tasks.add_task(send_reset_password_email, user.email, token)
-    return {"msg": "비밀번호 재설정 이메일을 발송했습니다."}
+# 1. 비밀번호 재설정 요청
+@router.post("/password-reset-request")
+def password_reset_request(req: PasswordResetRequest, db: Session = Depends(get_db)):
+    code = service_request_password_reset(req.userid, req.email, db)
+    return {"msg": "비밀번호 초기화 코드가 발송되었습니다.", "code": code}
 
-@router.post("/reset-pw")
-def reset_password_confirm(request: ResetPasswordConfirm, db: Session = Depends(get_db)):
-    user_id = reset_tokens.get(request.token)
-    if not user_id:
-        raise HTTPException(status_code=status.HTTP_400_BAD_REQUEST, detail="토큰이 유효하지 않거나 만료되었습니다.")
-    user = db.query(User).get(user_id)
-    if not user:
-        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="사용자를 찾을 수 없습니다.")
-    user.pw_hash = hash_password(request.new_password)
-    db.commit()
-    del reset_tokens[request.token]
-    return {"msg": "비밀번호가 성공적으로 재설정되었습니다."}
+# 2. 비밀번호 재설정 완료
+@router.post("/password-reset-confirm")
+def password_reset_confirm(req: PasswordResetConfirm, db: Session = Depends(get_db)):
+    return confirm_password_reset(req.userid, req.email, req.verification_code, req.new_password, db)
 
-@router.delete("/delete", status_code=status.HTTP_200_OK)
-def delete_user(db: Session = Depends(get_db), current_user = Depends(get_current_user)):
-    current_user.deleted_at = datetime.utcnow()
-    current_user.is_active = False
-    db.commit()
-
-    send_account_deletion_email(current_user.email, current_user.userid)
-    return {"msg": "회원 탈퇴가 완료되었습니다."}
-
-@router.get("/me")
-def read_users_me(current_user: User = Depends(get_current_user)):
-    return current_user
+@router.delete("/delete")
+def delete_user(db: Session = Depends(get_db), current_user: User = Depends(get_current_user)):
+    return delete_user_service(db, current_user)

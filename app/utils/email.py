@@ -1,48 +1,32 @@
-import os
-from sendgrid import SendGridAPIClient
-from sendgrid.helpers.mail import Mail
+import os, smtplib, random
+from email.mime.text import MIMEText
+from dotenv import load_dotenv
 
-SENDGRID_API_KEY = os.getenv("SENDGRID_API_KEY")
-FROM_EMAIL = "202438003@itc.ac.kr"
+load_dotenv()  # .env 파일 로드
 
-def send_reset_password_email(to_email: str, token: str):
-    reset_link = f"https://yourdomain.com/reset-password?token={token}"
-    message = Mail(
-        from_email=FROM_EMAIL,
-        to_emails=to_email,
-        subject="[YourApp] 비밀번호 재설정 요청 안내",
-        html_content=f"""
-        <p>안녕하세요.</p>
-        <p>다음 링크를 클릭해서 비밀번호를 재설정하세요:</p>
-        <p><a href="{reset_link}">{reset_link}</a></p>
-        <p>감사합니다.</p>
-        """
-    )
+SMTP_USER = os.getenv("SMTP_USER")
+SMTP_PASS = os.getenv("SMTP_PASS")
+SMTP_SERVER = os.getenv("SMTP_SERVER")
+SMTP_PORT = os.getenv("SMTP_PORT")
+
+def generate_code(length: int = 6) -> str:
+    """6자리 인증 코드 생성"""
+    return "".join(str(random.randint(0, 9)) for _ in range(length))
+
+def send_email_code_smtp(to_email: str, code: str):
+    """Gmail SMTP로 인증 코드 발송"""
+    msg = MIMEText(f"WALKorea 인증 코드: {code}")
+    msg["Subject"] = "WALKorea 인증 코드"
+    msg["From"] = SMTP_USER
+    msg["To"] = to_email
+
     try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        return response.status_code
+        with smtplib.SMTP(SMTP_SERVER, SMTP_PORT) as server:
+            server.ehlo()
+            server.starttls()
+            server.ehlo()
+            server.login(SMTP_USER, SMTP_PASS)
+            server.sendmail(SMTP_USER, [to_email], msg.as_string())
     except Exception as e:
-        print(f"이메일 발송 실패: {e}")
-        return None
-
-def send_account_deletion_email(to_email: str, user_name: str):
-    subject = "[YourApp] 회원 탈퇴 안내"
-    html_content = f"""
-    <p>안녕하세요, {user_name}님.</p>
-    <p>회원 탈퇴 처리가 정상적으로 완료되었습니다.</p>
-    <p>그동안 서비스를 이용해 주셔서 감사합니다.</p>
-    """
-    message = Mail(
-        from_email=FROM_EMAIL,
-        to_emails=to_email,
-        subject=subject,
-        html_content=html_content
-    )
-    try:
-        sg = SendGridAPIClient(SENDGRID_API_KEY)
-        response = sg.send(message)
-        return response.status_code
-    except Exception as e:
-        print(f"회원 탈퇴 안내 이메일 발송 실패: {e}")
-        return None
+        print(f"[메일 발송 실패] {e}")
+        raise ValueError("이메일 발송 실패")
