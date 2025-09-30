@@ -1,0 +1,50 @@
+name: Deploy to EC2
+
+on:
+  push:
+    branches: [ "main" ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      # 1. 레포지토리 checkout
+      - uses: actions/checkout@v3
+
+      # 2. 배포용 폴더 준비
+      - name: Prepare deploy folder
+        run: |
+          rm -rf deploy
+          mkdir deploy
+          cp -r app docker-compose.yml deploy/
+
+      # 3. SCP로 EC2에 전송
+      - name: Copy to EC2
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          source: "deploy/"
+          target: "~/WALKorea"
+          overwrite: true
+
+      # 4. SSH로 EC2 접속 → Docker Compose 실행
+      - name: Deploy on EC2
+        uses: appleboy/ssh-action@v0.1.7
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ubuntu
+          key: ${{ secrets.EC2_KEY }}
+          script: |
+            cd ~/WALKorea
+            # 환경변수 설정
+            export MYSQL_ROOT_PASSWORD=${{ secrets.MYSQL_ROOT_PASSWORD }}
+            export MYSQL_DATABASE=${{ secrets.MYSQL_DATABASE }}
+            export MYSQL_USER=${{ secrets.MYSQL_USER }}
+            export MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
+            export HOST_PORT=${{ secrets.HOST_PORT }}
+            export DB_PORT=${{ secrets.DB_PORT }}
+            
+            docker-compose down
+            docker-compose up -d --build
