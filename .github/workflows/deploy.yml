@@ -45,6 +45,9 @@ jobs:
             export MYSQL_PASSWORD=${{ secrets.MYSQL_PASSWORD }}
             export HOST_PORT=${{ secrets.HOST_PORT }}
             export DB_PORT=${{ secrets.DB_PORT }}
-            
+            export REDIS_HOST=${{ secrets.REDIS_HOST }}
+            export REDIS_PORT=${{ secrets.REDIS_PORT }}
+            export REDIS_DB=${{ secrets.REDIS_DB }}   
+
             docker-compose down
             docker-compose up -d --build
