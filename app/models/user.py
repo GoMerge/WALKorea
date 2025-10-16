@@ -13,7 +13,7 @@ class User(Base):
     pw_hash = Column(String(255), nullable=True)
     refresh_token_hash = Column(String(255), nullable=True)
     name = Column(String(100), nullable=True)
-    phonenum = Column(String(20), unique=True, nullable=False)
+    phonenum = Column(String(20), unique=True, nullable=True)
     birthday = Column(Date, nullable=True)
     gender = Column(String(10), nullable=True)
     role = Column(String(50), default='user')

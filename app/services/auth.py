@@ -13,6 +13,7 @@ blacklisted_tokens = set()
 # 회원가입
 def signup_user(user_in: UserCreate, code: str, db: Session):
     email_service.verify_code(user_in.email, code)
+    phonenum_value = getattr(user_in, "phonenum", None)  # 일반 가입
 
     existing_user = db.query(User).filter(
         (User.userid == user_in.userid) | (User.email == user_in.email)
@@ -25,7 +26,7 @@ def signup_user(user_in: UserCreate, code: str, db: Session):
         email=user_in.email,
         pw_hash=hash_password(user_in.password),
         name=user_in.name,
-        phonenum=user_in.phonenum,
+        phonenum=phonenum_value,
         birthday=user_in.birthday,
         gender=user_in.gender,
         nickname=user_in.nickname,

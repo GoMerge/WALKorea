@@ -64,6 +64,7 @@ def handle_naver_callback(code: str, state: str, db: Session) -> dict:
             name=user_info.get("nickname") or "무명 사용자",
             provider="naver",
             provider_id=provider_id,
+            phonenum=None
         )
         db.add(user)
         db.commit()
@@ -72,7 +73,7 @@ def handle_naver_callback(code: str, state: str, db: Session) -> dict:
     # 4. JWT 발급
     access_jwt = create_access_token({"user_id": str(user.id)})
     refresh_jwt = create_refresh_token({"user_id": str(user.id)})
-    user.refresh_token = hash_refresh_token(refresh_jwt)
+    user.refresh_token_hash = hash_refresh_token(refresh_jwt)
     db.commit()
 
     # 5. 닉네임 여부 확인 후 응답

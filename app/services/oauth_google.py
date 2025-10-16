@@ -1,4 +1,4 @@
-import os
+import os, uuid
 import requests
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
@@ -26,6 +26,8 @@ def get_google_login_url() -> dict:
 
 def handle_google_callback(code: str, db: Session) -> dict:
     """구글 OAuth2 콜백 처리"""
+
+    print("DB 세션 연결 확인:", db.bind)
 
     # 1. 구글 토큰 발급
     token_response = requests.post(
@@ -63,15 +65,21 @@ def handle_google_callback(code: str, db: Session) -> dict:
             name=user_info.get("name") or "무명 사용자",
             provider="google",
             provider_id=provider_id,
+            phonenum=str(uuid.uuid4())[:20]
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+        try:
+            db.add(user)
+            db.commit()       # 여기서 예외가 발생하면 rollback 됨
+            db.refresh(user)
+        except Exception as e:
+            db.rollback()
+            print("DB INSERT ERROR:", e)
+            raise HTTPException(status_code=500, detail="사용자 생성 실패")
 
     # 4. JWT 발급
     access_jwt = create_access_token({"user_id": str(user.id)})
     refresh_jwt = create_refresh_token({"user_id": str(user.id)})
-    user.refresh_token = hash_refresh_token(refresh_jwt)
+    user.refresh_token_hash = hash_refresh_token(refresh_jwt)
     db.commit()
 
     # 5. 닉네임 여부 확인 후 응답
