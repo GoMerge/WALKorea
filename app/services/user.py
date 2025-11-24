@@ -1,11 +1,11 @@
 from datetime import datetime
 from sqlalchemy.orm import Session
-from sqlalchemy.exc import IntegrityError
-from fastapi import HTTPException, status, Depends
-from app.database import get_db
+from fastapi import HTTPException, status
 from app.models.user import User
-from app.utils.auth import hash_password, send_verification_code, verify_code, verify_password
+from app.models.user_profile import UserProfile
+from app.utils.auth import hash_password, verify_password
 from app.schemas.user import UserUpdate
+from app.schemas.user import UserProfileCreate
 from app.services.email import email_service
 
 reset_tokens: dict = {}
@@ -82,3 +82,39 @@ def delete_user_service(db: Session, current_user: User):
     db.commit()
     # send_account_deletion_email(current_user.email, current_user.userid)  # 기존 이메일 발송 유지
     return {"msg": "회원 탈퇴가 완료되었습니다."}
+
+def update_user_region(db: Session, user_id: int, region_id: int):
+    user = db.query(User).filter(User.id == user_id).first()
+    if not user:
+        raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="사용자를 찾을 수 없습니다.")
+    
+    user.region_id = region_id
+    db.commit()
+    db.refresh(user)
+    return user
+
+def create_user_profile_service(db: Session, user_id: int, profile_in: UserProfileCreate):
+    profile = db.query(UserProfile).filter_by(user_id=user_id).first()
+    if profile:
+        profile.preferences = profile_in.preference.dict()
+    else:
+        profile = UserProfile(
+            user_id=user_id,
+            preferences=profile_in.preference.dict()
+        )
+        db.add(profile)
+    db.commit()
+    db.refresh(profile)
+    return profile
+
+def get_user_profile_service(db: Session, user_id: int):
+    return db.query(UserProfile).filter_by(user_id=user_id).first()
+
+def update_user_profile_service(db: Session, user_id: int, profile_in: UserProfileCreate):
+    profile = db.query(UserProfile).filter_by(user_id=user_id).first()
+    if not profile:
+        raise HTTPException(status_code=404, detail="프로필 정보가 없습니다.")
+    profile.preferences = profile_in.preference.dict()
+    db.commit()
+    db.refresh(profile)
+    return profile

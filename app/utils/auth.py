@@ -7,12 +7,15 @@ from app.utils.email import send_email_code_smtp
 from app.database import get_db
 from app.models.user import User
 from jose import JWTError, jwt
-import hmac, hashlib, random, string
+import hmac, hashlib, random, string, os
+from dotenv import load_dotenv
+
+load_dotenv()
 
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "your_secret_key_here"  # 환경변수로 관리 권장
+SECRET_KEY = os.getenv("SECRET_KEY")
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
