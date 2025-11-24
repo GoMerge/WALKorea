@@ -5,7 +5,7 @@ from app.models.user import User
 from app.schemas.auth import UserCreate
 from app.schemas.user import UserOut
 from app.utils.auth import (hash_refresh_token, hash_password, verify_password, create_access_token,
-    create_refresh_token, verify_refresh_token, get_current_user_from_token)
+    create_refresh_token, get_current_user_from_token)
 from app.services.email import email_service
 
 blacklisted_tokens = set()
@@ -70,11 +70,13 @@ def login_user(userid: str, password: str, db: Session):
 
 # 로그아웃
 def logout_service(refresh_token: str, db: Session):
-    user = db.query(User).filter(User.refresh_token_hash != None).first()
-    if user and verify_refresh_token(refresh_token, user.refresh_token_hash):
+    hashed_token = hash_refresh_token(refresh_token)
+    user = db.query(User).filter(User.refresh_token_hash == hashed_token).first()
+    if user:
         user.refresh_token_hash = None
         db.commit()
     return {"msg": "로그아웃 완료"}
+
 
 # 액세스 토큰 재발급
 def refresh_access_token(refresh_token: str, db: Session):

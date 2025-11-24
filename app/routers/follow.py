@@ -10,7 +10,6 @@ from app.services.follow_service import (
     unfollow_user,
     get_following_list,
     get_follower_list,
-    get_user_by_nickname,
     get_users_by_nickname_like_or_404,
 )
 
