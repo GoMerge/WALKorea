@@ -3,9 +3,7 @@ from sqlalchemy import (
     JSON, TIMESTAMP, Date, Float, DateTime, ForeignKey)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from sqlalchemy.ext.declarative import declarative_base
-
-Base = declarative_base()
+from app.models.base import Base
 
 
 # 공통 저장
@@ -17,8 +15,8 @@ class Place(Base):
     __tablename__ = "places"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True) # 내부 pk
-    content_id = Column(String(50), unique=True, nullable=False)  # TourAPI contentid
-    content_type_id = Column(Integer, nullable=False)  # 관광 타입
+    contentid = Column(String(50), unique=True, nullable=False)  # TourAPI contentid
+    contenttypeid = Column(Integer, nullable=False)  # 관광 타입
 
     title = Column(String(300), nullable=False) # 관광지명
 
@@ -29,8 +27,8 @@ class Place(Base):
     sigungucode = Column(String(10))
 
     # 위치 정보
-    latitude = Column(Float)
-    longitude = Column(Float)
+    mapx = Column(Float)
+    mapy = Column(Float)
 
     # 카테고리 3단계
     cat1 = Column(String(10))
@@ -39,8 +37,13 @@ class Place(Base):
 
     # 개요/이미지/기본 정보
     overview = Column(Text)
-    first_image = Column(String(500))
-    first_image2 = Column(String(500))
+    firstimage = Column(String(500))
+    firstimage2 = Column(String(500))
+    
+    # 기타정보
+    homepage = Column(Text)
+    tel = Column(String(500))
+    zipcode = Column(String(500))
 
     # 기타 메타데이터
 
@@ -51,6 +54,8 @@ class Place(Base):
     details = relationship("PlaceDetail", back_populates="place", uselist=False)
     images = relationship("PlaceImage", back_populates="place", cascade="all, delete-orphan")
     festival = relationship("Festival", back_populates="place", uselist=False)
+    hashtags = relationship("PlaceTag",back_populates="place",cascade="all, delete-orphan")
+    
 
 
 #
