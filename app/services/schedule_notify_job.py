@@ -33,5 +33,5 @@ def calendar_check_job(session_factory):
 
 def start_calendar_alarm_scheduler(session_factory):
     scheduler = AsyncIOScheduler()
-    scheduler.add_job(calendar_check_job, 'interval', minutes=1, args=[session_factory])
+    scheduler.add_job(calendar_check_job, 'interval', minutes=60, args=[session_factory])
     scheduler.start()

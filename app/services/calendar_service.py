@@ -1,9 +1,12 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException
-from app.models.calendar import UserCalendar, CalendarShare, CalendarPlace, CalendarEvent
-from app.models.place import Place
-from app.models.user import User  # 유저 프로필(위치 알림용) 모델
+from sqlalchemy import func
+from typing import List
+from fastapi import HTTPException, status
+from app.models.calendar import UserCalendar, CalendarPlace, CalendarEvent, CalendarShareRequest
+from app.models.places import Place
+from app.models.user import User
 from datetime import datetime
+from app.services.follow_service import is_mutual_follow
 
 ### 캘린더 생성/조회/삭제
 def create_user_calendar(db: Session, calendar_data):
@@ -24,46 +27,61 @@ def delete_user_calendar(db: Session, calendar_id: int):
     db.commit()
     return True
 
-### 캘린더 공유
-def share_calendar_with_follower(db: Session, calendar_id: int, follower_id: int):
-    exists = db.query(CalendarShare).filter_by(calendar_id=calendar_id, follower_id=follower_id).first()
-    if exists:
-        raise HTTPException(status_code=400, detail="이미 공유된 일정입니다.")
-    share = CalendarShare(calendar_id=calendar_id, follower_id=follower_id)
-    db.add(share)
-    db.commit()
-    db.refresh(share)
-    return share
-
-def get_shared_calendars_for_user(db: Session, follower_id: int):
-    return db.query(CalendarShare).filter_by(follower_id=follower_id).all()
 
 ### 개인일정(캘린더에 일정 추가/수정/삭제)
-def add_schedule_to_user_calendar(db: Session, calendar_id: int, title: str, start_date: datetime, end_date: datetime, memo: str = None):
+def add_schedule_to_user_calendar(
+    db: Session,
+    calendar_id: int,
+    title: str,
+    start_datetime: datetime,
+    end_datetime: datetime,
+    description: str | None = None,
+    location: str | None = None,
+    remind_minutes: int | None = None,
+):
+    cal = db.query(UserCalendar).filter_by(id=calendar_id).first()
+    if not cal:
+        raise HTTPException(404, "캘린더가 존재하지 않습니다.")
+
     event = CalendarEvent(
         calendar_id=calendar_id,
         title=title,
-        start_date=start_date,
-        end_date=end_date,
-        memo=memo
+        start_datetime=start_datetime,
+        end_datetime=end_datetime,
+        description=description,
+        location=location,
+        remind_minutes=remind_minutes,
     )
     db.add(event)
     db.commit()
     db.refresh(event)
     return event
 
-def update_event_in_calendar(db: Session, event_id: int, title: str = None, start_date: datetime = None, end_date: datetime = None, memo: str = None):
+def update_event_in_calendar(
+    db: Session,
+    event_id: int,
+    title: str | None = None,
+    start_datetime: datetime | None = None,
+    end_datetime: datetime | None = None,
+    description: str | None = None,
+    location: str | None = None,
+    remind_minutes: int | None = None,
+):
     event = db.query(CalendarEvent).filter_by(id=event_id).first()
     if not event:
         raise HTTPException(status_code=404, detail="해당 일정이 존재하지 않습니다.")
-    if title:
+    if title is not None:
         event.title = title
-    if start_date:
-        event.start_date = start_date
-    if end_date:
-        event.end_date = end_date
-    if memo:
-        event.memo = memo
+    if start_datetime is not None:
+        event.start_datetime = start_datetime
+    if end_datetime is not None:
+        event.end_datetime = end_datetime
+    if description is not None:
+        event.description = description
+    if location is not None:
+        event.location = location
+    if remind_minutes is not None:
+        event.remind_minutes = remind_minutes
     db.commit()
     db.refresh(event)
     return event
@@ -76,7 +94,7 @@ def delete_event_in_calendar(db: Session, event_id: int):
     db.commit()
     return True
 
-def get_events_for_calendar(db: Session, calendar_id: int):
+def get_events_for_calendar(db: Session, calendar_id: int) -> List[CalendarEvent]:
     return db.query(CalendarEvent).filter_by(calendar_id=calendar_id).all()
 
 ### 관광지(Place) 일정에 추가/조회
@@ -127,3 +145,102 @@ def match_events_to_user_location(db: Session, user_id: int):
     db.commit()
     return matched_events
 
+def create_share_request_service(
+    db: Session,
+    current_user_id: int,
+    event_id: int,
+    target_user_id: int,
+) -> CalendarShareRequest:
+    # 1) 맞팔 확인
+    if not is_mutual_follow(db, current_user_id, target_user_id):
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="서로 팔로우가 되어 있지 않습니다.",
+        )
+
+    # 2) 내가 소유한 이벤트인지 확인
+    event = (
+        db.query(CalendarEvent)
+        .join(UserCalendar, CalendarEvent.calendar_id == UserCalendar.id)
+        .filter(
+            CalendarEvent.id == event_id,
+            UserCalendar.user_id == current_user_id,
+        )
+        .first()
+    )
+    if not event:
+        raise HTTPException(status_code=404, detail="일정을 찾을 수 없습니다.")
+
+    # 3) 요청 생성
+    req = CalendarShareRequest(
+        from_user_id=current_user_id,
+        to_user_id=target_user_id,
+        event_id=event_id,
+        status="pending",
+    )
+    db.add(req)
+    db.commit()
+    db.refresh(req)
+    return req
+
+
+def list_incoming_share_requests_service(
+    db: Session,
+    current_user_id: int,
+) -> list[CalendarShareRequest]:
+    return (
+        db.query(CalendarShareRequest)
+        .filter_by(to_user_id=current_user_id, status="pending")
+        .all()
+    )
+
+
+def respond_share_request_service(
+    db: Session,
+    current_user_id: int,
+    request_id: int,
+    accept: bool,
+):
+    req = (
+        db.query(CalendarShareRequest)
+        .filter_by(id=request_id, to_user_id=current_user_id, status="pending")
+        .first()
+    )
+    if not req:
+        raise HTTPException(status_code=404, detail="공유 요청을 찾을 수 없습니다.")
+
+    if accept:
+        # 원본 이벤트
+        event = db.query(CalendarEvent).filter_by(id=req.event_id).first()
+        if not event:
+            raise HTTPException(status_code=404, detail="원본 일정을 찾을 수 없습니다.")
+
+        # 수신자 캘린더 하나 가져오기
+        cal = (
+            db.query(UserCalendar)
+            .filter_by(user_id=current_user_id)
+            .order_by(UserCalendar.id.asc())
+            .first()
+        )
+        if not cal:
+            raise HTTPException(status_code=400, detail="내 캘린더가 없습니다.")
+
+        shared_event = CalendarEvent(
+            calendar_id=cal.id,
+            title=event.title,
+            start_datetime=event.start_datetime,
+            end_datetime=event.end_datetime,
+            location=event.location,
+            description=event.description,
+            remind_minutes=event.remind_minutes,
+            is_shared=1,
+            shared_from_user_id=req.from_user_id,
+            shared_from_event_id=req.event_id,
+        )
+        db.add(shared_event)
+        req.status = "accepted"
+    else:
+        req.status = "rejected"
+
+    req.responded_at = func.now()
+    db.commit()
