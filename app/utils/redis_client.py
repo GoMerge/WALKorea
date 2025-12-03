@@ -1,15 +1,28 @@
 import redis.asyncio as redis
 import json
-from typing import Optional
+import os
+from dotenv import load_dotenv
 
-# Redis 서버 URL 환경변수에 맞게 수정해주세요
-redis_client = redis.from_url("redis://localhost", encoding="utf-8", decode_responses=True)
+load_dotenv()
+REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
+REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
+REDIS_DB = int(os.getenv("REDIS_DB", 0))
 
-async def get_cached_weather(region_key: str) -> Optional[dict]:
-    data = await redis_client.get(region_key)
+redis_client = redis.from_url(
+    f"redis://{REDIS_HOST}:{REDIS_PORT}",
+    db=REDIS_DB,
+    encoding="utf-8",
+    decode_responses=True
+)
+
+async def set_cached(key: str, value, expire_seconds: int = 3600):
+    await redis_client.set(key, json.dumps(value), ex=expire_seconds)
+
+async def get_cached(key: str):
+    data = await redis_client.get(key)
     if data:
         return json.loads(data)
     return None
 
-async def set_cached_weather(region_key: str, weather_data: dict, expire_seconds: int = 3600):
-    await redis_client.set(region_key, json.dumps(weather_data), ex=expire_seconds)
+async def delete_cached(key: str):
+    await redis_client.delete(key)
