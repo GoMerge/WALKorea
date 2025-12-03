@@ -1,3 +1,4 @@
+
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
@@ -9,16 +10,19 @@ from app.services.places import (
 from app.schemas.places import PlaceResponse
 from typing import List
 from app.models.places import Place, PlaceDetail
+from app.models.hashtag import PlaceTag, Tag 
 from fastapi.templating import Jinja2Templates
 import math
-from sqlalchemy import case
+from sqlalchemy import case, exists, func  
+from sqlalchemy import or_, and_
+
 
 
 
 #router = APIRouter(prefix="/places", tags=["Places"])
 
 router = APIRouter()
-templates = Jinja2Templates(directory="app/templates")
+templates = Jinja2Templates(directory="frontend/templates")
 
 
 #DB 저장
@@ -71,13 +75,38 @@ def read_place_detail(request: Request, contentid: int, db: Session = Depends(ge
     # 상세정보가 PlaceDetail에 있다면 가져오기
     detail = db.query(PlaceDetail).filter_by(place_id=contentid).first()
     
+    # places_detail 라우터 예시
+    nearby_places = db.query(Place).filter(
+        Place.mapx.isnot(None),
+        Place.mapy.isnot(None),
+        Place.mapy.between(place.mapy - 0.045, place.mapy + 0.045),
+        Place.mapx.between(place.mapx - 0.045, place.mapx + 0.045),
+        Place.contentid != contentid  # 자기 자신 제외
+    ).order_by(
+        func.abs(Place.mapy - place.mapy) + func.abs(Place.mapx - place.mapx)
+    ).limit(20).all()
+    
+    def place_to_dict(p):
+        return {
+            "contentid": p.contentid,
+            "title": p.title,
+            "addr1": p.addr1 or "",
+            "mapx": float(p.mapx) if p.mapx else None,
+            "mapy": float(p.mapy) if p.mapy else None,
+            "contenttypeid": p.contenttypeid
+        }
+    
+    nearby_places = [place_to_dict(p) for p in nearby_places]
+
+    
     return templates.TemplateResponse(
         "places_detail.html",
         {
             "request": request,
             "place": place,
             "detail": detail,
-            "hashtags": hashtags
+            "hashtags": hashtags,
+            "nearby_places": nearby_places,
         }
     )
   
@@ -89,6 +118,8 @@ def list_places_filtered(
     sort: str = "updated",  # 'updated' 최신순, 'created' 오래된순
     contenttypeid: int = None,  # 관광타입 필터
     addr: str = None,  # addr1 앞 2글자 필터
+    search: str = None,
+    tag: str = None,
     template: str = "places_list.html", 
     db: Session = Depends(get_db),
 ):
@@ -100,11 +131,27 @@ def list_places_filtered(
     # contenttypeid 필터
     if contenttypeid:
         query = query.filter(Place.contenttypeid == contenttypeid)
+        
 
     # addr1 앞 2글자 필터
     if addr:
         query = query.filter(Place.addr1.startswith(addr))
-
+        
+    if search:
+        keyword = f"%{search}%"
+        query = query.filter(
+            or_(
+                Place.title.ilike(keyword),
+                Place.overview.ilike(keyword)
+            )
+        )
+    # 해시태그 필터
+    if tag:
+        print(f"🔍 태그 검색: '{tag}'")
+        query = query.join(PlaceTag).join(Tag).filter(
+            Tag.name.ilike(f"%{tag}%")
+        ).distinct(Place.id)  # 중복 제거
+    
     # 정렬
     if sort == "updated":
         query = query.order_by(
@@ -136,5 +183,7 @@ def list_places_filtered(
             "sort": sort,
             "contenttypeid": contenttypeid,
             "addr": addr,
+            "search":search,
+            "tag":tag,
         },
     )
