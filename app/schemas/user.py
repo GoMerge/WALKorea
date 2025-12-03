@@ -1,5 +1,5 @@
 from pydantic import BaseModel, EmailStr, validator, Field
-from typing import Optional
+from typing import Optional, List
 from datetime import date, datetime
 import re
 
@@ -13,7 +13,7 @@ class UserBase(BaseModel):
     is_active: bool = True
 
     class Config:
-        orm_mode = True
+        from_attributes   = True
 
 class UserOut(UserBase):
     id: int
@@ -76,3 +76,30 @@ class PasswordResetConfirm(BaseModel):
 
 class DeleteUserRequest(BaseModel):
     password: str
+
+class UserRegionUpdate(BaseModel):
+    region_id: int  # 필수로 지역 ID를 제공받음
+
+class UserRegionResponse(BaseModel):
+    id: int
+    region_id: int
+
+    class Config:
+        from_attributes  = True
+
+class UserPreferenceSchema(BaseModel):
+    age_group: Optional[str] = Field(default="알 수 없음", description="연령대")
+    gender: Optional[str] = Field(default="알 수 없음")
+    travel_with: Optional[List[str]] = Field(default=["혼자", "친구", "가족", "커플", "단체", "어린이"])
+    travel_style: Optional[str] = Field(default="계획형")
+    activity_level: Optional[str] = Field(default="비활동적")
+    area_theme: Optional[List[str]] = Field(default=["바다", "산", "도시", "자연"])
+    activity_type: Optional[List[str]] = Field(default=["문화체험", "맛집", "휴식", "관광명소"])
+    photo_likes: Optional[str] = Field(default="보통")
+    vibe: Optional[str] = Field(default="조용한 곳")
+    night_activity: Optional[str] = Field(default="낮활동")
+    sns_like: Optional[bool] = Field(default=False)
+    avoid_crowd: Optional[bool] = Field(default=False)
+
+class UserProfileCreate(BaseModel):
+    preference: UserPreferenceSchema

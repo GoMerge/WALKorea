@@ -1,5 +1,7 @@
 from sqlalchemy.orm import Session
-from fastapi import HTTPException, status
+from fastapi import HTTPException, status, WebSocket
+from app.services.websocket_manager import active_connections
+from starlette.websockets import WebSocketState
 from app.models.follow import Follow  # ORM 모델
 from app.models.user import User
 
@@ -33,6 +35,14 @@ def follow_user(db: Session, follower_id: int, following_id: int) -> Follow:
     db.commit()
     db.refresh(follow)
     return follow
+
+def notify_follow_event(to_user_id: int, from_user_id: int):
+    ws: WebSocket = active_connections.get(to_user_id)
+    if ws and ws.application_state == WebSocketState.CONNECTED:
+        import asyncio
+        import json
+        message = {"event": "followed", "from_user_id": from_user_id}
+        asyncio.create_task(ws.send_text(json.dumps(message)))
 
 def unfollow_user(db: Session, follower_id: int, following_id: int):
     follow = db.query(Follow).filter_by(follower_id=follower_id, following_id=following_id).first()
