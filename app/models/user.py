@@ -30,3 +30,5 @@ class User(Base):
         return self.is_active and self.deleted_at is None
     
     region = relationship("Region")
+    user_calendars = relationship("UserCalendar", back_populates="user")
+    notifications = relationship("Notification", back_populates="user")

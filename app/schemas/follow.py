@@ -7,7 +7,9 @@ class FollowCreate(BaseModel):
 class FollowResponse(BaseModel):
     follower_id: int
     following_id: int
-    created_at: datetime  
+    created_at: datetime
+    follower_nickname: str | None = None
+    following_nickname: str | None = None
 
     class Config:
         from_attributes  = True

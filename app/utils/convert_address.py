@@ -7,7 +7,6 @@ load_dotenv()
 KAKAO_REST_API_KEY = os.getenv("KAKAO_REST_API_KEY")
 
 def convert_address_to_coordinates(address: str):
-    print(f"KAKAO_REST_API_KEY: {KAKAO_REST_API_KEY}")
     try:
         url = f"https://dapi.kakao.com/v2/local/search/address.json?query={address}"
         headers = {"Authorization": f"KakaoAK {KAKAO_REST_API_KEY}"}
