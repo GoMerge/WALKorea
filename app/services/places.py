@@ -1,131 +1,187 @@
-from passlib.context import CryptContext
-from datetime import datetime, timedelta
-from fastapi import Depends, HTTPException, status
-from fastapi.security import OAuth2PasswordBearer
-from sqlalchemy.orm import Session
-from app.utils.email import send_email_code_smtp
+from fastapi import APIRouter, Depends, Request
+from sqlalchemy.orm import Session, joinedload
 from app.database import get_db
-from app.models.user import User
-from jose import JWTError, jwt
-import hmac, hashlib, random, string, jwt
-import os
-from jwt.exceptions import PyJWTError
-from dotenv import load_dotenv
+import requests
+from sqlalchemy.orm import Session
+from app.models.places import Place, PlaceDetail
+from app.models.hashtag import PlaceTag, Tag
+import math
+from fastapi.templating import Jinja2Templates
 
-load_dotenv()
-SECRET_KEY = os.getenv("SECRET_KEY")
-oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
-pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-ALGORITHM = "HS256"
-ACCESS_TOKEN_EXPIRE_MINUTES = 60
-REFRESH_TOKEN_EXPIRE_DAYS = 7
+TOUR_API_BASE = "http://apis.data.go.kr/B551011/KorService2"
+SERVICE_KEY = "07b00c849181aa6c2bbdfbce284aff0ce01778ccc5e6a1fb9e9d49cad24ba714"
+MAX_SAVE_COUNT = 30000  # DB에 저장할 최대 관광지 개수
 
-# 비밀번호 해시
-def hash_password(password: str) -> str:
-    return pwd_context.hash(password)
-
-def verify_password(plain_password: str, hashed_password: str) -> bool:
-    return pwd_context.verify(plain_password, hashed_password)
-
-verification_store = {}
-
-def send_verification_code(email: str, ttl_minutes: int = 10) -> str:
-    """이메일 인증 코드 생성 및 만료 시간 설정"""
-    code = "".join(random.choices(string.digits, k=6))
-    verification_store[email] = {
-        "code": code,
-        "expires_at": datetime.utcnow() + timedelta(minutes=ttl_minutes)
+# ------------------------------------------
+# 1️⃣ TourAPI - 관광지 목록(areaBasedList2) 가져오기
+# ------------------------------------------
+def fetch_tour_data(page: int = 1, num_of_rows: int = 100):
+    url = f"{TOUR_API_BASE}/areaBasedList2"
+    params = {
+        "MobileOS": "ETC",
+        "MobileApp": "WALKorea",
+        "_type": "json",
+        "numOfRows": num_of_rows,
+        "pageNo": page,
+        "serviceKey": SERVICE_KEY,
+        "arrange": "C",
     }
-    # TODO: 실제 메일 발송
-    print(f"[DEBUG] 인증 코드({email}): {code} (expires in {ttl_minutes}m)")
-    return code
+    res = requests.get(url, params=params)
+    res.raise_for_status()
+    data = res.json()
+    
+    items = data["response"]["body"]["items"]["item"]
+    # item이 단일 dict이면 리스트로 감싸기
+    if not isinstance(items, list):
+        items = [items]
+    return items
 
-def verify_code(email: str, code: str) -> bool:
-    rec = verification_store.get(email)
-    if not rec:
-        return False
-    if rec["expires_at"] < datetime.utcnow():
-        verification_store.pop(email, None)
-        return False
-    if rec["code"] != code:
-        return False
-    verification_store.pop(email, None)
-    return True
+# ------------------------------------------
+# 2️⃣ TourAPI - 관광지 상세정보(detailCommon2) 가져오기
+# ------------------------------------------
+def fetch_place_detail(contentid: str) -> dict:
+    """
+    TourAPI detailCommon2 호출
+    overview, firstimage, homepage 등 상세정보 포함
+    """
+    url = f"{TOUR_API_BASE}/detailCommon2"
+    params = {
+        "MobileOS": "ETC",
+        "MobileApp": "WALKorea",
+        "_type": "json",
+        "contentId": contentid,
+        "serviceKey": SERVICE_KEY,
+    }
 
-# --- Refresh token hash / 검증 ---
-def hash_refresh_token(token: str) -> str:
-    return hmac.new(SECRET_KEY.encode(), token.encode(), hashlib.sha256).hexdigest()
+    res = requests.get(url, params=params)
+    res.raise_for_status()
+    item = res.json()["response"]["body"]["items"]["item"]
 
-def verify_refresh_token(token: str, token_hash: str) -> bool:
-    return hash_refresh_token(token) == token_hash
+    if isinstance(item, list):
+        return item[0]
+    return item
 
-# --- JWT 생성 ---
-def create_access_token(data: dict) -> str:
-    expire = datetime.utcnow() + timedelta(minutes=ACCESS_TOKEN_EXPIRE_MINUTES)
-    to_encode = data.copy()
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
-def create_refresh_token(data: dict) -> str:
-    expire = datetime.utcnow() + timedelta(days=REFRESH_TOKEN_EXPIRE_DAYS)
-    to_encode = data.copy()
-    to_encode.update({"exp": expire})
-    return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
+# ------------------------------------------
+# 3️⃣ DB 저장 - 최대 30,000개
+# ------------------------------------------
+def save_places_to_db(db: Session, num_of_rows: int = 1000, max_pages: int = 1000):
+    """
+    areaBasedList2에서 목록을 가져와
+    detailCommon2 상세정보까지 포함해 DB에 저장
+    최대 30,000개까지만 저장
+    """
+    page = 1
+    saved_count = db.query(Place).count()  # 이미 저장된 개수 확인
 
-# --- 현재 사용자 가져오기 ---
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
-    credentials_exception = HTTPException(
-        status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
-        headers={"WWW-Authenticate": "Bearer"},
+    print(f"현재 DB 저장 개수: {saved_count}개")
+
+    while page <= max_pages:
+        # 최대 30,000개 저장 도달 시 종료
+        if saved_count >= MAX_SAVE_COUNT:
+            print("📌 최대 30,000개 저장 완료 → 종료")
+            break
+
+        items = fetch_tour_data(page, num_of_rows=num_of_rows)
+
+        if not items:
+            print(f"⚠ 페이지 {page}에서 데이터 없음 → 종료")
+            break
+
+        # 페이지별 처리 로그
+        print(f"📄 {page} 페이지 처리 중... (총 {saved_count}개)")
+
+        for i in items:
+            if saved_count >= MAX_SAVE_COUNT:
+                break
+
+            contentid = str(i["contentid"])
+
+            # 중복 체크
+            existing = db.query(Place).filter(Place.contentid == contentid).first()
+            if existing:
+                continue
+
+            # 상세정보 가져오기
+            detail = fetch_place_detail(contentid)
+
+            # Place 저장
+            place = Place(
+                contentid=contentid,
+                contenttypeid=i.get("contenttypeid", 0),
+                title=i.get("title", ""),
+                addr1=i.get("addr1", ""),
+                addr2=i.get("addr2", ""),
+                areacode=i.get("areacode"),
+                sigungucode=i.get("sigungucode"),
+                mapx=float(i.get("mapx")) if i.get("mapx") else None,
+                mapy=float(i.get("mapy")) if i.get("mapy") else None,
+                cat1=i.get("cat1", ""),
+                cat2=i.get("cat2", ""),
+                cat3=i.get("cat3", ""),
+                overview=detail.get("overview", ""),
+                firstimage=detail.get("firstimage", ""),
+                firstimage2=detail.get("firstimage2", ""),
+                homepage=detail.get("homepage", ""),
+                tel=detail.get("tel", ""),
+                zipcode=detail.get("zipcode", ""),
+            )
+            db.add(place)
+
+
+            saved_count += 1
+
+        db.commit()
+        page += 1
+
+    print(f"🎉 최종 저장 개수: {saved_count}개")
+
+
+# ✅ 상세정보 조회 (DB에 없으면 TourAPI 호출 후 저장)
+def get_place_detail(db: Session, contentid: str):
+    detail = db.query(PlaceDetail).filter_by(place_id=contentid).first()
+    if detail:
+        return detail
+
+    # DB에 없으면 TourAPI 호출
+    url = f"{TOUR_API_BASE}/detailCommon2"
+    params = {
+        "MobileOS": "ETC",
+        "MobileApp": "WALKorea",
+        "_type": "json",
+        "contentId": contentid,
+        "serviceKey": SERVICE_KEY,
+    }
+    res = requests.get(url, params=params)
+    res.raise_for_status()
+    data = res.json()["response"]["body"]["items"]["item"][0]
+
+    # DB에 저장
+    detail = PlaceDetail(
+        place_id=contentid,
+        detail_json=data
     )
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")
-        if user_id is None:
-            raise credentials_exception
-    except JWTError:
-        raise credentials_exception
-
-    # ★ User.id 기준으로 조회
-    user = db.query(User).filter(User.id == int(user_id)).first()
-    if user is None:
-        raise credentials_exception
-
-    if not user.is_active or user.deleted_at is not None:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive or deleted user",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    return user
-
-# --- 탈퇴 유저 정리 ---
-def delete_expired_users(db: Session, expire_days: int = 30):
-    expire_threshold = datetime.utcnow() - timedelta(days=expire_days)
-    users_to_delete = db.query(User).filter(
-        User.deleted_at != None,
-        User.deleted_at < expire_threshold
-    ).all()
-
-    for user in users_to_delete:
-        db.delete(user)
+    db.add(detail)
     db.commit()
+    db.refresh(detail)
+    return detail
 
-# --- 토큰으로 사용자 조회 ---
-def get_current_user_from_token(token: str, db: Session) -> User:
-    if SECRET_KEY is None:
-        raise RuntimeError("SECRET_KEY 환경변수가 설정되어 있지 않습니다.")
-    try:
-        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")   # ★ 동일
-        if user_id is None:
-            raise HTTPException(status_code=401, detail="토큰에 user_id가 없습니다.")
-    except PyJWTError:
-        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
+#--------------------------------------------------------------------------------------------------
+# 리스트 템플릿 연동
+#--------------------------------------------------------------------------------------------------
 
-    user = db.query(User).filter(User.id == int(user_id)).first()  # ★ 동일
-    if not user:
-        raise HTTPException(status_code=404, detail="User not found")
-    return user
+
+def get_places_page(db: Session, page: int = 1, per_page: int = 10):
+    offset = (page - 1) * per_page
+    total = db.query(Place).count()
+    total_pages = (total + per_page - 1) // per_page
+    places = (
+        db.query(Place)
+        .options(joinedload(Place.hashtags).joinedload(PlaceTag.tag))
+        .order_by(Place.id.desc())
+        .offset(offset)
+        .limit(per_page)
+        .all()
+    )
+    return places, total_pages

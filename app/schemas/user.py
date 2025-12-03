@@ -23,6 +23,8 @@ class UserOut(UserBase):
     role: str
     provider: Optional[str] = None
     provider_id: Optional[str] = None
+    region_id: Optional[int] = None
+    region_name: Optional[str] = None
 
 class SignupResponse(BaseModel):
     msg: str
