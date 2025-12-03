@@ -12,7 +12,7 @@ class FollowResponse(BaseModel):
     following_nickname: str | None = None
 
     class Config:
-        orm_mode = True
+        from_attributes  = True
 
 class NicknameSearchResponse(BaseModel):
     user_id: int

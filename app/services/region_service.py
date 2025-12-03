@@ -1,4 +1,3 @@
-# app/services/region_service.py
 from sqlalchemy.orm import Session
 from app.models.region import Region
 
