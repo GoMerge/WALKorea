@@ -1,4 +1,4 @@
-from app.models.place import Place
+from app.models.places import Place
 from app.models.user_profile import UserProfile
 from sqlalchemy import or_
 from sqlalchemy.orm import Session

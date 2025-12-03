@@ -3,11 +3,11 @@ from typing import Optional, List
 
 
 class RegionBase(BaseModel):
-    code: str
+    id: int
     name: str
-    level: int
-    parent_id: Optional[int] = None
-    full_name: Optional[str] = None
+
+    class Config:
+        from_attributes = True
 
 
 class RegionCreate(RegionBase):
@@ -20,3 +20,12 @@ class Region(RegionBase):
 
     class Config:
         from_attributes = True
+
+class RegionSearchItem(BaseModel):
+    id: int
+    code: str
+    full_name: str
+
+    class Config:
+        from_attributes = True
+
