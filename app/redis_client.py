@@ -1,7 +1,7 @@
-import os
-import redis
-from dotenv import load_dotenv
+import aioredis
 import json
+from dotenv import load_dotenv
+import os
 
 load_dotenv()
 
@@ -9,26 +9,16 @@ REDIS_HOST = os.getenv("REDIS_HOST", "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
 REDIS_DB = int(os.getenv("REDIS_DB", 0))
 
-# Redis 연결 객체
-redis_client = redis.Redis(
-    host=REDIS_HOST,
-    port=REDIS_PORT,
-    db=REDIS_DB,
-    decode_responses=True  # 문자열 자동 디코딩
-)
+redis = aioredis.from_url(f"redis://{REDIS_HOST}:{REDIS_PORT}", db=REDIS_DB)
 
-# 유틸 함수
-def set_cache(key: str, value, ttl: int = 3600):
-    """Redis에 값 저장 (ttl: 초)"""
-    redis_client.set(key, json.dumps(value), ex=ttl)
+async def set_cached_weather(key: str, value, expire_seconds: int = 3600):
+    await redis.set(key, json.dumps(value), ex=expire_seconds)
 
-def get_cache(key: str):
-    """Redis에서 값 가져오기"""
-    value = redis_client.get(key)
-    if value:
-        return json.loads(value)
+async def get_cached_weather(key: str):
+    data = await redis.get(key)
+    if data:
+        return json.loads(data)
     return None
 
-def delete_cache(key: str):
-    """Redis에서 키 삭제"""
-    redis_client.delete(key)
+async def delete_cached_weather(key: str):
+    await redis.delete(key)

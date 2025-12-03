@@ -7,7 +7,7 @@ from app.utils.auth import get_current_user
 from app.services.user import get_profile_service, change_password_service, update_profile_service, confirm_password_reset, delete_user_service
 from app.services.email import EmailService
 from app.services.user import request_password_reset as service_request_password_reset 
-from app.services.user import create_user_profile_service
+from app.services.user import create_user_profile_service, get_user_profile_service
 
 router = APIRouter()
 email = EmailService()
@@ -60,11 +60,26 @@ def update_region(
     db.refresh(user)
     return {"message": "지역이 정상적으로 설정되었습니다."}
 
-@router.post("/user/profile/preferences")
-async def create_preferences(
-    profile_in: UserProfileCreate,
+@router.get("/profile/preferences")
+async def get_preferences(
     db: Session = Depends(get_db),
     current_user = Depends(get_current_user)
 ):
-    profile = create_user_profile_service(db, current_user.id, profile_in)
-    return {"profile": profile}
+    profile = get_user_profile_service(db, current_user.id)
+    if not profile or not profile.preferences:
+        return {"preference": None}
+    return {"preference": profile.preferences}
+
+@router.get("/recommendations")
+def get_recommendations(
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user)
+):
+    profile = get_user_profile_service(db, current_user.id)
+    prefs = profile.preferences or {}   # dict 형태 가정
+
+    # 예시: 가중치/필터 추출
+    area_theme    = prefs.get("area_theme", [])
+    activity_type = prefs.get("activity_type", [])
+    budget_level  = prefs.get("budget_level", "mid")
+    crowd_level   = prefs.get("crowd_level", "moderate")

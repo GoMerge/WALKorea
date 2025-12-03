@@ -4,18 +4,33 @@ from fastapi import HTTPException, status
 from app.models.user import User
 from app.models.user_profile import UserProfile
 from app.utils.auth import hash_password, verify_password
-from app.schemas.user import UserUpdate
+from app.schemas.user import UserUpdate, UserOut
 from app.schemas.user import UserProfileCreate
 from app.services.email import email_service
 
-reset_tokens: dict = {}
-users_store = {
-    "test1": {"userid": "test1", "email": "test1@example.com", "password": hash_password("Test1234!")},
-    # 필요한 다른 사용자도 추가 가능
-}
+def get_profile_service(current_user: User) -> UserOut:
+    region_name = None
+    if getattr(current_user, "region", None):
+        region_name = current_user.region.full_name
 
-def get_profile_service(current_user: User) -> User:
-    return current_user
+    return UserOut(
+        id=current_user.id,
+        userid=current_user.userid,
+        email=current_user.email,
+        nickname=current_user.nickname,
+        name=current_user.name,
+        phonenum=current_user.phonenum,
+        birthday=current_user.birthday,
+        gender=current_user.gender,
+        deleted_at=current_user.deleted_at,
+        is_active=current_user.is_active,
+        role=current_user.role,
+        provider=current_user.provider,
+        provider_id=current_user.provider_id,
+        region_id=current_user.region_id,
+        region_name=region_name,
+    )
+
 
 def update_profile_service(user_in: UserUpdate, db: Session, current_user: User):
     user_id = current_user.id

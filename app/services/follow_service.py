@@ -52,7 +52,34 @@ def unfollow_user(db: Session, follower_id: int, following_id: int):
     db.commit()
 
 def get_following_list(db: Session, user_id: int):
-    return db.query(Follow).filter_by(follower_id=user_id).all()
+    rows = (
+        db.query(Follow, User.nickname)
+        .join(User, Follow.following_id == User.id)
+        .filter(Follow.follower_id == user_id)
+        .all()
+    )
+    result = []
+    for follow, nickname in rows:
+        follow.following_nickname = nickname 
+        result.append(follow)
+    return result
+
 
 def get_follower_list(db: Session, user_id: int):
-    return db.query(Follow).filter_by(following_id=user_id).all()
+    rows = (
+        db.query(Follow, User.nickname)
+        .join(User, Follow.follower_id == User.id)
+        .filter(Follow.following_id == user_id)
+        .all()
+    )
+    result = []
+    for follow, nickname in rows:
+        follow.follower_nickname = nickname
+        result.append(follow)
+    return result
+
+
+def is_mutual_follow(db: Session, user_a: int, user_b: int) -> bool:
+    a_to_b = db.query(Follow).filter_by(follower_id=user_a, following_id=user_b).first()
+    b_to_a = db.query(Follow).filter_by(follower_id=user_b, following_id=user_a).first()
+    return bool(a_to_b and b_to_a)
