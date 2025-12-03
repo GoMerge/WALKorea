@@ -2,6 +2,7 @@
 <html lang="en">
 
 <head>
+  <!-- 지도 구현 -->
   <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
   <base href="/" / >
   <meta charset="utf-8">
@@ -510,18 +511,15 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
 
-  
-  <!-- 1. SDK 로드 (https:// 사용, autoload 제거) -->
-<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=aaaaf8b0ce03226ac69bdee98dd9aa8f"></script>
-
-<!-- 2. 지연 로딩 + 재시도 로직 -->
+  <!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도-->
+<!-- 지도 스크립트 전체 교체 -->
 <script>
 (function() {
-  function initMap(attempts = 0) {
-    console.log(`🧪 맵 초기화 시도 ${attempts + 1}`);
+  function initMap() {
+    console.log('⏳ Kakao SDK 대기 중...');
     
     if (typeof kakao !== 'undefined' && kakao.maps) {
-      console.log('✅ kakao SDK 확인됨');
+      console.log('✅ Kakao SDK 확인됨');
       
       var container = document.getElementById('kakaomap');
       if (!container) {
@@ -531,30 +529,92 @@
       
       var options = {
         center: new kakao.maps.LatLng({{ place.mapy|default(37.566826) }}, {{ place.mapx|default(126.9786567) }}),
-        level: 3
+        level: 2  // ⭐ 더 가까이! (3→4)
       };
       
       var map = new kakao.maps.Map(container, options);
       
+      var markerPosition = new kakao.maps.LatLng({{ place.mapy|default(37.566826) }}, {{ place.mapx|default(126.9786567) }});
       var marker = new kakao.maps.Marker({
-        position: new kakao.maps.LatLng({{ place.mapy|default(37.566826) }}, {{ place.mapx|default(126.9786567) }})
+        position: markerPosition,
+        map: map,
+        title: '{{ place.title }}'
       });
-      marker.setMap(map);
+
+      // ⭐ 메인 인포윈도우 변수 저장
+      var mainInfowindow = new kakao.maps.InfoWindow({
+        content: `
+          <div style="padding:16px; min-width:180px; text-align:left; border-radius:8px; box-shadow:0 2px 10px rgba(0,0,0,0.1); background:white;">
+            <h6 style="margin:0 0 8px 0; font-weight:600; color:#333; font-size:15px;">{{ place.title }}</h6>
+            <p style="margin:0 0 12px 0; font-size:13px; color:#666; line-height:1.4;">{{ place.addr1 }}</p>
+            <a href="/places/detail/{{ place.contentid }}" 
+               style="padding:6px 12px; background:#007bff; color:white; text-decoration:none; font-size:12px; border-radius:5px; display:inline-block;"
+               class="btn btn-sm btn-primary">상세정보 보기</a>
+          </div>
+        `
+      });
       
-      console.log('🎉 카카오맵 완전 로드 성공!');
+      kakao.maps.event.addListener(marker, 'click', function() {
+        mainInfowindow.open(map, marker);
+      });
+
+      // ⭐ 주변 관광지 (안전한 처리!)
+      var nearbyPlaces = {{ nearby_places | tojson | safe }};
+      console.log('📍 주변 관광지:', nearbyPlaces.length, '개');
+      
+      var nearbyInfoWindows = [];  // ⭐ 주변 인포윈도우 배열
+      
+      if (nearbyPlaces && nearbyPlaces.length > 0) {
+        var bounds = new kakao.maps.LatLngBounds();
+        bounds.extend(markerPosition);
+        
+        nearbyPlaces.forEach(function(p) {
+          if (!p.mapx || !p.mapy || !p.title) return;
+          
+          var pos = new kakao.maps.LatLng(p.mapy, p.mapx);
+          bounds.extend(pos);
+          
+          var nearbyMarker = new kakao.maps.Marker({
+            position: pos,
+            map: map,
+            title: p.title
+          });
+          
+          var nearbyInfowindow = new kakao.maps.InfoWindow({
+            content: `
+              <div style="padding:12px; min-width:150px; border-radius:8px; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+                <h6 style="margin:0 0 5px 0; font-size:14px;">${p.title}</h6>
+                <p style="margin:0 0 8px 0; font-size:12px; color:#666;">${p.addr1 || ''}</p>
+                <a href="/places/detail/${p.contentid}" style="padding:4px 8px; background:#007bff; color:white; text-decoration:none; font-size:11px; border-radius:4px;">상세보기</a>
+              </div>`
+          });
+          
+          // ⭐ 배열에 저장
+          nearbyInfoWindows.push(nearbyInfowindow);
+          
+          kakao.maps.event.addListener(nearbyMarker, 'click', function() {
+            nearbyInfowindow.open(map, nearbyMarker);
+          });
+        });
+        
+        map.setBounds(bounds);
+      }
+      
+      // ⭐ 지도 클릭 → 모든 인포윈도우 닫기!
+      kakao.maps.event.addListener(map, 'click', function() {
+        mainInfowindow.close();
+        nearbyInfoWindows.forEach(function(iw) {
+          iw.close();
+        });
+      });
+      
+      console.log('🎉 카카오맵 + 주변 관광지 완전 로드 성공!');
       return;
     }
     
-    // 3회까지 재시도
-    if (attempts < 3) {
-      console.log('⏳ SDK 대기 중... 재시도');
-      setTimeout(() => initMap(attempts + 1), 1000);
-    } else {
-      console.error('💥 SDK 로드 최종 실패. Network 탭 확인 필요');
-    }
+    setTimeout(initMap, 500);
   }
   
-  // DOM 로드 후 500ms 후 실행
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', () => setTimeout(initMap, 500));
   } else {
@@ -562,6 +622,9 @@
   }
 })();
 </script>
+
+
+
 
 
 </body>
