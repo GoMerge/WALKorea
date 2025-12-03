@@ -3,6 +3,7 @@
 
 <head>
   
+  <base href="/" / >
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
   <title>WALKorea</title>
@@ -53,7 +54,7 @@
       <nav id="navmenu" class="navmenu">
         <ul>
           <li><a href="index.html">홈</a></li>
-          <li class="dropdown"><a href="#"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown"><a href="/places/list"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
               <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
@@ -104,22 +105,27 @@
           <div class="row d-flex justify-content-center text-center">
             <div class="col-lg-8">
               {% set page_map = {
-            12: {'title': '관광지', 'desc': '전국의 관광지를 확인하세요!'},
-            14: {'title': '문화시설', 'desc': '다양한 문화시설을 확인하세요!'},
-            15: {'title': '축제', 'desc': '특색 있는 축제 정보를 확인하세요!'},
-            32: {'title': '숙박', 'desc': '편안한 숙박시설을 찾아보세요!'},
-            39: {'title': '음식점', 'desc': '맛있는 음식점을 추천합니다!'},
-            38: {'title': '쇼핑', 'desc': '쇼핑할 곳을 소개합니다!'},
-            28: {'title': '레포츠', 'desc': '신나는 레포츠 활동을 즐겨보세요!'}
-          } %}
+                12: {'title': '관광지', 'desc': '전국의 관광지를 확인하세요!'},
+                14: {'title': '문화시설', 'desc': '다양한 문화시설을 확인하세요!'},
+                15: {'title': '축제', 'desc': '특색 있는 축제 정보를 확인하세요!'},
+                32: {'title': '숙박', 'desc': '편안한 숙박시설을 찾아보세요!'},
+                39: {'title': '음식점', 'desc': '맛있는 음식점을 추천합니다!'},
+                38: {'title': '쇼핑', 'desc': '쇼핑할 곳을 소개합니다!'},
+                28: {'title': '레포츠', 'desc': '신나는 레포츠 활동을 즐겨보세요!'}
+              } %}
           
-          {% if contenttypeid and contenttypeid in page_map %}
-            <h1 class="heading-title">{{ page_map[contenttypeid].title }}</h1>
-            <p class="mb-0">{{ page_map[contenttypeid].desc }}</p>
-          {% else %}
-            <h1 class="heading-title">여행지</h1>
-            <p class="mb-0">전국의 여행지를 확인하세요!</p>
-          {% endif %}
+              {% if tag %}
+              <!-- ⭐ 태그 검색 우선! -->
+              <h1 class="heading-title">#{{ tag }}</h1>
+              {% elif contenttypeid and contenttypeid in page_map %}
+              <!-- 기존 contenttypeid -->
+              <h1 class="heading-title">{{ page_map[contenttypeid].title }}</h1>
+              <p class="mb-0">{{ page_map[contenttypeid].desc }}</p>
+              {% else %}
+              <!-- 기본 -->
+              <h1 class="heading-title">여행지</h1>
+              <p class="mb-0">전국의 여행지를 확인하세요!</p>
+              {% endif %}
             </div>
           </div>
         </div>
@@ -190,8 +196,9 @@
                       <div class="d-flex justify-content-between align-items-center">
                         {% if place.hashtags  %}
                         <div class="property-agent">
-                          {% for pt in place.hashtags  %}
-                          <a href="/places/list?tag={{ pt.tag.name }}" class="badge bg-secondary text-decoration-none me-1">#{{ pt.tag.name }}</a>
+                          {% for pt in place.hashtags[:6]  %}
+                          <a href="/places/list?tag={{ pt.tag.name }}&page=1{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}
+                          {% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="badge bg-secondary text-decoration-none me-1">#{{ pt.tag.name }}</a>
                           {% endfor %}
                         </div>
                         {% endif %}
@@ -209,17 +216,23 @@
             </div>
             {% endfor %}
 
-            <!-- 페이징 -->
+            <!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 -->
             <nav class="mt-5" data-aos="fade-up" data-aos-delay="300">
               <ul class="pagination justify-content-center">
 
+                <!-- 첫번째 페이지-->
                 <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                  <a class="page-link" href="/places/list_fi?page=1" tabindex="-1">&laquo;</a>
+                   <a class="page-link" href="/places/list?page=1{% if sort %}&sort={{ sort }}{% endif %}
+                   {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                   {% endif %}" tabindex="-1">&laquo;</a>
                 </li>
 
+                <!-- 이전 페이지-->
                 {% set prev_block = page - 10 if page - 10 > 0 else 1 %}
                   <li class="page-item {% if page == 1 %}disabled{% endif %}">
-                    <a class="page-link" href="/places/list?page={{ prev_block }}">&lsaquo;</a>
+                    <a class="page-link" href="/places/list?page={{ prev_block }}{% if sort %}&sort={{ sort }}{% endif %}
+                    {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                    {% endif %}">&lsaquo;</a>
                   </li>
 
                 {% set start_page = ((page - 1) // 10) * 10 + 1 %}
@@ -228,154 +241,79 @@
                 {% set end_page = total_pages %}
                 {% endif %}
 
+                <!-- 현재 페이지 -->
                 {% for p in range(start_page, end_page + 1) %}
                   <li class="page-item {% if p == page %}active{% endif %}">
-                  <a class="page-link" href="/places/list?page={{ p }}">{{ p }}</a>
+                  <a class="page-link" href="/places/list?page={{ p }}{% if sort %}&sort={{ sort }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">{{ p }}</a>
                   </li>
                 {% endfor %}
 
+                <!-- 다음 페이지 -->
                 {% set next_block = page + 10 if page + 10 <= total_pages else total_pages %}
                   <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                    <a class="page-link" href="/places/list?page={{ next_block }}">&rsaquo;</a>
+                    <a class="page-link" href="/places/list?page={{ next_block }}{% if sort %}&sort={{ sort }}{% endif %}
+                    {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                    {% endif %}">&rsaquo;</a>
                   </li>
 
+
+                <!-- 마지막 페이지-->
                 <li class="page-item {% if page == total_pages %}disabled{% endif %}">
-                  <a class="page-link" href="/places/list?page={{ total_pages }}">&raquo;</a>
+                  <a class="page-link" href="/places/list?page={{ total_pages }}{% if sort %}&sort={{ sort }}{% endif %}
+                  {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                  {% endif %}">&raquo;</a>
                 </li>
               </ul>
             </nav>
-            <!-- 페이징 -->
+            <!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 -->
 
           </div>
 
-          <div class="col-lg-4" data-aos="fade-up" data-aos-delay="200">
+          <div class="col-lg-4" >
 
             <div class="properties-sidebar">
 
               <div class="filter-widget">
-                <h5 class="filter-title">Filter Properties</h5>
+                <h5 class="filter-title">여러 여행지를 검색해보세요</h5>
 
+                <!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 -->
                 <div class="filter-section">
-                  <label class="form-label">Property Type</label>
-                  <select class="form-select">
-                    <option>All Types</option>
-                    <option>House</option>
-                    <option>Apartment</option>
-                    <option>Condo</option>
-                    <option>Townhouse</option>
-                    <option>Commercial</option>
-                  </select>
-                </div>
-
-                <div class="filter-section">
-                  <label class="form-label">Price Range</label>
-                  <div class="row g-2">
-                    <div class="col-6">
-                      <input type="number" class="form-control" placeholder="Min Price">
+                   <form method="get" action="/places/list">
+                    <input type="hidden" name="contenttypeid" value="{{ contenttypeid or '' }}">
+                    <input type="hidden" name="addr" value="{{ addr or '' }}">
+                    <input type="hidden" name="sort" value="{{ sort }}">
+    
+                    <div class="input-group input-group-sm">
+                      <input type="text" class="form-control" name="search" placeholder="검색어 입력" value="{{ search if search }}">
+                      <button class="btn btn-primary btn-sm" type="submit">검색</button>
+                       
                     </div>
-                    <div class="col-6">
-                      <input type="number" class="form-control" placeholder="Max Price">
-                    </div>
-                  </div>
+                  </form>
                 </div>
+                <!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 -->
 
+
+                <!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 -->
                 <div class="filter-section">
-                  <label class="form-label">Bedrooms</label>
+                  <label class="form-label">지역</label>
                   <div class="bedroom-filter">
                     {% set regions = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '경북', '경남', '전북', '전남', '제주'] %}
 
-                    <a href="/places/list?page=1&sort={{ sort }}" class="btn btn-outline-secondary btn-sm {% if not addr %}active{% endif %}">&num;전체</a>
+                     <a href="/places/list?page=1&sort={{ sort }}{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn btn-outline-secondary btn-sm {% if not addr %}active{% endif %}">&num;전체</a>
+
 
                     {% for region in regions %}
-                    <a href="/places/list?addr={{ region }}&page=1&sort={{ sort }}" class="btn btn-outline-secondary btn-sm {% if addr == region %}active{% endif %}">
-                     &num;{{ region }}
+                     <a href="/places/list?addr={{ region }}&page=1&sort={{ sort }}{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
+                      class="btn btn-outline-secondary btn-sm {% if addr == region %}active{% endif %}">
+                      &num;{{ region }}
                     </a>
                     {% endfor %}
                   </div>
                 </div>
+                <!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 -->
 
-                <div class="filter-section">
-                  <label class="form-label">Bathrooms</label>
-                  <div class="bathroom-filter">
-                    <button class="btn btn-outline-secondary btn-sm filter-btn active">Any</button>
-                    <button class="btn btn-outline-secondary btn-sm filter-btn">1+</button>
-                    <button class="btn btn-outline-secondary btn-sm filter-btn">2+</button>
-                    <button class="btn btn-outline-secondary btn-sm filter-btn">3+</button>
-                  </div>
-                </div>
 
-                <div class="filter-section">
-                  <label class="form-label">Location</label>
-                  <input type="text" class="form-control" placeholder="Enter city or neighborhood">
-                </div>
 
-                <div class="filter-section">
-                  <label class="form-label">Features</label>
-                  <div class="features-filter">
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="garage">
-                      <label class="form-check-label" for="garage">Garage</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="pool">
-                      <label class="form-check-label" for="pool">Swimming Pool</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="balcony">
-                      <label class="form-check-label" for="balcony">Balcony</label>
-                    </div>
-                    <div class="form-check">
-                      <input class="form-check-input" type="checkbox" id="garden">
-                      <label class="form-check-label" for="garden">Garden</label>
-                    </div>
-                  </div>
-                </div>
-
-                <button class="btn btn-primary w-100">Apply Filters</button>
-
-              </div>
-
-              <div class="featured-properties mt-4">
-                <h5>Featured Properties</h5>
-
-                <div class="featured-item">
-                  <div class="row g-3 align-items-center">
-                    <div class="col-5">
-                      <img src="assets/img/real-estate/property-exterior-8.webp" alt="Property" class="img-fluid rounded">
-                    </div>
-                    <div class="col-7">
-                      <h6 class="mb-1">Luxury Penthouse</h6>
-                      <p class="text-muted small mb-1">Manhattan, NY</p>
-                      <strong class="text-primary">$2,850,000</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="featured-item">
-                  <div class="row g-3 align-items-center">
-                    <div class="col-5">
-                      <img src="assets/img/real-estate/property-interior-7.webp" alt="Property" class="img-fluid rounded">
-                    </div>
-                    <div class="col-7">
-                      <h6 class="mb-1">Modern Studio</h6>
-                      <p class="text-muted small mb-1">Brooklyn, NY</p>
-                      <strong class="text-primary">$3,200/mo</strong>
-                    </div>
-                  </div>
-                </div>
-
-                <div class="featured-item">
-                  <div class="row g-3 align-items-center">
-                    <div class="col-5">
-                      <img src="assets/img/real-estate/property-exterior-9.webp" alt="Property" class="img-fluid rounded">
-                    </div>
-                    <div class="col-7">
-                      <h6 class="mb-1">Family Home</h6>
-                      <p class="text-muted small mb-1">Queens, NY</p>
-                      <strong class="text-primary">$895,000</strong>
-                    </div>
-                  </div>
-                </div>
 
               </div>
 
