@@ -1,16 +1,17 @@
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, Depends, HTTPException, status, WebSocket
 from sqlalchemy.orm import Session
 from app.utils.auth import get_current_user
 from app.database import get_db
 from app.schemas.follow import FollowCreate, FollowResponse
 from app.models.user import User
 from pydantic import BaseModel
+from app.services.websocket_manager import active_connections
+from starlette.websockets import WebSocketState
 from app.services.follow_service import (
     follow_user,
     unfollow_user,
     get_following_list,
     get_follower_list,
-    get_user_by_nickname,
     get_users_by_nickname_like_or_404,
 )
 

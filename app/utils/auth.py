@@ -7,12 +7,16 @@ from app.utils.email import send_email_code_smtp
 from app.database import get_db
 from app.models.user import User
 from jose import JWTError, jwt
-import hmac, hashlib, random, string
+import hmac, hashlib, random, string, jwt
+import os
+from jwt.exceptions import PyJWTError
+from dotenv import load_dotenv
 
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "your_secret_key_here"  # 환경변수로 관리 권장
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -78,16 +82,17 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     )
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        userid = payload.get("sub")
-        if userid is None:
+        user_id = payload.get("user_id")
+        if user_id is None:
             raise credentials_exception
     except JWTError:
         raise credentials_exception
-    
-    user = db.query(User).filter(User.userid == userid).first()
+
+    # ★ User.id 기준으로 조회
+    user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
         raise credentials_exception
-    
+
     if not user.is_active or user.deleted_at is not None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
@@ -109,21 +114,18 @@ def delete_expired_users(db: Session, expire_days: int = 30):
     db.commit()
 
 # --- 토큰으로 사용자 조회 ---
-def get_current_user_from_token(token: str, db: Session):
+def get_current_user_from_token(token: str, db: Session) -> User:
+    if SECRET_KEY is None:
+        raise RuntimeError("SECRET_KEY 환경변수가 설정되어 있지 않습니다.")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id_or_sub = payload.get("user_id") or payload.get("sub")
-        if user_id_or_sub is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        user_id = payload.get("user_id")   # ★ 동일
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="토큰에 user_id가 없습니다.")
+    except PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
-        user = None
-        if str(user_id_or_sub).isdigit():
-            user = db.query(User).filter(User.id == int(user_id_or_sub)).first()
-        if not user:
-            user = db.query(User).filter(User.userid == str(user_id_or_sub)).first()
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-        return user
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token decode error")
+    user = db.query(User).filter(User.id == int(user_id)).first()  # ★ 동일
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
