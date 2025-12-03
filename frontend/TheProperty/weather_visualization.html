@@ -1,0 +1,140 @@
+<div class="container mt-5">
+  <!-- 지역선택 트리 -->
+  <form class="row mb-3" onsubmit="updateWeather(event)">
+    <div class="col-md-3">
+      <select class="form-select" id="sidoSelect">
+        <option value="">시/도 선택</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" id="gugunSelect" disabled>
+        <option value="">구/군 선택</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" id="dongSelect" disabled>
+        <option value="">동 선택</option>
+      </select>
+    </div>
+    <div class="col-md-3">
+      <select class="form-select" id="seasonSelect">
+        <option value="">계절 선택</option>
+        <option value="봄">봄</option>
+        <option value="여름">여름</option>
+        <option value="가을">가을</option>
+        <option value="겨울">겨울</option>
+      </select>
+    </div>
+    <div class="col-md-3 mt-2">
+      <input type="number" class="form-control" id="monthInput" min="1" max="12" placeholder="월 선택(1~12)">
+    </div>
+    <div class="col-md-3 mt-2">
+      <button type="submit" class="btn btn-primary">업데이트</button>
+    </div>
+  </form>
+
+  <!-- 시각화 결과 -->
+  <div class="row">
+    <div class="col-md-7">
+      <h4>월별 30년 평균 기온/강수/편차</h4>
+      <div class="card mb-5">
+        <img id="weather-graph" class="card-img-top" alt="기온·강수 그래프" />
+        <div class="card-body p-2">
+          <small class="text-muted">필터: 지역, 월, 계절</small>
+        </div>
+      </div>
+    </div>
+    <div class="col-md-5">
+      <h4>지점별 날씨 지도</h4>
+      <div class="card">
+        <iframe id="weather-map" width="100%" height="400" style="border:none;"></iframe>
+        <div class="card-body p-2">
+          <small class="text-muted">계절/월별 필터 지원</small>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadSidos() {
+  const res = await fetch("http://127.0.0.1:8000/regions/sidos");
+  const sidos = await res.json();
+  const select = document.getElementById("sidoSelect");
+  select.innerHTML = '<option value="">시/도 선택</option>';
+  sidos.forEach(sido => {
+    select.innerHTML += `<option value="${sido.id}">${sido.name}</option>`;
+  });
+  document.getElementById("gugunSelect").innerHTML = '<option value="">구/군 선택</option>';
+  document.getElementById("dongSelect").innerHTML = '<option value="">동 선택</option>';
+  document.getElementById("gugunSelect").disabled = true;
+  document.getElementById("dongSelect").disabled = true;
+}
+loadSidos();
+
+document.getElementById("sidoSelect").onchange = async function() {
+  const sido_id = this.value;
+  if (!sido_id) {
+    document.getElementById("gugunSelect").innerHTML = '<option value="">구/군 선택</option>';
+    document.getElementById("gugunSelect").disabled = true;
+    document.getElementById("dongSelect").innerHTML = '<option value="">동 선택</option>';
+    document.getElementById("dongSelect").disabled = true;
+    return;
+  }
+  const res = await fetch(`http://127.0.0.1:8000/regions/guguns/${sido_id}`);
+  const guguns = await res.json();
+  const gugunSelect = document.getElementById("gugunSelect");
+  gugunSelect.innerHTML = '<option value="">구/군 선택</option>';
+  guguns.forEach(gugun => {
+    gugunSelect.innerHTML += `<option value="${gugun.id}">${gugun.name}</option>`;
+  });
+  gugunSelect.disabled = false;
+  document.getElementById("dongSelect").innerHTML = '<option value="">동 선택</option>';
+  document.getElementById("dongSelect").disabled = true;
+};
+document.getElementById("gugunSelect").onchange = async function() {
+  const gugun_id = this.value;
+  if (!gugun_id) {
+    document.getElementById("dongSelect").innerHTML = '<option value="">동 선택</option>';
+    document.getElementById("dongSelect").disabled = true;
+    return;
+  }
+  const res = await fetch(`http://127.0.0.1:8000/regions/dongs/${gugun_id}`);
+  const dongs = await res.json();
+  const dongSelect = document.getElementById("dongSelect");
+  dongSelect.innerHTML = '<option value="">동 선택</option>';
+  dongs.forEach(dong => {
+    dongSelect.innerHTML += `<option value="${dong.id}">${dong.name}</option>`;
+  });
+  dongSelect.disabled = false;
+};
+
+// ★ 필터·버튼 클릭 시 날씨 그래프/지도 업데이트
+function updateWeather(event) {
+  event.preventDefault();
+  const sido = document.getElementById("sidoSelect").value;
+  const gugun = document.getElementById("gugunSelect").value;
+  const dong = document.getElementById("dongSelect").value;
+  const season = document.getElementById("seasonSelect").value;
+  const month = document.getElementById("monthInput").value;
+
+  // 지역 필터 가공 (필요 시 백엔드 엔드포인트에서 처리)
+  let regionParam = dong || gugun || sido || ""; // 최하위 동 선택 > 구군 > 시도 순
+
+  let graphUrl = "http://127.0.0.1:8000/weather/monthly-visual";
+  let mapUrl = "http://127.0.0.1:8000/weather/map";
+  let params = [];
+
+  if (regionParam) params.push(`region=${regionParam}`);
+  if (month) params.push(`month=${month}`);
+  if (season) params.push(`season=${encodeURIComponent(season)}`);
+
+  if (params.length) {
+    graphUrl += "?" + params.join("&");
+    mapUrl += "?" + params.join("&");
+  }
+
+  document.getElementById("weather-graph").src = graphUrl;
+  document.getElementById("weather-map").src = mapUrl;
+}
+</script>

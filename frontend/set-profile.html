@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>프로필 설정 | WALKorea</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<main class="container py-5">
+  <div class="row justify-content-center">
+    <div class="col-lg-5">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h2 class="mb-4 text-center fw-bold">프로필 설정</h2>
+          <form id="profile-form" autocomplete="off">
+            <div class="mb-3">
+              <label class="form-label">닉네임 <span class="text-danger">*</span></label>
+              <input type="text" class="form-control" name="nickname" required maxlength="16" placeholder="닉네임을 입력하세요">
+              <div id="nickname-msg" class="small mt-1"></div>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">생년월일 <span class="text-danger">*</span></label>
+              <input type="date" class="form-control" name="birthday" required>
+            </div>
+            <div class="mb-3">
+              <label class="form-label">성별 <span class="text-danger">*</span></label>
+              <select class="form-select" name="gender" required>
+                <option value="">성별 선택</option>
+                <option value="M">남성</option>
+                <option value="F">여성</option>
+                <option value="O">기타</option>
+              </select>
+            </div>
+            <button type="submit" class="btn btn-success w-100 mt-2">설정 완료</button>
+          </form>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+    // 1. 쿼리스트링에서 토큰 추출 + localStorage 저장 + URL 숨김
+    const params = new URLSearchParams(location.search);
+    const accessToken = params.get("access_token");
+    const userId = params.get("user_id");
+    // 토큰 저장 후 주소창에서 토큰 파라미터 제거 (보안)
+    if(accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        // 토큰 없이 user_id만 남기고 URL 정리(없으면 pathname만)
+        let newUrl = location.pathname + (userId ? `?user_id=${userId}` : "");
+        window.history.replaceState({}, document.title, newUrl);
+    }
+
+    // 2. 닉네임 실시간 중복 체크
+    const form = document.getElementById("profile-form");
+    const nickInput = form.nickname;
+    const msgBox = document.getElementById("nickname-msg");
+    let nickTimeout = null;
+    nickInput.addEventListener("input", function() {
+      clearTimeout(nickTimeout);
+      const val = nickInput.value.trim();
+      if(val.length < 2) {
+        msgBox.textContent = "닉네임을 2자 이상 입력하세요.";
+        msgBox.className = "small text-danger mt-1";
+        return;
+      }
+      nickTimeout = setTimeout(async ()=> {
+        const res = await fetch("/auth/check-nickname?nickname=" + encodeURIComponent(val));
+        const data = await res.json();
+        if(data.result === "dup") {
+          msgBox.textContent = "이미 사용 중인 닉네임입니다.";
+          msgBox.className = "small text-danger mt-1";
+        } else {
+          msgBox.textContent = "사용 가능한 닉네임입니다.";
+          msgBox.className = "small text-success mt-1";
+        }
+      }, 400);
+    });
+
+    // 3. 폼 제출
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+      const nickname = form.nickname.value.trim();
+      const birthday = form.birthday.value;
+      const gender = form.gender.value;
+      if(nickname.length < 2) {
+        msgBox.textContent = "닉네임을 2자 이상 입력하세요.";
+        msgBox.className = "small text-danger mt-1";
+        return;
+      }
+      // 중복 최종 확인
+      const resCheck = await fetch("/auth/check-nickname?nickname=" + encodeURIComponent(nickname));
+      const check = await resCheck.json();
+      if(check.result === "dup") {
+        msgBox.textContent = "이미 사용 중인 닉네임입니다.";
+        msgBox.className = "small text-danger mt-1";
+        return;
+      }
+      // FormData 방식 POST
+      const submitData = new FormData();
+      submitData.append("user_id", userId || "");
+      submitData.append("nickname", nickname);
+      submitData.append("birthday", birthday);
+      submitData.append("gender", gender);
+      // access_token은 localStorage에서 꺼내서 append
+      submitData.append("access_token", localStorage.getItem("access_token"));
+
+      const resp = await fetch("/auth/set-profile", {
+        method: "POST",
+        body: submitData
+      });
+      if(resp.ok) {
+        alert("프로필 설정 완료! 메인으로 이동합니다.");
+        window.location.href = "/index.html";
+      } else {
+        const err = await resp.json().catch(()=>null);
+        alert("오류: " + ((err && err.detail) || "프로필 설정 실패"));
+      }
+    }
+});
+</script>
+</body>
+</html>

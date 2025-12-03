@@ -1,0 +1,1478 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>마이페이지 | WALKorea</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color:#f5f7fb; }
+    .day-good-badge {
+      display: inline-block;
+      margin-left: 2px;
+      margin-top: 2px;
+    }
+    .sidebar-fixed {
+      width: 260px;
+      min-width: 260px;
+      max-width: 260px;
+      border-right: 1px solid #e5e7eb;
+      background-color:#fff;
+    }
+
+    /* 사이드바 메뉴 공통 스타일 */
+    .sidebar .menu-title {
+      font-size:0.85rem;
+      font-weight:600;
+      color:#6b7280;
+      margin-top:1rem;
+      margin-bottom:0.25rem;
+    }
+
+    .sidebar .nav-link {
+      font-size:0.95rem;
+      color:#374151;
+      padding:0.45rem 0.75rem;
+      border-radius:0.35rem;
+      margin-bottom:2px;
+    }
+
+    .sidebar .nav-link.active {
+      background-color:#e0f2fe;
+      color:#0369a1;
+      font-weight:600;
+    }
+
+    .calendar-grid {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:4px;
+      font-size:0.85rem;
+    }
+    .calendar-day {
+      position: relative;           
+      border-radius: 4px;
+      padding: 4px;
+      background-color: #fff;
+      border: 1px solid #e5e7eb;
+
+      min-height: 0;
+      aspect-ratio: 3 / 2;      
+      overflow: hidden;    
+    }
+    .calendar-day.today {
+      border: 2px solid #16a34a;
+      background-color: #ecfdf3;
+    }
+    .calendar-day .date-num {
+      line-height: 1.1;
+      margin-bottom: 4px;
+    }
+    .calendar-day .event-list {
+      position: absolute;
+      top: 28px;          /* 날짜 숫자 아래부터 */
+      left: 4px;
+      right: 4px;
+      bottom: 4px;
+      overflow: hidden;   /* 넘치는 줄은 잘리게 */
+    }
+    .calendar-day .event-chip {
+      background-color: #0ea5e9;
+      color: #fff;
+      border-radius: 6px;
+      padding: 2px 4px;
+      margin-top: 2px;
+      font-size: 0.72rem;
+      text-overflow: ellipsis;
+      white-space: nowrap;
+      overflow: hidden;
+    }
+    .calendar-dot {
+      width: 6px;
+      height: 6px;
+      border-radius: 50%;
+      background-color: #16a34a; /* 초록 */
+      margin: 2px auto 0;
+    }
+    .weather-box {
+      background-color:#fff;
+      border-radius:0.75rem;
+      padding:0.75rem 0.85rem;
+      box-shadow:0 1px 3px rgba(15,23,42,0.08);
+      font-size:0.8rem;
+    }
+
+    #region-weather-list div {
+      line-height:1.4;
+    }
+    .event-weather-badge {
+      font-size: 0.7rem;
+      margin-top: 2px;
+      color: #0f172a;
+    }
+    .event-weather-badge.good {
+      color: #16a34a; /* 초록 */
+      font-weight: 600;
+    }
+    .event-weather-badge.bad {
+      color: #dc2626; /* 빨강 */
+      font-weight: 600;
+    }
+    .event-chip.shared-event-chip {
+      background-color: #f973a5;  /* 핑크 */
+      border: 1px solid #ec4899;
+      color: #fff;
+    }
+    .shared-event-chip {
+      background-color: #f973a5;  /* 핑크 */
+      border-color: #ec4899;
+    }
+    .shared-event-list-item {
+      border-left: 4px solid #f973a5;
+      background-color: #fff1f5;
+    }
+  </style>
+</head>
+<body>
+<header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">WALKorea</a>
+    <ul class="navbar-nav ms-auto gap-2">
+      <li class="nav-item"><a class="nav-link" href="recommend.html">추천 여행지</a></li>
+      <li class="nav-item"><a class="nav-link" href="calendar.html">여행 캘린더</a></li>
+      <li class="nav-item"><a class="nav-link" href="mypage_calendar.html">마이페이지</a></li>
+      <!-- 알림 아이콘 -->
+      <li class="nav-item position-relative">
+        <button id="notif-btn" class="btn btn-link nav-link p-0 position-relative">
+          <span class="fs-5">🔔</span>
+          <span id="notif-badge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+          </span>
+        </button>
+
+        <!-- 알림 리스트 패널 -->
+        <div id="notif-panel"
+             class="card shadow-sm position-absolute end-0 mt-2 d-none"
+             style="width:260px; z-index:1050;">
+          <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+            <span class="small fw-semibold">알림</span>
+            <button id="notif-close" class="btn btn-sm btn-outline-secondary py-0 px-1">×</button>
+          </div>
+          <ul id="notif-list" class="list-group list-group-flush small"></ul>
+        </div>
+      </li>
+      <li class="nav-item" id="nav-login"><a class="btn btn-success" href="login.html">로그인</a></li>
+      <li class="nav-item" id="nav-signup"><a class="btn btn-primary" href="signup.html">회원가입</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container-fluid" style="margin-top:10px;">
+  <div class="d-flex">
+    <!-- 왼쪽: 마이페이지 카테고리 -->
+    <aside class="sidebar-fixed sidebar p-3">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
+            style="width:40px;height:40px;">
+          <span id="side-initial">W</span>
+        </div>
+        <div class="ms-2">
+          <div class="fw-semibold" id="side-nickname">로그인 사용자</div>
+          <div class="text-muted small" id="side-email">-</div>
+        </div>
+      </div>
+
+      <div class="weather-box mb-3" id="weather-box">
+        <div class="fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+        <div class="small text-muted mb-2" id="region-weather-desc">
+          마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
+        </div>
+        <div id="region-weather-list"></div>
+        <a class="btn btn-outline-success btn-sm mt-2 w-100" href="mypage_profile.html">
+          지역 설정하러 가기
+        </a>
+      </div>
+
+      <div class="menu-title">마이페이지</div>
+      <nav class="nav flex-column">
+        <a href="mypage_calendar.html"  class="nav-link active">내 일정</a>
+        <a href="mypage_friends.html"   class="nav-link">친구 관리</a>
+        <a href="mypage_recommend.html" class="nav-link">맞춤 관광</a>
+        <a href="mypage_profile.html"   class="nav-link">프로필 수정</a>
+      </nav>
+    </aside>
+
+    <!-- 오른쪽: 컨텐츠 영역 -->
+    <section class="col-md-9 col-lg-10 p-4">
+      <!-- 상단: 프로필 카드 -->
+      <div class="row g-3 mb-3">
+        <div class="col-lg-8">
+          <div class="profile-card d-flex align-items-center gap-3">
+            <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width:64px;height:64px;font-size:1.5rem;">
+              <span id="profile-initial">W</span>
+            </div>
+            <div>
+              <div class="fw-bold fs-5" id="profile-nickname">로그인 사용자</div>
+              <div class="text-muted small" id="profile-email">-</div>
+              <div class="text-muted small" id="profile-region-msg">
+                거주 지역을 설정하면 이곳에 동네 날씨를 보여줄게요.
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 섹션: 내 일정 -->
+      <div id="section-calendar">
+        <div class="d-flex justify-content-between align-items-center mb-2">
+          <div class="d-flex align-items-center gap-2">
+            <button class="btn btn-outline-secondary btn-sm" id="prev-month">&lt;</button>
+            <h4 class="mb-0 fw-bold" id="month-title">2025년 11월</h4>
+            <button class="btn btn-outline-secondary btn-sm" id="next-month">&gt;</button>
+          </div>
+          <button class="btn btn-success btn-sm" id="btn-new-calendar">+ 일정 추가</button>
+        </div>
+        <div class="calendar-grid text-center mb-2 fw-semibold">
+          <div class="text-danger">일</div><div>월</div><div>화</div><div>수</div><div>목</div><div>금</div><div class="text-primary">토</div>
+        </div>
+        <div id="calendar-body" class="calendar-grid mb-3"></div>
+        <h6 class="fw-bold mb-2">내 일정 목록</h6>
+        <ul class="list-group small" id="my-cal-list"></ul>
+      </div>
+    </section>
+  </div>
+  <!-- 일정 추가 모달 -->
+  <div class="modal fade" id="eventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h5 class="modal-title">일정 추가</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <form id="event-form">
+          <div class="modal-body">
+            <div class="mb-2">
+              <label class="form-label small">제목</label>
+              <input type="text" class="form-control" id="ev-title" required>
+            </div>
+
+            <div class="row g-2 mb-2">
+              <div class="col-6">
+                <label class="form-label small">시작</label>
+                <input type="datetime-local" class="form-control" id="ev-start" required>
+              </div>
+              <div class="col-6">
+                <label class="form-label small">종료</label>
+                <input type="datetime-local" class="form-control" id="ev-end" required>
+              </div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small">장소</label>
+              <div class="input-group input-group-sm position-relative">
+                <input type="text"
+                  class="form-control"
+                  id="ev-place"
+                  placeholder="예) 서울 종로구 / 종로 5길 / 건물명으로 검색 후 선택">
+              </div>
+              <div class="list-group position-absolute w-100"
+                  id="place-suggestions"
+                  style="z-index:1056; max-height:200px; overflow:auto; display:none;"></div>
+              <div class="small text-muted mt-1" id="place-preview"></div>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small">알림 시간</label>
+              <select class="form-select form-select-sm" id="ev-remind">
+                <option value="0">알림 없음</option>
+                <option value="5">5분 전</option>
+                <option value="10">10분 전</option>
+                <option value="30">30분 전</option>
+                <option value="60">1시간 전</option>
+              </select>
+            </div>
+
+            <div class="mb-2">
+              <label class="form-label small">메모</label>
+              <textarea class="form-control" id="ev-memo" rows="3" placeholder="메모를 입력하세요"></textarea>
+            </div>
+
+          </div>
+          <div class="modal-footer py-2">
+            <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">취소</button>
+            <button type="submit" class="btn btn-success btn-sm">저장</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  <!-- 날짜별 일정 모달 -->
+  <div class="modal fade" id="dayEventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h5 class="modal-title" id="day-modal-title">12월 8일 일정</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <ul class="list-group small" id="day-event-list"></ul>
+        </div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-outline-secondary btn-sm" data-bs-dismiss="modal">닫기</button>
+          <button type="button" class="btn btn-success btn-sm" id="btn-add-on-day">
+            + 이 날짜에 일정 추가
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+    <!-- 일정 공유 대상 선택 모달 -->
+  <div class="modal fade" id="shareEventModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h5 class="modal-title">일정 공유</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p class="small mb-2" id="share-event-title"></p>
+          <label class="form-label small">공유할 친구 선택</label>
+          <select class="form-select form-select-sm" id="share-target-select">
+          </select>
+          <div class="small text-muted mt-1">
+            서로 팔로우 중인 친구만 공유할 수 있어요.
+          </div>
+        </div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">취소</button>
+          <button type="button" class="btn btn-success btn-sm" id="btn-share-confirm">공유하기</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 공유 요청 수락/거절 모달 -->
+  <div class="modal fade" id="shareConfirmModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+      <div class="modal-content">
+        <div class="modal-header py-2">
+          <h5 class="modal-title">일정 공유 요청</h5>
+          <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+        </div>
+        <div class="modal-body">
+          <p id="share-confirm-text" class="mb-0"></p>
+        </div>
+        <div class="modal-footer py-2">
+          <button type="button" class="btn btn-secondary btn-sm" id="btn-share-reject">거절</button>
+          <button type="button" class="btn btn-success btn-sm" id="btn-share-accept">수락</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</main>
+
+<script>
+
+let shareTargetFollowing = [];   // 팔로잉 목록 캐시
+let shareSourceEvent = null;     // 현재 공유하려는 이벤트 객체
+
+let debugPlaceWeatherMap = {};
+let debugUserWeatherMap = {};
+
+// 공통: 항상 최신 토큰 읽기
+function getToken() {
+  return localStorage.getItem("access_token");
+}
+
+const placeInput = document.getElementById("ev-place");
+const suggestBox = document.getElementById("place-suggestions");
+
+let placeTimer = null;
+
+placeInput.addEventListener("input", () => {
+  const q = placeInput.value.trim();
+  if (placeTimer) clearTimeout(placeTimer);
+
+  if (!q) {
+    suggestBox.style.display = "none";
+    suggestBox.innerHTML = "";
+    return;
+  }
+
+  placeTimer = setTimeout(() => fetchRegionSuggestions(q), 300);
+});
+
+async function fetchRegionSuggestions(q) {
+  const res = await fetch(`http://127.0.0.1:8000/address/search?q=${encodeURIComponent(q)}`);
+  if (!res.ok) {
+    suggestBox.style.display = "none";
+    suggestBox.innerHTML = "";
+    return;
+  }
+  const items = await res.json();  // [{id, code, full_name}, ...]
+
+  if (!items.length) {
+    suggestBox.style.display = "none";
+    suggestBox.innerHTML = "";
+    return;
+  }
+
+  suggestBox.innerHTML = "";
+  items.forEach(item => {
+    const btn = document.createElement("button");
+    btn.type = "button";
+    btn.className = "list-group-item list-group-item-action small text-start";
+    btn.textContent = item.full_name;
+    btn.dataset.regionId = item.id;
+    btn.dataset.regionCode = item.code;
+    btn.onclick = () => selectRegionSuggestion(item);
+    suggestBox.appendChild(btn);
+  });
+  suggestBox.style.display = "block";
+}
+
+function selectRegionSuggestion(item) {
+  placeInput.value = item.full_name;
+  placeInput.dataset.regionId = item.id;
+  placeInput.dataset.regionCode = item.code;
+  placeInput.dataset.fullName = item.full_name;
+
+  suggestBox.style.display = "none";
+  suggestBox.innerHTML = "";
+
+  document.getElementById("place-preview").textContent = item.full_name;
+
+  const preview = document.getElementById("place-preview");
+  preview.textContent = item.full_name;
+}
+
+
+async function apiFetch(url, options = {}) {
+  const res = await fetch(url, options);
+  if (res.status === 401) {
+    alert("로그인이 만료되었습니다. 다시 로그인해 주세요.");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href = "login.html";
+    return null;
+  }
+  return res;
+}
+
+// 공통: 헤더/사이드바 프로필 세팅
+async function setupHeaderAndProfile() {
+  const token = getToken();
+  const nav = document.querySelector(".navbar-nav");
+  const loginLi = document.getElementById("nav-login");
+  const signupLi = document.getElementById("nav-signup");
+
+  if (token && nav) {
+    if (loginLi) loginLi.remove();
+    if (signupLi) signupLi.remove();
+    const logoutLi = document.createElement("li");
+    logoutLi.className = "nav-item";
+    logoutLi.innerHTML = `<a class="btn btn-outline-danger" href="#">로그아웃</a>`;
+    logoutLi.querySelector("a").onclick = (e) => {
+      e.preventDefault();
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      window.location.href = "index.html";
+    };
+    nav.appendChild(logoutLi);
+  }
+  if (!token) return;
+
+  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (!res.ok) return;
+  const user = await res.json();
+
+  const nick = user.nickname || (user.name || "사용자");
+  const email = user.email || "";
+
+  const sideNick = document.getElementById("side-nickname");
+  const profNick = document.getElementById("profile-nickname");
+  if (sideNick) sideNick.textContent = nick;
+  if (profNick) profNick.textContent = nick;
+
+  const sideEmail = document.getElementById("side-email");
+  const profEmail = document.getElementById("profile-email");
+  if (sideEmail) sideEmail.textContent = email;
+  if (profEmail) profEmail.textContent = email;
+
+  const sideInit = document.getElementById("side-initial");
+  const profInit = document.getElementById("profile-initial");
+  if (sideInit) sideInit.textContent = nick[0];
+  if (profInit) profInit.textContent = nick[0];
+
+  const regionMsg = document.getElementById("profile-region-msg");
+  const weatherTitle = document.getElementById("region-weather-title");
+  const weatherDesc  = document.getElementById("region-weather-desc");
+  if (!user.region_id) {
+    regionMsg.textContent = "지역이 설정되지 않았습니다. 프로필에서 동네를 선택해 주세요.";
+    weatherTitle.textContent = "동네를 선택해 주세요";
+    weatherDesc.textContent  = "프로필에서 거주 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.";
+    userBaseAddress = null;
+  } else {
+    const base = user.region_full_name || user.region_name;
+    regionMsg.textContent = `현재 지역: ${base}`;
+    weatherTitle.textContent = `${base}의 오늘 날씨`;
+    weatherDesc.textContent  = "날씨 API를 연동해서 실제 데이터를 표시하면 됩니다.";
+    userBaseAddress = base;
+  }
+}
+
+function formatKoreanWeekday(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const names = ["일", "월", "화", "수", "목", "금", "토"];
+  return names[d.getDay()];
+}
+
+function mapIconToEmoji(icon) {
+  // Visual Crossing icon 값 간단 매핑
+  switch (icon) {
+    case "rain": return "🌧️";
+    case "snow": return "❄️";
+    case "fog": return "🌫️";
+    case "wind": return "💨";
+    case "cloudy": return "☁️";
+    case "partly-cloudy-day": return "⛅";
+    case "partly-cloudy-night": return "☁️";
+    case "clear-day": return "☀️";
+    case "clear-night": return "🌙";
+    default: return "🌤️";
+  }
+}
+
+function weatherEmojiFromResult(w) {
+  if (!w) return "";                 // 정보 없으면 이모지 없음
+  if (w.is_good === true) return "😊";   // 좋음
+  if (w.is_good === false) return "😡";  // 나쁨
+  return "😐";                        // 나쁘지도, 좋지도 않을 때
+}
+
+function weatherTextFromResult(w) {
+  if (!w) return "";                 // 정보 없으면 텍스트도 없음
+  return w.is_good ? "날씨 좋음" : "날씨 나쁨";
+}
+
+
+document.getElementById("event-form").addEventListener("submit", async (e) => {
+  e.preventDefault();
+
+  const formEl = document.getElementById("event-form");
+  const editingId = formEl.dataset.editEventId || null;
+
+  const calId = await ensureUserCalendarId();
+  if (!calId) return;
+
+  const title = document.getElementById("ev-title").value.trim();
+  const start = document.getElementById("ev-start").value;
+  const end   = document.getElementById("ev-end").value;
+  const memo  = document.getElementById("ev-memo").value.trim();
+  const remindMinutes = parseInt(document.getElementById("ev-remind").value, 10);
+  const placeInputEl = document.getElementById("ev-place");
+  const placeText = placeInputEl.value.trim();
+  const placeFull = placeInputEl.dataset.fullName || placeText;
+
+  if (!title || !start || !end) {
+    alert("제목과 시간은 필수입니다.");
+    return;
+  }
+
+  const startDate = new Date(start + ':00').toISOString();
+  const endDate   = new Date(end + ':00').toISOString();
+
+  const payload = {
+    title,
+    start_date: startDate,
+    end_date: endDate,
+    description: memo || null,
+    location: placeFull || null,
+    remind_minutes: isNaN(remindMinutes) ? null : remindMinutes
+  };
+
+  const token = getToken();
+  let url, method;
+  if (editingId) {
+    // 수정
+    url = `http://127.0.0.1:8000/calendar/events/${editingId}`;
+    method = "PUT";
+  } else {
+    // 신규
+    url = `http://127.0.0.1:8000/calendar/${calId}/events`;
+    method = "POST";
+  }
+
+  const res = await fetch(url, {
+    method,
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify(payload)
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(()=>null);
+    alert((err && err.detail) || "일정 저장에 실패했습니다.");
+    return;
+  }
+
+  // 상태 초기화
+  delete formEl.dataset.editEventId;
+
+  const modalEl = document.getElementById("eventModal");
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  modal.hide();
+
+  await loadCalendars();
+  const calIdAfter = await ensureUserCalendarId();
+  if (calIdAfter) {
+    await loadEventsToCalendar(calIdAfter);
+  }
+});
+
+
+async function loadProfileWeather() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/weather/profile/current", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const data = await res.json();  // { region_name, days: [...] }
+
+    const boxTitle = document.getElementById("region-weather-title");
+    const boxDesc  = document.getElementById("region-weather-desc");
+    const listBox  = document.getElementById("region-weather-list");
+    if (!data.days || !boxTitle || !boxDesc || !listBox) return;
+
+    boxTitle.textContent = `${data.region_name}의 6일간 날씨`;
+    boxDesc.textContent  = "오늘을 포함한 6일치 동네 날씨예요.";
+
+    listBox.innerHTML = "";
+
+    data.days.forEach((d, idx) => {
+      const div = document.createElement("div");
+      div.className = "d-flex align-items-center small mb-1";
+
+      const weekday = formatKoreanWeekday(d.date);
+      const label = idx === 0 ? "오늘" : weekday;
+
+      const temp = d.temp;
+      const tmax = d.temp_max;
+      const tmin = d.temp_min;
+
+      const tempPart = (tmax != null && tmin != null)
+        ? `${tmax.toFixed(0)}° / ${tmin.toFixed(0)}°`
+        : (temp != null ? `${temp.toFixed(0)}°` : "-°");
+
+      const iconEmoji = mapIconToEmoji(d.icon);
+      const desc = d.desc || "";
+
+      div.innerHTML = `
+        <span class="text-muted" style="width:32px;">${label}</span>
+        <span style="width:32px; text-align:center;">${iconEmoji}</span>
+        <span class="fw-semibold" style="width:80px; text-align:right;">${tempPart}</span>
+        <span class="text-muted" style="flex:1; text-align:left; margin-left:8px;">
+          ${desc}
+        </span>
+      `;
+      listBox.appendChild(div);
+    });
+  } catch (e) {
+    console.error("profile weather error", e);
+  }
+}
+
+// 캘린더 로직
+let currentYear, currentMonth;
+let eventsCache = {}; 
+let userBaseAddress = null;
+
+function initCalendar() {
+  const today = new Date();
+  const body = {
+    user_id: 0,                 // 백엔드에서 current_user.id로 덮어쓰기 때문에 안 보내도 되게 스키마 수정하는 게 좋음
+    place_id: null,
+    event_date: today.toISOString().slice(0, 10),
+    start_time: null,
+    end_time: null,
+    memo: "내 캘린더"
+  };
+  currentYear = today.getFullYear();
+  currentMonth = today.getMonth();
+  document.getElementById("prev-month").onclick = () => changeMonth(-1);
+  document.getElementById("next-month").onclick = () => changeMonth(1);
+  renderCalendar();
+}
+
+async function changeMonth(delta) {
+  currentMonth += delta;
+  if (currentMonth < 0) { currentMonth = 11; currentYear--; }
+  else if (currentMonth > 11) { currentMonth = 0; currentYear++; }
+  renderCalendar();
+
+  const calId = await ensureUserCalendarId();
+  if (calId) {
+    await loadEventsToCalendar(calId);  
+  }
+}
+
+function renderCalendar() {
+  const title = document.getElementById("month-title");
+  title.textContent = `${currentYear}년 ${currentMonth+1}월`;
+
+  const body = document.getElementById("calendar-body");
+  body.innerHTML = "";
+
+  const first = new Date(currentYear, currentMonth, 1);
+  const last  = new Date(currentYear, currentMonth+1, 0);
+  const startDay = first.getDay();
+  const total = last.getDate();
+
+  const today = new Date();
+  const isThisMonth = (today.getFullYear() === currentYear && today.getMonth() === currentMonth);
+
+  for (let i=0;i<startDay;i++) body.appendChild(document.createElement("div"));
+
+  for (let d=1; d<=total; d++) {
+    const div = document.createElement("div");
+    div.className = "calendar-day";
+    const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    if (isThisMonth && d === today.getDate()) div.classList.add("today");
+    div.dataset.date = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    console.log("cell date:", dateStr); 
+    div.innerHTML = `
+    <div class="date-num">${d}</div>
+    <div class="small text-muted event-list">일정 없음</div>
+    `;
+    body.appendChild(div);
+  }
+}
+
+async function loadCalendars() {
+  const res = await apiFetch("http://127.0.0.1:8000/calendar/", {
+    headers: { "Authorization": "Bearer " + getToken() }
+  });
+  if (!res) return;       
+  const list = res.ok ? await res.json() : [];
+
+  const ul = document.getElementById("my-cal-list");
+  ul.innerHTML = "";
+  list.forEach(c => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.textContent = c.memo || c.title || "내 캘린더";
+    ul.appendChild(li);
+  });
+}
+
+let userCalendarId = null;
+
+async function loadEventsToCalendar(calId) {
+  const token = getToken();
+  const res = await fetch(`http://127.0.0.1:8000/calendar/${calId}/events`, {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (!res.ok) return;
+  const events = await res.json();
+  console.log("events from API:", events);
+
+  // 1) 현재 달 기준으로 먼저 필터링
+  const filtered = events.filter(ev => {
+    const iso = ev.start_datetime || ev.start_date;
+    if (!iso) return false;
+    const d = new Date(iso);
+    return d.getFullYear() === currentYear && d.getMonth() === currentMonth;
+  });
+
+  // 2) 날씨 추천 payload (현재 달 이벤트만)
+  const placeWeatherPayload = filtered
+    .filter(ev => ev.location && (ev.start_datetime || ev.start_date))
+    .map(ev => ({
+      address: ev.location,
+      date: (ev.start_datetime || ev.start_date).slice(0,10)
+    }));
+  const placeWeatherMap = await fetchWeatherRecommendations(placeWeatherPayload);
+  debugPlaceWeatherMap = placeWeatherMap;
+
+  // 2-1) 한 달 전체 날짜에 대해 사용자 위치 기준 날씨 요청 (따봉용)
+  let userWeatherMap = {};
+  if (userBaseAddress) {
+    const monthDaysPayload = [];
+
+    const firstDay = new Date(currentYear, currentMonth, 1);
+    const lastDay  = new Date(currentYear, currentMonth + 1, 0);
+    const total    = lastDay.getDate();
+
+    for (let d = 1; d <= total; d++) {
+      const dateStr = `${currentYear}-${String(currentMonth+1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+      monthDaysPayload.push({
+        address: userBaseAddress,    // ★ 항상 사용자 위치
+        date: dateStr                // ★ 그 달의 모든 날짜
+      });
+    }
+
+    userWeatherMap = await fetchWeatherRecommendations(monthDaysPayload);
+    debugUserWeatherMap = userWeatherMap;
+  }
+
+  const cells = document.querySelectorAll(".calendar-day");
+  const map = {};
+  eventsCache = {};
+
+  // 3) 내 일정 목록: 현재 달만
+  const ul = document.getElementById("my-cal-list");
+  ul.innerHTML = "";
+
+  const sorted = [...filtered].sort((a, b) => {
+    const sa = (a.start_datetime || a.start_date);
+    const sb = (b.start_datetime || b.start_date);
+    return sa.localeCompare(sb);
+  });
+
+  sorted.forEach(ev => {
+    const iso = (ev.start_datetime || ev.start_date);
+    const d = new Date(iso);
+    const month = d.getMonth() + 1;
+    const day = d.getDate();
+    const time = iso.slice(11, 16);
+    const keyForEvent = `${iso.slice(0,10)}|${ev.location || ""}`;
+
+    const w = placeWeatherMap[keyForEvent];
+    console.log("event item:", keyForEvent, ev);
+    console.log("weather for event:", ev.title, keyForEvent, w);
+
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    if (ev.is_shared === 1) {
+      li.classList.add("shared-event-list-item");
+    }
+
+    let emoji = "";
+    let wText = "날씨 정보 없음";
+
+    if (ev.location) {
+      const key = `${iso.slice(0,10)}|${ev.location}`;
+      const w = placeWeatherMap[key];
+      console.log("weather for event:", ev.title, key, w);
+
+      emoji = weatherEmojiFromResult(w);
+
+      if (w && w.weather && w.weather.avg_weather) {
+        const aw = w.weather.avg_weather;
+        const tRaw = aw["기온(℃)"];
+        const pRaw = aw["강수량(mm)"];
+
+        const parts = [];
+        if (tRaw != null) parts.push(`평균 ${Number(tRaw).toFixed(1)}°C`);
+        if (pRaw != null) parts.push(`강수 ${Number(pRaw).toFixed(1)}mm`);
+
+        if (parts.length > 0) {
+          wText = parts.join(", ");
+        }
+      }
+    }
+
+    li.innerHTML = `
+      <div class="me-2 flex-grow-1">
+        <div class="fw-semibold">${emoji ? emoji + " " : ""}${ev.title}</div>
+        <div class="text-muted small">
+          ${month}/${day} ${time} · ${wText}
+        </div>
+      </div>
+      <div class="d-flex gap-1">
+        <button class="btn btn-sm btn-outline-primary btn-share-event">공유하기</button>
+        <button class="btn btn-sm btn-outline-secondary btn-edit-event">수정</button>
+        <button class="btn btn-sm btn-outline-danger btn-delete-event">삭제</button>
+      </div>
+    `;
+
+    const shareBtn = li.querySelector(".btn-share-event");
+    shareBtn.onclick = async (e) => {
+      e.stopPropagation();
+      await openShareModal(ev);
+    };
+
+    const editBtn = li.querySelector(".btn-edit-event");
+    editBtn.onclick = (e) => {
+      e.stopPropagation();
+      openEventModalForEdit(ev);   // 수정 모드로 모달 열기
+    };
+
+    const deleteBtn = li.querySelector(".btn-delete-event");
+    deleteBtn.onclick = async (e) => {
+      e.stopPropagation();
+      await deleteEvent(ev);
+    };
+
+    li.onclick = () => openEventDetail(ev);
+    ul.appendChild(li);
+  });
+
+
+
+  // 4) 날짜별 이벤트/캐시 구성
+  filtered.forEach(ev => {
+    const src = ev.start_datetime || ev.start_date;
+    if (!src) return;
+    const d = src.slice(0, 10);   // "YYYY-MM-DD"
+    if (!map[d]) map[d] = [];
+    map[d].push(ev.title);
+    if (!eventsCache[d]) eventsCache[d] = [];
+    eventsCache[d].push(ev);
+  });
+  console.log("eventsByDate map:", map);
+
+  // 5) 셀 렌더링 + 따봉/이모지
+  cells.forEach(cell => {
+    const date = cell.dataset.date;           // "YYYY-MM-DD"
+    const label = cell.querySelector(".event-list");
+    const dateEl = cell.querySelector(".date-num");
+    if (!label || !dateEl) return;
+
+    const cellEvents = eventsCache[date] || [];
+
+    // 1) 사용자 위치 기준 "좋은 날"인지 먼저 판별
+    let dayIsGood = false;
+    let wForDay = null;
+
+    if (userBaseAddress) {
+      const key = `${date}|${userBaseAddress}`;
+      wForDay = userWeatherMap[key];
+      if (wForDay && (wForDay.is_good === true || wForDay.quality === "good")) {
+        dayIsGood = true;
+      }
+    }
+
+    // 2) 기존 배지 제거 후, good 이면 새 배지 추가
+    const oldBadge = dateEl.querySelector(".day-good-badge");
+    if (oldBadge) oldBadge.remove();
+
+    if (dayIsGood) {
+      const badge = document.createElement("span");
+      badge.textContent = "👍";
+      badge.className = "day-good-badge ms-1";
+      dateEl.appendChild(badge);
+    }
+
+    // 3) 이하 일정/표정 이모티콘 로직은 그대로
+    if (cellEvents.length > 0) {
+      label.innerHTML = "";
+      cellEvents.slice(0, 3).forEach(ev => {
+        const chip = document.createElement("div");
+        chip.className = "event-chip";
+        if (ev.is_shared === 1) chip.classList.add("shared-event-chip");
+
+        let emoji = "";
+        if (ev.location) {
+          const key = `${date}|${ev.location}`;
+          const w = placeWeatherMap[key];
+          emoji = weatherEmojiFromResult(w);
+        }
+
+        chip.textContent = `${emoji ? emoji + " " : ""}${ev.title}`;
+        label.appendChild(chip);
+      });
+      if (cellEvents.length > 3) {
+        const more = document.createElement("div");
+        more.className = "text-muted small";
+        more.textContent = `+${cellEvents.length - 3} 더보기`;
+        label.appendChild(more);
+      }
+    } else {
+      label.textContent = "일정 없음";
+    }
+  });
+}
+
+
+// 일정 배열 [{ address, date }, ...] 로 추천 요청
+async function fetchWeatherRecommendations(events) {
+  if (!events.length) return {};
+
+  const token = getToken();    
+  if (!token) return {};
+  try {
+    const res = await fetch("http://127.0.0.1:8000/calendar/weather/recommend", {
+      method: "POST",
+      headers: { "Content-Type": "application/json", "Authorization": "Bearer " + token },
+      body: JSON.stringify(events)
+    });
+    if (!res.ok) {
+      console.warn("weather recommend failed", res.status);
+      return {};
+    }
+
+    const data = await res.json(); // { results: [...] }
+    console.log("weather recommend data:", data); 
+
+    const map = {};
+    (data.results || []).forEach(r => {
+      const key = `${r.date}|${r.address}`;
+      console.log("result item:", key, r);
+      map[key] = r;
+    });
+    return map;  // { "2025-12-01|서울 종로구 ...": {is_good, weather, ...}, ... }
+  } catch (e) {
+    console.error("weather recommend error", e);
+    return {};
+  }
+}
+
+
+async function ensureUserCalendarId() {
+  const token = getToken();
+  if (userCalendarId) return userCalendarId;
+
+  const res = await fetch("http://127.0.0.1:8000/calendar/", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  const list = res.ok ? await res.json() : [];
+  if (list.length === 0) {
+    alert("캘린더가 없습니다. 백엔드에서 UserCalendar 생성 API를 맞추거나, 구조를 정리해야 합니다.");
+    return null;
+  }
+  userCalendarId = list[0].id;
+  return userCalendarId;
+}
+
+window.addEventListener("DOMContentLoaded", async () => {
+  const btnNew = document.getElementById("btn-new-calendar");
+  btnNew.addEventListener("click", () => {
+    openEventModal();          // 오늘 날짜 기준으로 모달 오픈
+  });
+
+  const calBody = document.getElementById("calendar-body");
+  calBody.addEventListener("dblclick", (e) => {
+    const cell = e.target.closest(".calendar-day");
+    if (!cell) return;
+    const dateStr = cell.dataset.date;   // renderCalendar에서 넣어둔 yyyy-mm-dd
+    openDayEventModal(dateStr); 
+  });
+
+  const token = getToken();
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "login.html";
+    return;
+  }
+  await setupHeaderAndProfile();
+  await loadProfileWeather();
+  initCalendar();
+  await loadCalendars();
+
+  const calId = await ensureUserCalendarId();
+  if (calId) {
+    await loadEventsToCalendar(calId);   
+  }
+  await checkIncomingShares();
+});
+
+function openDayEventModal(dateStr) {
+  const listEl = document.getElementById("day-event-list");
+  const titleEl = document.getElementById("day-modal-title");
+  const addBtn = document.getElementById("btn-add-on-day");
+
+  // 제목: "2025년 12월 8일" 형태
+  const d = new Date(dateStr);
+  titleEl.textContent = `${d.getFullYear()}년 ${d.getMonth()+1}월 ${d.getDate()}일 일정`;
+
+  listEl.innerHTML = "";
+  const events = eventsCache[dateStr] || [];
+
+  if (events.length === 0) {
+    const li = document.createElement("li");
+    li.className = "list-group-item text-muted small";
+    li.textContent = "등록된 일정이 없습니다.";
+    listEl.appendChild(li);
+  } else {
+    events.forEach(ev => {
+      const li = document.createElement("li");
+      li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+      let emoji = "";
+      let wText = "날씨 정보 없음";
+
+      if (ev.location) {
+        const key = `${dateStr}|${ev.location}`;
+        const w = debugPlaceWeatherMap[key];
+        console.log("day modal weather:", ev.title, key, w);
+
+        emoji = weatherEmojiFromResult(w);
+
+        if (w) {
+          const parts = [];
+          if (w.avg_temp != null)  parts.push(`평균 ${Number(w.avg_temp).toFixed(1)}°C`);
+          if (w.precip_mm != null) parts.push(`강수 ${Number(w.precip_mm).toFixed(1)}mm`);
+          if (parts.length > 0) wText = parts.join(", ");
+        }
+      }
+
+      li.innerHTML = `
+        <div class="me-2 flex-grow-1">
+          <div class="fw-semibold">${emoji ? emoji + " " : ""}${ev.title}</div>
+          <div class="text-muted small">
+            ${(ev.start_datetime || ev.start_date).slice(11,16)}
+            ~ ${(ev.end_datetime || ev.end_date).slice(11,16)}
+            · ${wText}
+          </div>
+        </div>
+        <div class="d-flex gap-1">
+          <button class="btn btn-sm btn-outline-primary btn-share-event">공유</button>
+          <button class="btn btn-sm btn-outline-secondary btn-edit-event">수정</button>
+          <button class="btn btn-sm btn-outline-danger btn-delete-event">삭제</button>
+        </div>
+      `;
+
+      const shareBtn = li.querySelector(".btn-share-event");
+      shareBtn.onclick = async (e) => {
+        e.stopPropagation();
+        await openShareModal(ev);
+      };
+
+      const editBtn = li.querySelector(".btn-edit-event");
+      editBtn.onclick = (e) => {
+        e.stopPropagation();
+        // 날짜별 모달 닫고 수정 모달 오픈
+        bootstrap.Modal.getInstance(document.getElementById("dayEventModal")).hide();
+        openEventModalForEdit(ev);
+      };
+
+      const deleteBtn = li.querySelector(".btn-delete-event");
+      deleteBtn.onclick = async (e) => {
+        e.stopPropagation();
+        await deleteEvent(ev);
+      };
+
+      // 리스트 전체 클릭 시 상세 정보만 보고 싶으면 유지
+      li.onclick = () => openEventDetail(ev);
+
+      listEl.appendChild(li);
+    });
+  }
+
+  addBtn.onclick = () => {
+    const modal = bootstrap.Modal.getInstance(document.getElementById("dayEventModal"));
+    modal.hide();
+    openEventModal(dateStr);   // ★ 이 날짜로 일정 추가 모달 오픈
+  };
+
+  const modal = new bootstrap.Modal(document.getElementById("dayEventModal"));
+  modal.show();
+}
+
+function openEventDetail(ev) {
+  const isShared = ev.is_shared === 1;
+
+  const title = ev.title;
+  const start = (ev.start_datetime || ev.start_date);
+  const end   = (ev.end_datetime || ev.end_date);
+  const place = ev.location || "-";
+  const memo  = ev.memo || ev.description || "-";
+
+  let msg =
+    `제목: ${title}\n` +
+    `시간: ${start} ~ ${end}\n` +
+    `장소: ${place}\n` +
+    `메모: ${memo}\n`;
+
+  if (isShared) {
+    msg += `\n※ 공유로 받은 일정입니다.`;
+  }
+
+  alert(msg);
+}
+
+function openEventModal(defaultDate = null) {
+  const startInput = document.getElementById("ev-start");
+  const endInput   = document.getElementById("ev-end");
+
+  const baseDate = defaultDate ? new Date(defaultDate) : new Date();
+  const base = new Date(
+    baseDate.getFullYear(),
+    baseDate.getMonth(),
+    baseDate.getDate(),
+    9, 0
+  );
+  const end  = new Date(base.getTime() + 60*60*1000);
+
+  const toLocal = d => {
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off*60000);
+    return local.toISOString().slice(0,16);
+  };
+
+  startInput.value = toLocal(base);
+  endInput.value   = toLocal(end);
+
+  placeInput.value = "";
+  placeInput.dataset.regionId = "";
+  placeInput.dataset.regionCode = "";
+  suggestBox.style.display = "none";
+  suggestBox.innerHTML = "";
+  document.getElementById("place-preview").textContent = "";
+
+  const modal = new bootstrap.Modal(document.getElementById("eventModal"));
+  modal.show();
+}
+
+async function loadFollowingForShare() {
+  const token = getToken();
+  if (!token) return;
+  const res = await fetch("http://127.0.0.1:8000/follow/following", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  shareTargetFollowing = res.ok ? await res.json() : [];
+}
+
+async function openShareModal(ev) {
+  shareSourceEvent = ev;
+
+  // 팔로잉 목록 없으면 로딩
+  if (!shareTargetFollowing.length) {
+    await loadFollowingForShare();
+  }
+
+  const titleEl = document.getElementById("share-event-title");
+  const select  = document.getElementById("share-target-select");
+  titleEl.textContent = `공유할 일정: ${ev.title}`;
+
+  select.innerHTML = "";
+
+  if (!shareTargetFollowing.length) {
+    const opt = document.createElement("option");
+    opt.value = "";
+    opt.textContent = "먼저 친구를 팔로우해 주세요.";
+    select.appendChild(opt);
+    select.disabled = true;
+  } else {
+    select.disabled = false;
+    shareTargetFollowing.forEach(f => {
+      const opt = document.createElement("option");
+      opt.value = f.following_id;
+      opt.textContent = f.following_nickname || `사용자 #${f.following_id}`;
+      select.appendChild(opt);
+    });
+  }
+
+  const modal = new bootstrap.Modal(document.getElementById("shareEventModal"));
+  modal.show();
+}
+
+document.getElementById("btn-share-confirm").onclick = async () => {
+  const select = document.getElementById("share-target-select");
+  const targetId = parseInt(select.value, 10);
+  if (!targetId || !shareSourceEvent) return;
+
+  const token = getToken();
+  const res = await fetch("http://127.0.0.1:8000/calendar/share/request", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({
+      event_id: shareSourceEvent.id,
+      target_user_id: targetId
+    })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    alert((err && err.detail) || "일정 공유에 실패했습니다.");
+    return;
+  }
+
+  alert("일정 공유 요청을 보냈습니다.");
+  bootstrap.Modal.getInstance(document.getElementById("shareEventModal")).hide();
+};
+async function checkIncomingShares() {
+  const token = getToken();
+  if (!token) return;
+
+  const res = await fetch("http://127.0.0.1:8000/calendar/share/incoming", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (!res.ok) return;
+  const requests = await res.json();   // [{id, from_user_id, event_id, status, ...}]
+
+  for (const req of requests) {
+    await showShareConfirmDialog(req);
+  }
+}
+
+async function respondShare(requestId, accept) {
+  const token = getToken();
+  const res = await fetch(`http://127.0.0.1:8000/calendar/share/${requestId}/respond`, {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ accept })
+  });
+  return res.ok;
+}
+
+async function showShareConfirmDialog(req) {
+  const textEl = document.getElementById("share-confirm-text");
+  const name = req.from_user_nickname || `사용자 #${req.from_user_id}`;
+  textEl.textContent = `${name} 가 일정을 공유했습니다. 캘린더에 추가하시겠습니까?`;
+
+  return new Promise(resolve => {
+    const modalEl = document.getElementById("shareConfirmModal");
+    const modal = new bootstrap.Modal(modalEl);
+
+    const acceptBtn = document.getElementById("btn-share-accept");
+    const rejectBtn = document.getElementById("btn-share-reject");
+
+    const cleanup = async (reload) => {
+      acceptBtn.onclick = null;
+      rejectBtn.onclick = null;
+      modal.hide();
+      if (reload) {
+        const calId = await ensureUserCalendarId();
+        if (calId) await loadEventsToCalendar(calId);
+      }
+      resolve();
+    };
+
+    acceptBtn.onclick = async () => {
+      const ok = await respondShare(req.id, true);
+      if (!ok) alert("공유 일정 수락에 실패했습니다.");
+      await cleanup(true);
+    };
+
+    rejectBtn.onclick = async () => {
+      const ok = await respondShare(req.id, false);
+      if (!ok) alert("공유 일정 거절에 실패했습니다.");
+      await cleanup(false);
+    };
+
+    modal.show();
+  });
+}
+function openEventModalForEdit(ev) {
+  const startInput = document.getElementById("ev-start");
+  const endInput   = document.getElementById("ev-end");
+  const titleInput = document.getElementById("ev-title");
+  const memoInput  = document.getElementById("ev-memo");
+  const remindSel  = document.getElementById("ev-remind");
+  const placeInputEl = document.getElementById("ev-place");
+
+  // 시작/종료 시간을 로컬 포맷으로 변환
+  const toLocal = iso => {
+    const d = new Date(iso);
+    const off = d.getTimezoneOffset();
+    const local = new Date(d.getTime() - off*60000);
+    return local.toISOString().slice(0,16);
+  };
+
+  titleInput.value = ev.title || "";
+  memoInput.value  = ev.memo || ev.description || "";
+  placeInputEl.value = ev.location || "";
+  remindSel.value = ev.remind_minutes != null ? String(ev.remind_minutes) : "0";
+
+  startInput.value = toLocal(ev.start_datetime || ev.start_date);
+  endInput.value   = toLocal(ev.end_datetime || ev.end_date);
+
+  // 수정 모드 표시용
+  document.getElementById("event-form").dataset.editEventId = ev.id;
+
+  const modal = new bootstrap.Modal(document.getElementById("eventModal"));
+  modal.show();
+}
+async function deleteEvent(ev) {
+  if (!confirm(`'${ev.title}' 일정을 삭제할까요?`)) return;
+
+  const token = getToken();
+  const res = await fetch(`http://127.0.0.1:8000/calendar/events/${ev.id}`, {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + token }
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(()=>null);
+    alert((err && err.detail) || "일정 삭제에 실패했습니다.");
+    return;
+  }
+
+  alert("일정을 삭제했습니다.");
+
+  await loadCalendars();
+  const calId = await ensureUserCalendarId();
+  if (calId) {
+    await loadEventsToCalendar(calId);
+  }
+}
+
+let notifCount = 0;
+
+async function loadNotifications() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/notifications/", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const items = await res.json();   // [{id, type, message, ...}, ...]
+
+    const ul = document.getElementById("notif-list");
+    if (!ul) return;
+    ul.innerHTML = "";
+
+    items.forEach(n => {
+      const li = document.createElement("li");
+      li.className = "list-group-item py-2";
+      li.textContent = n.message;
+      ul.appendChild(li);
+    });
+
+    if (items.length > 0) {
+      notifCount = items.filter(n => !n.is_read).length || items.length;
+      const badge = document.getElementById("notif-badge");
+      if (badge) {
+        badge.textContent = notifCount;
+        badge.classList.toggle("d-none", notifCount === 0);
+      }
+    }
+  } catch (e) {
+    console.error("loadNotifications error", e);
+  }
+}
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("notif-btn");
+  const panel = document.getElementById("notif-panel");
+  const closeBtn = document.getElementById("notif-close");
+
+  if (!btn || !panel) return;
+
+  btn.addEventListener("click", async () => {
+    if (panel.classList.contains("d-none")) {
+      await loadNotifications();          // 열 때마다 최신 목록
+      panel.classList.remove("d-none");
+      const badge = document.getElementById("notif-badge");
+      if (badge) badge.classList.add("d-none");   // 열면 뱃지 초기화
+    } else {
+      panel.classList.add("d-none");
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => panel.classList.add("d-none"));
+  }
+});
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

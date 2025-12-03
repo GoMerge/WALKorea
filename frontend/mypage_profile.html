@@ -1,0 +1,765 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>마이페이지 | WALKorea</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color:#f5f7fb; }
+
+    .sidebar-fixed {
+      width: 260px;
+      min-width: 260px;
+      max-width: 260px;
+      border-right: 1px solid #e5e7eb;
+      background-color:#fff;
+    }
+
+    /* 사이드바 메뉴 공통 스타일 */
+    .sidebar .menu-title {
+      font-size:0.85rem;
+      font-weight:600;
+      color:#6b7280;
+      margin-top:1rem;
+      margin-bottom:0.25rem;
+    }
+
+    .sidebar .nav-link {
+      font-size:0.95rem;
+      color:#374151;
+      padding:0.45rem 0.75rem;
+      border-radius:0.35rem;
+      margin-bottom:2px;
+    }
+
+    .sidebar .nav-link.active {
+      background-color:#e0f2fe;
+      color:#0369a1;
+      font-weight:600;
+    }
+
+    .calendar-grid {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:4px;
+      font-size:0.85rem;
+    }
+    .calendar-day {
+      min-height:70px;
+      border-radius:4px;
+      padding:4px;
+      background-color:#fff;
+      border:1px solid #e5e7eb;
+    }
+    .calendar-day.today {
+      border:2px solid #16a34a;
+    }
+    .calendar-day .date-num {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .weather-box {
+      background-color:#fff;
+      border-radius:0.75rem;
+      padding:0.75rem 0.85rem;
+      box-shadow:0 1px 3px rgba(15,23,42,0.08);
+      font-size:0.8rem;
+    }
+
+    #region-weather-list div {
+      line-height:1.4;
+    }
+  </style>
+</head>
+<body>
+<header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">WALKorea</a>
+    <ul class="navbar-nav ms-auto gap-2">
+      <li class="nav-item"><a class="nav-link" href="recommend.html">추천 여행지</a></li>
+      <li class="nav-item"><a class="nav-link" href="calendar.html">여행 캘린더</a></li>
+      <li class="nav-item"><a class="nav-link" href="mypage_calendar.html">마이페이지</a></li>
+      <!-- 알림 아이콘 -->
+      <li class="nav-item position-relative">
+        <button id="notif-btn" class="btn btn-link nav-link p-0 position-relative">
+          <span class="fs-5">🔔</span>
+          <span id="notif-badge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+          </span>
+        </button>
+
+        <!-- 알림 리스트 패널 -->
+        <div id="notif-panel"
+             class="card shadow-sm position-absolute end-0 mt-2 d-none"
+             style="width:260px; z-index:1050;">
+          <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+            <span class="small fw-semibold">알림</span>
+            <button id="notif-close" class="btn btn-sm btn-outline-secondary py-0 px-1">×</button>
+          </div>
+          <ul id="notif-list" class="list-group list-group-flush small"></ul>
+        </div>
+      </li>
+      <li class="nav-item" id="nav-login"><a class="btn btn-success" href="login.html">로그인</a></li>
+      <li class="nav-item" id="nav-signup"><a class="btn btn-primary" href="signup.html">회원가입</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container-fluid" style="margin-top:10px;">
+  <div class="d-flex">
+    <!-- 왼쪽: 마이페이지 카테고리 -->
+    <aside class="sidebar-fixed sidebar p-3">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
+            style="width:40px;height:40px;">
+          <span id="side-initial">W</span>
+        </div>
+        <div class="ms-2">
+          <div class="fw-semibold" id="side-nickname">로그인 사용자</div>
+          <div class="text-muted small" id="side-email">-</div>
+        </div>
+      </div>
+
+      <div class="weather-box mb-3" id="weather-box">
+        <div class="fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+        <div class="small text-muted mb-2" id="region-weather-desc">
+          마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
+        </div>
+        <div id="region-weather-list"></div>
+        <a class="btn btn-outline-success btn-sm mt-2 w-100" href="mypage_profile.html">
+          지역 설정하러 가기
+        </a>
+      </div>
+
+      <div class="menu-title">마이페이지</div>
+      <nav class="nav flex-column">
+        <a href="mypage_calendar.html"  class="nav-link">내 일정</a>
+        <a href="mypage_friends.html"   class="nav-link">친구 관리</a>
+        <a href="mypage_recommend.html" class="nav-link">맞춤 관광</a>
+        <a href="mypage_profile.html"   class="nav-link active">프로필 수정</a>
+      </nav>
+    </aside>
+    
+    <section class="flex-grow-1 py-5 px-4" style="max-width:960px;">
+      <div class="row g-4">
+        <div class="col-lg-7">
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <!-- 여기부터 기존 내 정보 form 내용 그대로 -->
+              <h3 class="mb-3 fw-bold">내 정보</h3>
+              <p class="text-muted small mb-4">
+                가입 시 입력한 기본 정보를 확인하고 일부를 수정할 수 있습니다.
+              </p>
+              <form id="profile-form">
+                <div class="mb-3">
+                  <label class="form-label">아이디</label>
+                  <input type="text" class="form-control" id="userid" disabled>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">이메일</label>
+                  <input type="email" class="form-control" id="email" disabled>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">닉네임</label>
+                  <input type="text" class="form-control" id="nickname">
+                  <div id="nickname-msg" class="small mt-1"></div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">휴대폰 번호</label>
+                  <input type="text" class="form-control" id="phonenum" placeholder="01012345678">
+                  <div id="phone-msg" class="small mt-1"></div>
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">생년월일</label>
+                  <input type="date" class="form-control" id="birthday">
+                </div>
+                <div class="mb-3">
+                  <label class="form-label">성별</label>
+                  <select class="form-select" id="gender">
+                    <option value="">선택</option>
+                    <option value="M">남성</option>
+                    <option value="F">여성</option>
+                    <option value="O">기타</option>
+                  </select>
+                </div>
+
+                <!-- 거주 지역 -->
+                <div class="mb-3">
+                  <label class="form-label">거주 지역</label>
+                  <div class="d-flex gap-2">
+                    <input type="text" class="form-control" id="edit-region-label"
+                          placeholder="지역을 선택해주세요" readonly>
+                    <button type="button" class="btn btn-outline-secondary"
+                            data-bs-toggle="modal" data-bs-target="#regionModal">
+                      지역 선택
+                    </button>
+                  </div>
+                  <input type="hidden" id="edit-region-id">
+                </div>
+
+                <button type="submit" class="btn btn-success w-100 mt-2">정보 저장</button>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <!-- 우측: 비밀번호 변경 / 계정 관리 -->
+        <div class="col-lg-5">
+          <div class="card shadow-sm mb-4">
+            <div class="card-body">
+              <h4 class="fw-bold mb-3">비밀번호 변경</h4>
+              <form id="pw-form">
+                <div class="mb-2">
+                  <label class="form-label">현재 비밀번호</label>
+                  <input type="password" class="form-control" id="current_password" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">새 비밀번호</label>
+                  <input type="password" class="form-control" id="new_password" required>
+                </div>
+                <div class="mb-2">
+                  <label class="form-label">새 비밀번호 확인</label>
+                  <input type="password" class="form-control" id="new_password_confirm" required>
+                </div>
+                <div id="pw-msg" class="small mt-1"></div>
+                <button type="submit" class="btn btn-outline-primary w-100 mt-2">비밀번호 변경</button>
+              </form>
+            </div>
+          </div>
+
+          <div class="card shadow-sm">
+            <div class="card-body">
+              <h4 class="fw-bold mb-3">계정 관리</h4>
+              <button id="logout-btn" class="btn btn-outline-secondary w-100 mb-2">로그아웃</button>
+              <button id="delete-btn" class="btn btn-outline-danger w-100">회원 탈퇴</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<!-- 지역 선택 모달 -->
+<div class="modal fade" id="regionModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h5 class="modal-title">거주 지역 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="mb-2">
+          <input type="text" class="form-control form-control-sm" id="region-search"
+                 placeholder="지역명 검색 예) 서울, 서초구">
+        </div>
+        <div class="row g-2" style="max-height:320px; overflow-y:auto;">
+          <div class="col-3 border-end">
+            <div class="fw-semibold small mb-1">시·도</div>
+            <ul class="list-group list-group-flush small" id="sido-list"></ul>
+          </div>
+          <div class="col-4 border-end">
+            <div class="fw-semibold small mb-1">시·군·구</div>
+            <ul class="list-group list-group-flush small" id="sigungu-list"></ul>
+          </div>
+          <div class="col-5">
+            <div class="fw-semibold small mb-1">동·읍·면</div>
+            <ul class="list-group list-group-flush small" id="dong-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <div class="me-auto small text-muted" id="region-selected-text">선택된 지역: 없음</div>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-success btn-sm" id="region-apply-btn">적용</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script>
+  function formatKoreanWeekday(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const names = ["일", "월", "화", "수", "목", "금", "토"];
+  return names[d.getDay()];
+}
+
+function mapIconToEmoji(icon) {
+  switch (icon) {
+    case "rain": return "🌧️";
+    case "snow": return "❄️";
+    case "fog": return "🌫️";
+    case "wind": return "💨";
+    case "cloudy": return "☁️";
+    case "partly-cloudy-day": return "⛅";
+    case "partly-cloudy-night": return "☁️";
+    case "clear-day": return "☀️";
+    case "clear-night": return "🌙";
+    default: return "🌤️";
+  }
+}
+
+async function loadProfileWeather() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/weather/profile/current", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const data = await res.json();   // { region_name, days: [...] }
+
+    const box = document.getElementById("weather-box");
+    const boxTitle = document.getElementById("region-weather-title");
+    const boxDesc  = document.getElementById("region-weather-desc");
+    const listBox  = document.getElementById("region-weather-list");
+    if (!data.days || !boxTitle || !boxDesc || !listBox || !box) return;
+
+    // 숨김 해제
+    box.style.display = "block";
+
+    boxTitle.textContent = `${data.region_name}의 6일간 날씨`;
+    boxDesc.textContent  = "오늘을 포함한 6일치 동네 날씨예요.";
+
+    listBox.innerHTML = "";
+
+    data.days.forEach((d, idx) => {
+      const div = document.createElement("div");
+      div.className = "d-flex align-items-center small mb-1";
+
+      const weekday = formatKoreanWeekday(d.date);
+      const label = idx === 0 ? "오늘" : weekday;
+
+      const temp = d.temp;
+      const tmax = d.temp_max;
+      const tmin = d.temp_min;
+
+      const tempPart = (tmax != null && tmin != null)
+        ? `${tmax.toFixed(0)}° / ${tmin.toFixed(0)}°`
+        : (temp != null ? `${temp.toFixed(0)}°` : "-°");
+
+      const iconEmoji = mapIconToEmoji(d.icon);
+      const desc = d.desc || "";
+
+      div.innerHTML = `
+        <span class="text-muted" style="width:32px;">${label}</span>
+        <span style="width:32px; text-align:center;">${iconEmoji}</span>
+        <span class="fw-semibold" style="width:80px; text-align:right;">${tempPart}</span>
+        <span class="text-muted" style="flex:1; text-align:left; margin-left:8px;">
+          ${desc}
+        </span>
+      `;
+      listBox.appendChild(div);
+    });
+  } catch (e) {
+    console.error("profile weather error", e);
+  }
+}
+
+  
+// ---- 공통 헤더 + 초기 로딩 ----
+window.addEventListener("DOMContentLoaded", async function() {
+  const token = localStorage.getItem("access_token");
+  const nav = document.querySelector(".navbar-nav");
+  const loginLi = document.getElementById("nav-login");
+  const signupLi = document.getElementById("nav-signup");
+
+  if (token && nav) {
+    if (loginLi) loginLi.remove();
+    if (signupLi) signupLi.remove();
+
+    const profileLi = document.createElement("li");
+    profileLi.className = "nav-item d-flex align-items-center";
+    profileLi.innerHTML = `<span class="me-2 fw-semibold" id="nav-nickname">로그인 사용자</span>`;
+    nav.appendChild(profileLi);
+
+    const logoutNavLi = document.createElement("li");
+    logoutNavLi.className = "nav-item";
+    logoutNavLi.innerHTML = `<a class="btn btn-outline-danger" href="#">로그아웃</a>`;
+    logoutNavLi.querySelector("a").onclick = function(e) {
+      e.preventDefault();
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      window.location.href = "index.html";
+    };
+    nav.appendChild(logoutNavLi);
+
+    await loadProfile(token);
+    await loadSidos();
+    await loadProfileWeather();
+    document.getElementById("region-apply-btn").onclick = applyRegionSelection;
+  } else {
+    alert("로그인이 필요합니다.");
+    window.location.href = "login.html";
+    return;
+  }
+
+  document.getElementById("profile-form").addEventListener("submit", onSaveProfile);
+  document.getElementById("pw-form").addEventListener("submit", onChangePassword);
+  document.getElementById("logout-btn").addEventListener("click", () => {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href = "index.html";
+  });
+  document.getElementById("delete-btn").addEventListener("click", onDeleteAccount);
+
+  // 닉네임 중복 체크
+  const nickInput = document.getElementById("nickname");
+  const nickMsg = document.getElementById("nickname-msg");
+  let nickTimer = null;
+  nickInput.addEventListener("input", function() {
+    clearTimeout(nickTimer);
+    const val = nickInput.value.trim();
+    if (val.length < 2) {
+      nickMsg.textContent = "닉네임을 2자 이상 입력하세요.";
+      nickMsg.className = "small text-danger mt-1";
+      return;
+    }
+    nickTimer = setTimeout(async () => {
+      const res = await fetch(`/auth/check-nickname?nickname=${encodeURIComponent(val)}`);
+      const data = await res.json().catch(()=>null);
+      if (data && data.result === "dup") {
+        nickMsg.textContent = "이미 사용 중인 닉네임입니다.";
+        nickMsg.className = "small text-danger mt-1";
+      } else {
+        nickMsg.textContent = "사용 가능한 닉네임입니다.";
+        nickMsg.className = "small text-success mt-1";
+      }
+    }, 400);
+  });
+
+  // 휴대폰 번호 포맷 체크
+  const phoneInput = document.getElementById("phonenum");
+  const phoneMsg = document.getElementById("phone-msg");
+  phoneInput.addEventListener("input", function() {
+    let val = phoneInput.value.replace(/\D/g, "");
+    phoneInput.value = val;
+    if (!val) {
+      phoneMsg.textContent = "";
+      return;
+    }
+    if (/^010\d{8}$/.test(val)) {
+      phoneMsg.textContent = "사용 가능한 번호입니다.";
+      phoneMsg.className = "small text-success mt-1";
+    } else {
+      phoneMsg.textContent = "010으로 시작하는 11자리 숫자로 입력하세요.";
+      phoneMsg.className = "small text-danger mt-1";
+    }
+  });
+});
+
+// ---- 프로필 로딩 ----
+async function loadProfile(token) {
+  try {
+    const res = await fetch("http://127.0.0.1:8000/user/profile", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+
+    // 상단 네비 닉네임
+    const navNick = document.getElementById("nav-nickname");
+    if (navNick && data.nickname) navNick.textContent = data.nickname;
+
+    // ★ 왼쪽 사이드바 프로필 정보 채우기
+    const sideNick = document.getElementById("side-nickname");
+    const sideEmail = document.getElementById("side-email");
+    const sideInit  = document.getElementById("side-initial");
+    const baseName  = data.nickname || data.userid || "사용자";
+    if (sideNick) sideNick.textContent = baseName;
+    if (sideEmail) sideEmail.textContent = data.email || "";
+    if (sideInit)  sideInit.textContent = baseName[0];
+
+    // 폼 필드들
+    document.getElementById("userid").value = data.userid || "";
+    document.getElementById("email").value = data.email || "";
+    document.getElementById("nickname").value = data.nickname || "";
+    document.getElementById("phonenum").value = data.phonenum || "";
+    if (data.birthday) document.getElementById("birthday").value = data.birthday;
+    if (data.gender) document.getElementById("gender").value = data.gender;
+
+    document.getElementById("edit-region-label").value = data.region_name || "";
+    document.getElementById("edit-region-id").value = data.region_id || "";
+  } catch (e) {
+    console.error("loadProfile error", e);
+  }
+}
+
+
+// ---- 프로필 저장 + 지역 저장 ----
+async function onSaveProfile(e) {
+  e.preventDefault();
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
+
+  const payload = {
+    phonenum: document.getElementById("phonenum").value.trim(),
+    nickname: document.getElementById("nickname").value.trim(),
+    gender: document.getElementById("gender").value || null,
+  };
+  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+    method: "PUT",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify(payload)
+  });
+  if (!res.ok) {
+    const err = await res.json().catch(()=>null);
+    alert((err && err.detail) || "프로필 저장에 실패했습니다.");
+    return;
+  }
+
+  const regionId = document.getElementById("edit-region-id").value;
+  if (regionId) {
+    const res2 = await fetch("http://127.0.0.1:8000/user/me/region", {
+      method: "PUT",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({ region_id: parseInt(regionId, 10) })
+    });
+    if (!res2.ok) {
+      const err2 = await res2.json().catch(()=>null);
+      alert((err2 && err2.detail) || "지역 설정 저장에 실패했습니다.");
+      return;
+    }
+  }
+
+  alert("프로필과 지역이 저장되었습니다.");
+}
+
+// ---- 비밀번호 변경 ----
+async function onChangePassword(e) {
+  e.preventDefault();
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
+  const current = document.getElementById("current_password").value;
+  const pw = document.getElementById("new_password").value;
+  const pw2 = document.getElementById("new_password_confirm").value;
+  const pwMsg = document.getElementById("pw-msg");
+
+  if (pw !== pw2) {
+    pwMsg.textContent = "새 비밀번호와 확인이 일치하지 않습니다.";
+    pwMsg.className = "small text-danger mt-1";
+    return;
+  }
+  pwMsg.textContent = "";
+
+  const payload = { current_password: current, new_password: pw };
+  const res = await fetch("http://127.0.0.1:8000/user/change-pw", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify(payload)
+  });
+  if (res.ok) {
+    alert("비밀번호가 변경되었습니다. 다시 로그인해 주세요.");
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    window.location.href = "login.html";
+  } else {
+    const err = await res.json().catch(()=>null);
+    pwMsg.textContent = (err && err.detail) || "비밀번호 변경에 실패했습니다.";
+    pwMsg.className = "small text-danger mt-1";
+  }
+}
+
+// ---- 회원 탈퇴 ----
+async function onDeleteAccount() {
+  if (!confirm("정말 탈퇴하시겠습니까? 되돌릴 수 없습니다.")) return;
+  const token = localStorage.getItem("access_token");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    return;
+  }
+  const res = await fetch("http://127.0.0.1:8000/user/delete", {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (res.ok) {
+    alert("회원 탈퇴가 완료되었습니다.");
+    localStorage.clear();
+    window.location.href = "index.html";
+  } else {
+    const err = await res.json().catch(()=>null);
+    alert((err && err.detail) || "회원 탈퇴에 실패했습니다.");
+  }
+}
+
+// ---- 지역 3단계 선택 ----
+let selectedSido = null;
+let selectedGugun = null;
+let selectedDong = null;
+let selectedRegionId = null;
+
+async function loadSidos() {
+  const res = await fetch("http://127.0.0.1:8000/regions/sidos");
+  if (!res.ok) {
+    console.error("sidos load fail", res.status);
+    return;
+  }
+  const list = await res.json();
+  const ul = document.getElementById("sido-list");
+  ul.innerHTML = "";
+  list.forEach(sido => {
+    const li = document.createElement("li");
+    li.className = "list-group-item list-group-item-action";
+    li.textContent = sido.name;
+    li.onclick = () => {
+      selectedSido = sido;
+      selectedGugun = null;
+      selectedDong = null;
+      loadGuguns(sido.id);
+      document.getElementById("sigungu-list").innerHTML = "";
+      document.getElementById("dong-list").innerHTML = "";
+      updateSelectedText();
+    };
+    ul.appendChild(li);
+  });
+}
+
+async function loadGuguns(sidoId) {
+  const res = await fetch(`http://127.0.0.1:8000/regions/guguns/${sidoId}`);
+  if (!res.ok) return;
+  const list = await res.json();
+  const ul = document.getElementById("sigungu-list");
+  ul.innerHTML = "";
+  list.forEach(gu => {
+    const li = document.createElement("li");
+    li.className = "list-group-item list-group-item-action";
+    li.textContent = gu.name;
+    li.onclick = () => {
+      selectedGugun = gu;
+      selectedDong = null;
+      loadDongs(gu.id);
+      document.getElementById("dong-list").innerHTML = "";
+      updateSelectedText();
+    };
+    ul.appendChild(li);
+  });
+}
+
+async function loadDongs(gugunId) {
+  const res = await fetch(`http://127.0.0.1:8000/regions/dongs/${gugunId}`);
+  if (!res.ok) return;
+  const list = await res.json();
+  const ul = document.getElementById("dong-list");
+  ul.innerHTML = "";
+  list.forEach(dong => {
+    const li = document.createElement("li");
+    li.className = "list-group-item list-group-item-action";
+    li.textContent = dong.name;
+    li.onclick = () => {
+      selectedDong = dong;
+      selectedRegionId = dong.id;
+      updateSelectedText();
+    };
+    ul.appendChild(li);
+  });
+}
+
+function updateSelectedText() {
+  const text = document.getElementById("region-selected-text");
+  if (selectedSido && selectedGugun && selectedDong) {
+    text.textContent = `선택된 지역: ${selectedSido.name} ${selectedGugun.name} ${selectedDong.name}`;
+  } else if (selectedSido && selectedGugun) {
+    text.textContent = `선택된 지역: ${selectedSido.name} ${selectedGugun.name}`;
+  } else if (selectedSido) {
+    text.textContent = `선택된 지역: ${selectedSido.name}`;
+  } else {
+    text.textContent = "선택된 지역: 없음";
+  }
+}
+
+function applyRegionSelection() {
+  if (!selectedRegionId) {
+    alert("시·도, 시·군·구, 동을 모두 선택해주세요.");
+    return;
+  }
+  const label = `${selectedSido.name} ${selectedGugun.name} ${selectedDong.name}`;
+  document.getElementById("edit-region-label").value = label;
+  document.getElementById("edit-region-id").value = selectedRegionId;
+
+  const modalEl = document.getElementById("regionModal");
+  const modal = bootstrap.Modal.getInstance(modalEl);
+  modal.hide();
+}
+let notifCount = 0;
+
+async function loadNotifications() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/notifications/", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const items = await res.json();   // [{id, type, message, ...}, ...]
+
+    const ul = document.getElementById("notif-list");
+    if (!ul) return;
+    ul.innerHTML = "";
+
+    items.forEach(n => {
+      const li = document.createElement("li");
+      li.className = "list-group-item py-2";
+      li.textContent = n.message;
+      ul.appendChild(li);
+    });
+
+    if (items.length > 0) {
+      notifCount = items.filter(n => !n.is_read).length || items.length;
+      const badge = document.getElementById("notif-badge");
+      if (badge) {
+        badge.textContent = notifCount;
+        badge.classList.toggle("d-none", notifCount === 0);
+      }
+    }
+  } catch (e) {
+    console.error("loadNotifications error", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("notif-btn");
+  const panel = document.getElementById("notif-panel");
+  const closeBtn = document.getElementById("notif-close");
+
+  if (!btn || !panel) return;
+
+  btn.addEventListener("click", async () => {
+    if (panel.classList.contains("d-none")) {
+      await loadNotifications();          // 열 때마다 최신 목록
+      panel.classList.remove("d-none");
+      const badge = document.getElementById("notif-badge");
+      if (badge) badge.classList.add("d-none");   // 열면 뱃지 초기화
+    } else {
+      panel.classList.add("d-none");
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => panel.classList.add("d-none"));
+  }
+});
+
+</script>
+</body>
+</html>

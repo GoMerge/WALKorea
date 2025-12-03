@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>마이페이지 | WALKorea</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <style>
+    body { background-color:#f5f7fb; }
+
+    .sidebar-fixed {
+      width: 260px;
+      min-width: 260px;
+      max-width: 260px;
+      border-right: 1px solid #e5e7eb;
+      background-color:#fff;
+    }
+
+    /* 사이드바 메뉴 공통 스타일 */
+    .sidebar .menu-title {
+      font-size:0.85rem;
+      font-weight:600;
+      color:#6b7280;
+      margin-top:1rem;
+      margin-bottom:0.25rem;
+    }
+
+    .sidebar .nav-link {
+      font-size:0.95rem;
+      color:#374151;
+      padding:0.45rem 0.75rem;
+      border-radius:0.35rem;
+      margin-bottom:2px;
+    }
+
+    .sidebar .nav-link.active {
+      background-color:#e0f2fe;
+      color:#0369a1;
+      font-weight:600;
+    }
+
+    .calendar-grid {
+      display:grid;
+      grid-template-columns:repeat(7,1fr);
+      gap:4px;
+      font-size:0.85rem;
+    }
+    .calendar-day {
+      min-height:70px;
+      border-radius:4px;
+      padding:4px;
+      background-color:#fff;
+      border:1px solid #e5e7eb;
+    }
+    .calendar-day.today {
+      border:2px solid #16a34a;
+    }
+    .calendar-day .date-num {
+      font-weight:600;
+      margin-bottom:4px;
+    }
+    .weather-box {
+      background-color:#fff;
+      border-radius:0.75rem;
+      padding:0.75rem 0.85rem;
+      box-shadow:0 1px 3px rgba(15,23,42,0.08);
+      font-size:0.8rem;
+    }
+
+    #region-weather-list div {
+      line-height:1.4;
+    }
+  </style>
+</head>
+<body>
+<header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
+  <div class="container">
+    <a class="navbar-brand fw-bold text-success" href="index.html">WALKorea</a>
+    <ul class="navbar-nav ms-auto gap-2">
+      <li class="nav-item"><a class="nav-link" href="recommend.html">추천 여행지</a></li>
+      <li class="nav-item"><a class="nav-link" href="calendar.html">여행 캘린더</a></li>
+      <li class="nav-item"><a class="nav-link" href="mypage_calendar.html">마이페이지</a></li>
+      <!-- 알림 아이콘 -->
+      <li class="nav-item position-relative">
+        <button id="notif-btn" class="btn btn-link nav-link p-0 position-relative">
+          <span class="fs-5">🔔</span>
+          <span id="notif-badge"
+                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
+          </span>
+        </button>
+
+        <!-- 알림 리스트 패널 -->
+        <div id="notif-panel"
+             class="card shadow-sm position-absolute end-0 mt-2 d-none"
+             style="width:260px; z-index:1050;">
+          <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
+            <span class="small fw-semibold">알림</span>
+            <button id="notif-close" class="btn btn-sm btn-outline-secondary py-0 px-1">×</button>
+          </div>
+          <ul id="notif-list" class="list-group list-group-flush small"></ul>
+        </div>
+      </li>
+      <li class="nav-item" id="nav-login"><a class="btn btn-success" href="login.html">로그인</a></li>
+      <li class="nav-item" id="nav-signup"><a class="btn btn-primary" href="signup.html">회원가입</a></li>
+    </ul>
+  </div>
+</header>
+
+<main class="container-fluid" style="margin-top:10px;">
+  <div class="d-flex">
+    <!-- 왼쪽: 마이페이지 카테고리 -->
+    <aside class="sidebar-fixed sidebar p-3">
+      <div class="d-flex align-items-center mb-3">
+        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
+            style="width:40px;height:40px;">
+          <span id="side-initial">W</span>
+        </div>
+        <div class="ms-2">
+          <div class="fw-semibold" id="side-nickname">로그인 사용자</div>
+          <div class="text-muted small" id="side-email">-</div>
+        </div>
+      </div>
+
+      <div class="weather-box mb-3" id="weather-box">
+        <div class="fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+        <div class="small text-muted mb-2" id="region-weather-desc">
+          마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
+        </div>
+        <div id="region-weather-list"></div>
+        <a class="btn btn-outline-success btn-sm mt-2 w-100" href="mypage_profile.html">
+          지역 설정하러 가기
+        </a>
+      </div>
+
+      <div class="menu-title">마이페이지</div>
+      <nav class="nav flex-column">
+        <a href="mypage_calendar.html"  class="nav-link">내 일정</a>
+        <a href="mypage_friends.html"   class="nav-link active">친구 관리</a>
+        <a href="mypage_recommend.html" class="nav-link">맞춤 관광</a>
+        <a href="mypage_profile.html"   class="nav-link">프로필 수정</a>
+      </nav>
+    </aside>
+
+    <!-- 오른쪽: 친구 관리 컨텐츠 -->
+    <section class="col-md-9 col-lg-10 p-4">
+      <div class="profile-card mb-4 d-flex align-items-center gap-3">
+        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width:64px;height:64px;font-size:1.5rem;">
+          <span id="profile-initial">W</span>
+        </div>
+        <div>
+          <div class="fw-bold fs-5" id="profile-nickname">로그인 사용자</div>
+          <div class="text-muted small" id="profile-email">-</div>
+          <div class="text-muted small">친구와 일정을 공유하고, 서로의 여행 계획을 확인해 보세요.</div>
+        </div>
+      </div>
+
+      <h4 class="fw-bold mb-3">친구 관리 (팔로우 / 팔로워)</h4>
+      <!-- 친구 검색 영역 -->
+      <div class="row mb-3">
+        <div class="col-md-6">
+          <div class="input-group input-group-sm">
+            <input type="text" id="friend-search-input" class="form-control"
+                   placeholder="닉네임으로 친구 찾기">
+            <button class="btn btn-outline-secondary" id="friend-search-btn">검색</button>
+          </div>
+          <div class="small text-muted mt-1">
+            닉네임 일부만 입력해도 검색돼요.
+          </div>
+        </div>
+      </div>
+
+      <div class="row g-3">
+        <!-- 검색 결과 -->
+        <div class="col-md-6">
+          <h6 class="fw-semibold">검색 결과</h6>
+          <ul class="list-group small" id="friend-search-result"></ul>
+        </div>
+
+        <!-- 팔로잉 / 팔로워 -->
+        <div class="col-md-3">
+          <h6 class="fw-semibold">
+            팔로잉 <span class="text-muted small" id="following-count">(0)</span>
+          </h6>
+          <ul class="list-group small" id="following-list"></ul>
+        </div>
+        <div class="col-md-3">
+          <h6 class="fw-semibold">
+            팔로워 <span class="text-muted small" id="follower-count">(0)</span>
+          </h6>
+          <ul class="list-group small" id="follower-list"></ul>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+
+<script>
+
+let currentUserId = null;
+let followingIdSet = new Set();
+
+const token = localStorage.getItem("access_token");
+
+function formatKoreanWeekday(dateStr) {
+  if (!dateStr) return "";
+  const d = new Date(dateStr);
+  const names = ["일", "월", "화", "수", "목", "금", "토"];
+  return names[d.getDay()];
+}
+
+function mapIconToEmoji(icon) {
+  switch (icon) {
+    case "rain": return "🌧️";
+    case "snow": return "❄️";
+    case "fog": return "🌫️";
+    case "wind": return "💨";
+    case "cloudy": return "☁️";
+    case "partly-cloudy-day": return "⛅";
+    case "partly-cloudy-night": return "☁️";
+    case "clear-day": return "☀️";
+    case "clear-night": return "🌙";
+    default: return "🌤️";
+  }
+}
+
+async function loadProfileWeather() {
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/weather/profile/current", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const data = await res.json();   // { region_name, days: [...] }
+
+    const box = document.getElementById("weather-box");
+    const boxTitle = document.getElementById("region-weather-title");
+    const boxDesc  = document.getElementById("region-weather-desc");
+    const listBox  = document.getElementById("region-weather-list");
+    if (!data.days || !boxTitle || !boxDesc || !listBox || !box) return;
+
+    boxTitle.textContent = `${data.region_name}의 6일간 날씨`;
+    boxDesc.textContent  = "오늘을 포함한 6일치 동네 날씨예요.";
+    listBox.innerHTML = "";
+
+    data.days.forEach((d, idx) => {
+      const div = document.createElement("div");
+      div.className = "d-flex align-items-center small mb-1";
+
+      const weekday = formatKoreanWeekday(d.date);
+      const label = idx === 0 ? "오늘" : weekday;
+
+      const temp = d.temp;
+      const tmax = d.temp_max;
+      const tmin = d.temp_min;
+
+      const tempPart = (tmax != null && tmin != null)
+        ? `${tmax.toFixed(0)}° / ${tmin.toFixed(0)}°`
+        : (temp != null ? `${temp.toFixed(0)}°` : "-°");
+
+      const iconEmoji = mapIconToEmoji(d.icon);
+      const desc = d.desc || "";
+
+      div.innerHTML = `
+        <span class="text-muted" style="width:32px;">${label}</span>
+        <span style="width:32px; text-align:center;">${iconEmoji}</span>
+        <span class="fw-semibold" style="width:80px; text-align:right;">${tempPart}</span>
+        <span class="text-muted" style="flex:1; text-align:left; margin-left:8px;">
+          ${desc}
+        </span>
+      `;
+      listBox.appendChild(div);
+    });
+  } catch (e) {
+    console.error("profile weather error", e);
+  }
+}
+
+
+
+// 공통: 헤더/사이드바 프로필 세팅
+async function setupHeaderAndProfile() {
+  const nav = document.querySelector(".navbar-nav");
+  const loginLi = document.getElementById("nav-login");
+  const signupLi = document.getElementById("nav-signup");
+  if (token && nav) {
+    if (loginLi) loginLi.remove();
+    if (signupLi) signupLi.remove();
+    const logoutLi = document.createElement("li");
+    logoutLi.className = "nav-item";
+    logoutLi.innerHTML = `<a class="btn btn-outline-danger" href="#">로그아웃</a>`;
+    logoutLi.querySelector("a").onclick = (e) => {
+      e.preventDefault();
+      localStorage.removeItem("access_token");
+      localStorage.removeItem("refresh_token");
+      window.location.href = "index.html";
+    };
+    nav.appendChild(logoutLi);
+  }
+  if (!token) return;
+
+  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (!res.ok) return;
+  const user = await res.json();
+  currentUserId = user.id;
+
+  const nick = user.nickname || (user.name || "사용자");
+  const email = user.email || "";
+
+  const sideNick = document.getElementById("side-nickname");
+  const profNick = document.getElementById("profile-nickname");
+  if (sideNick) sideNick.textContent = nick;
+  if (profNick) profNick.textContent = nick;
+
+  const sideEmail = document.getElementById("side-email");
+  const profEmail = document.getElementById("profile-email");
+  if (sideEmail) sideEmail.textContent = email;
+  if (profEmail) profEmail.textContent = email;
+
+  const sideInit = document.getElementById("side-initial");
+  const profInit = document.getElementById("profile-initial");
+  if (sideInit) sideInit.textContent = nick[0];
+  if (profInit) profInit.textContent = nick[0];
+}
+
+async function searchFriendsByNickname(query) {
+  if (!token || !query.trim()) return;
+
+  const res = await fetch(
+    `http://127.0.0.1:8000/follow/search-by-nickname/?nickname=${encodeURIComponent(query)}`,
+    {
+      headers: { "Authorization": "Bearer " + token }
+    }
+  );
+  if (!res.ok) {
+    alert("친구 검색에 실패했습니다.");
+    return;
+  }
+  const users = await res.json();  // [{id, nickname, email, ...}]
+
+  const ul = document.getElementById("friend-search-result");
+  ul.innerHTML = "";
+
+  // 나 자신 / 이미 팔로잉한 사용자 제거
+  const filteredUsers = users.filter(u => {
+    const uid = u.user_id;
+    if (currentUserId && uid === currentUserId) return false;
+    if (followingIdSet.has(uid)) return false;
+    return true;
+  });
+
+  if (!filteredUsers.length) {
+    const li = document.createElement("li");
+    li.className = "list-group-item text-muted small";
+    li.textContent = "검색 결과가 없습니다.";
+    ul.appendChild(li);
+    return;
+  }
+
+  filteredUsers.forEach(user => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    li.innerHTML = `
+      <div>
+        <div class="fw-semibold">${user.nickname || "(이름 없음)"}</div>
+      </div>
+      <button class="btn btn-sm btn-outline-success">팔로우</button>
+    `;
+
+    const btn = li.querySelector("button");
+    btn.onclick = async () => {
+      await followUser(user.user_id);
+      btn.textContent = "팔로잉";
+      btn.classList.remove("btn-outline-success");
+      btn.classList.add("btn-secondary");
+      btn.disabled = true;
+    };
+
+    ul.appendChild(li);
+  });
+}
+
+// 팔로우 신청
+async function followUser(targetUserId) {
+  if (!token) return;
+
+  const res = await fetch("http://127.0.0.1:8000/follow/", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Authorization": "Bearer " + token
+    },
+    body: JSON.stringify({ following_id: targetUserId })
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    alert((err && err.detail) || "팔로우 신청에 실패했습니다.");
+    return;
+  }
+
+  alert("팔로우 신청이 완료되었습니다.");
+  await loadFollowLists();   // 팔로잉 목록 갱신
+}
+
+// 팔로우 목록 로딩
+async function loadFollowLists() {
+  const [followingRes, followerRes] = await Promise.all([
+    fetch("http://127.0.0.1:8000/follow/following", {
+      headers: { "Authorization": "Bearer " + token }
+    }),
+    fetch("http://127.0.0.1:8000/follow/followers", {
+      headers: { "Authorization": "Bearer " + token }
+    })
+  ]);
+
+  const following = followingRes.ok ? await followingRes.json() : [];
+  const followers = followerRes.ok ? await followerRes.json() : [];
+
+  const fList = document.getElementById("following-list");
+  const rList = document.getElementById("follower-list");
+  fList.innerHTML = "";
+  rList.innerHTML = "";
+
+  const followingCountEl = document.getElementById("following-count");
+  const followerCountEl  = document.getElementById("follower-count");
+  if (followingCountEl) followingCountEl.textContent = `(${following.length})`;
+  if (followerCountEl)  followerCountEl.textContent  = `(${followers.length})`;
+
+  followingIdSet = new Set(following.map(f => f.following_id));
+
+  fList.innerHTML = "";
+  rList.innerHTML = "";
+
+  following.forEach(f => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+
+    const name = f.following_nickname || `사용자 #${f.following_id}`;
+
+    li.innerHTML = `
+      <span>${name}</span>
+      <button class="btn btn-sm btn-outline-danger">취소</button>
+    `;
+
+    const btn = li.querySelector("button");
+    btn.onclick = async () => {
+      if (!confirm(`'${name}' 팔로우를 취소할까요?`)) return;
+      await unfollowUser(f.following_id);
+    };
+
+    fList.appendChild(li);
+  });
+
+  followers.forEach(f => {
+    const li = document.createElement("li");
+    li.className = "list-group-item d-flex justify-content-between align-items-center";
+    li.textContent = f.follower_nickname || `사용자 #${f.follower_id}`;
+    rList.appendChild(li);
+  });
+}
+
+async function unfollowUser(followingId) {
+  if (!token) return;
+
+  const res = await fetch(`http://127.0.0.1:8000/follow/${followingId}`, {
+    method: "DELETE",
+    headers: { "Authorization": "Bearer " + token }
+  });
+
+  if (!res.ok) {
+    const err = await res.json().catch(() => null);
+    alert((err && err.detail) || "팔로우 취소에 실패했습니다.");
+    return;
+  }
+
+  alert("팔로우를 취소했습니다.");
+  await loadFollowLists();      // 목록/카운트/검색 필터 갱신
+}
+
+
+window.addEventListener("DOMContentLoaded", async () => {
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "login.html";
+    return;
+  }
+  await setupHeaderAndProfile();
+  await loadProfileWeather();
+  await loadFollowLists();
+
+  // 친구 검색 이벤트 연결
+  const input = document.getElementById("friend-search-input");
+  const btn   = document.getElementById("friend-search-btn");
+
+  btn.addEventListener("click", () => {
+    searchFriendsByNickname(input.value);
+  });
+  input.addEventListener("keydown", (e) => {
+    if (e.key === "Enter") {
+      e.preventDefault();
+      searchFriendsByNickname(input.value);
+    }
+  });
+});
+let notifCount = 0;
+
+async function loadNotifications() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return;
+
+  try {
+    const res = await fetch("http://127.0.0.1:8000/notifications/", {
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) return;
+    const items = await res.json();   // [{id, type, message, ...}, ...]
+
+    const ul = document.getElementById("notif-list");
+    if (!ul) return;
+    ul.innerHTML = "";
+
+    items.forEach(n => {
+      const li = document.createElement("li");
+      li.className = "list-group-item py-2";
+      li.textContent = n.message;
+      ul.appendChild(li);
+    });
+
+    if (items.length > 0) {
+      notifCount = items.filter(n => !n.is_read).length || items.length;
+      const badge = document.getElementById("notif-badge");
+      if (badge) {
+        badge.textContent = notifCount;
+        badge.classList.toggle("d-none", notifCount === 0);
+      }
+    }
+  } catch (e) {
+    console.error("loadNotifications error", e);
+  }
+}
+
+document.addEventListener("DOMContentLoaded", () => {
+  const btn = document.getElementById("notif-btn");
+  const panel = document.getElementById("notif-panel");
+  const closeBtn = document.getElementById("notif-close");
+
+  if (!btn || !panel) return;
+
+  btn.addEventListener("click", async () => {
+    if (panel.classList.contains("d-none")) {
+      await loadNotifications();          // 열 때마다 최신 목록
+      panel.classList.remove("d-none");
+      const badge = document.getElementById("notif-badge");
+      if (badge) badge.classList.add("d-none");   // 열면 뱃지 초기화
+    } else {
+      panel.classList.add("d-none");
+    }
+  });
+
+  if (closeBtn) {
+    closeBtn.addEventListener("click", () => panel.classList.add("d-none"));
+  }
+});
+
+</script>
+</body>
+</html>
