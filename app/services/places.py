@@ -7,10 +7,13 @@ from app.models.places import Place, PlaceDetail
 from app.models.hashtag import PlaceTag, Tag
 import math
 from fastapi.templating import Jinja2Templates
+import os
 
 
 TOUR_API_BASE = "http://apis.data.go.kr/B551011/KorService2"
-SERVICE_KEY = "07b00c849181aa6c2bbdfbce284aff0ce01778ccc5e6a1fb9e9d49cad24ba714"
+
+SERVICE_KEY = os.getenv("SERVICE_KEY")
+
 MAX_SAVE_COUNT = 30000  # DB에 저장할 최대 관광지 개수
 
 # ------------------------------------------
