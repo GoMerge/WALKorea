@@ -1,19 +1,19 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.services.oauth_naver import (get_naver_login_url, handle_naver_callback)
+from app.services.oauth_naver import get_naver_login_url, handle_naver_callback
 
 router = APIRouter()
 
-
 @router.get("/login")
 def naver_login():
-    """네이버 로그인 URL 반환"""
-    return get_naver_login_url()
+    """네이버 로그인 페이지로 즉시 리다이렉트"""
+    url = get_naver_login_url()["login_url"]
+    return RedirectResponse(url)
 
-
-@router.get("/callback")
+@router.get("/callback", response_class=RedirectResponse)
 def naver_callback(request: Request, db: Session = Depends(get_db)):
     """네이버 OAuth2 콜백 처리"""
     code = request.query_params.get("code")
