@@ -1,7 +1,7 @@
 # app/models/hashtag.py
 from sqlalchemy import Column, BigInteger, String, ForeignKey, TIMESTAMP, func
 from sqlalchemy.orm import relationship
-from app.models.base import Base
+from app.database import Base
 
 class Tag(Base):
     __tablename__ = "tags"

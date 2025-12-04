@@ -10,16 +10,23 @@ from app.services.places import (
 from app.schemas.places import PlaceResponse
 from typing import List
 from app.models.places import Place, PlaceDetail
+from app.models.user import User
+from app.models.user_profile import UserProfile
 from app.models.hashtag import PlaceTag, Tag 
 from fastapi.templating import Jinja2Templates
 import math
+from app.utils.auth import get_current_user_optional, get_current_user
+from app.services.recommendation_service import (
+    sort_places_with_preferences,
+    get_place_scores_for_user,
+    USER_TOP_RECOMMENDED,
+    TOP_N,
+)
 from sqlalchemy import case, exists, func  
 from sqlalchemy import or_, and_
+from typing import Optional
 
 
-
-
-#router = APIRouter(prefix="/places", tags=["Places"])
 
 router = APIRouter()
 templates = Jinja2Templates(directory="frontend/templates")
@@ -60,11 +67,13 @@ def read_places(db: Session = Depends(get_db)):
     
 #템플릿 상세 조회
 @router.get("/detail/{contentid}")
-def read_place_detail(request: Request, contentid: int, db: Session = Depends(get_db)):
-    """
-    특정 관광지 상세 조회 및 HTML 렌더링
-    """
-    # Place 기본 정보
+def read_place_detail(
+    request: Request,
+    contentid: int,
+    db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional),
+):
+    
     place = db.query(Place).filter(Place.contentid == contentid).first()
     if not place:
         raise HTTPException(status_code=404, detail="Place not found")
@@ -107,7 +116,8 @@ def read_place_detail(request: Request, contentid: int, db: Session = Depends(ge
             "detail": detail,
             "hashtags": hashtags,
             "nearby_places": nearby_places,
-        }
+            "current_user": current_user,
+        },
     )
   
 # 목록 필터링  
@@ -115,28 +125,27 @@ def read_place_detail(request: Request, contentid: int, db: Session = Depends(ge
 def list_places_filtered(
     request: Request,
     page: int = 1,
-    sort: str = "updated",  # 'updated' 최신순, 'created' 오래된순
-    contenttypeid: int = None,  # 관광타입 필터
-    addr: str = None,  # addr1 앞 2글자 필터
+    sort: str = "updated",
+    contenttypeid: int = None,
+    addr: str = None,
     search: str = None,
     tag: str = None,
-    template: str = "places_list.html", 
+    template: str = "places_list.html",
     db: Session = Depends(get_db),
+    current_user: User | None = Depends(get_current_user_optional),
 ):
-    per_page = 10  # 페이지당 항목 수 고정
+    print(">>> /places/list current_user =", current_user.id if current_user else None)
+    per_page = 10
     offset = (page - 1) * per_page
 
     query = db.query(Place)
 
-    # contenttypeid 필터
     if contenttypeid:
         query = query.filter(Place.contenttypeid == contenttypeid)
-        
 
-    # addr1 앞 2글자 필터
     if addr:
         query = query.filter(Place.addr1.startswith(addr))
-        
+
     if search:
         keyword = f"%{search}%"
         query = query.filter(
@@ -145,33 +154,35 @@ def list_places_filtered(
                 Place.overview.ilike(keyword)
             )
         )
-    # 해시태그 필터
+
     if tag:
-        print(f"🔍 태그 검색: '{tag}'")
         query = query.join(PlaceTag).join(Tag).filter(
             Tag.name.ilike(f"%{tag}%")
-        ).distinct(Place.id)  # 중복 제거
-    
-    # 정렬
+        ).distinct(Place.id)
+
     if sort == "updated":
         query = query.order_by(
-            case((Place.firstimage != '', 1), else_=0).desc(),  # firstimage 있는 것 먼저
-            Place.updated_at.desc()  # 최신순
+            case((Place.firstimage != '', 1), else_=0).desc(),
+            Place.updated_at.desc()
         )
     elif sort == "created":
         query = query.order_by(
-            case((Place.firstimage != '', 1), else_=0).desc(),  # firstimage 있는 것 먼저
-            Place.created_at.asc()  # 오래된순
+            case((Place.firstimage != '', 1), else_=0).desc(),
+            Place.created_at.asc()
         )
     else:
         query = query.order_by(
             case((Place.firstimage != '', 1), else_=0).desc(),
-            Place.id.desc()                       # 기본 정렬
+            Place.id.desc()
         )
 
     total = query.count()
     total_pages = (total + per_page - 1) // per_page
     places = query.offset(offset).limit(per_page).all()
+
+    pref_summary = None
+    if current_user:
+        places, pref_summary = sort_places_with_preferences(db, current_user.id, places)
 
     return templates.TemplateResponse(
         template,
@@ -183,7 +194,56 @@ def list_places_filtered(
             "sort": sort,
             "contenttypeid": contenttypeid,
             "addr": addr,
-            "search":search,
-            "tag":tag,
+            "search": search,
+            "tag": tag,
+            "pref_summary": pref_summary,   # 템플릿에서 사용할 값
         },
     )
+
+@router.get("/recommend")
+def recommend_places(
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    base_query = db.query(Place)
+    places: list[Place] = base_query.limit(50).all()
+
+    sorted_places, summary, score_map = sort_places_with_preferences(
+        db, current_user.id, places
+    )
+
+    top_ids = {int(p.contentid) for p in sorted_places[:TOP_N]}
+    USER_TOP_RECOMMENDED[current_user.id] = top_ids
+    print("TOP IDS FOR USER", current_user.id, top_ids)
+
+    return {
+        "summary": summary,
+        "items": [
+            {
+                "id": p.contentid,
+                "title": p.title,
+                "addr1": p.addr1,
+                "firstimage": p.firstimage,
+                "scores": score_map.get(p.contentid, {}),
+            }
+            for p in sorted_places
+        ],
+    }
+
+@router.get("/recommend/reason/{place_id}")
+def get_reason(
+    place_id: int,
+    db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
+):
+    scores = get_place_scores_for_user(db, current_user.id, place_id)
+    if scores is None:
+        return {"is_recommended": False}
+
+    return {
+        "is_recommended": True,
+        "base": scores["base"],
+        "topic": scores["topic"],
+        "distance": scores["distance"],
+        "final": scores["total"],
+    }
