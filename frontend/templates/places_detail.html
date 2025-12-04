@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="en">
+<style>
+  /* 추천 카드 */
+  #recommend-reason.card {
+    border: none;
+    border-radius: 16px;
+    box-shadow: 0 16px 30px rgba(15, 23, 42, 0.08);
+  }
+
+  #recommend-reason .card-title {
+    font-size: 1rem;
+    font-weight: 700;
+    color: #111827;
+  }
+
+  #recommend-reason .small.text-muted {
+    color: #6b7280 !important;
+  }
+
+  /* Progress bar 공통 높이/라운드 */
+  #recommend-reason .progress {
+    height: 12px;       
+    border-radius: 999px;
+    background-color: #e5e7eb;
+  }
+
+  #recommend-reason .progress-bar {
+    border-radius: 999px;
+    background: linear-gradient(90deg, #34d399, #10b981);
+    font-size: 0.7rem;  
+  } 
+  #recommend-reason #score-topic.progress-bar {
+    background: linear-gradient(90deg, #60a5fa, #2563eb);
+  }
+  #recommend-reason #score-distance.progress-bar {
+    background: linear-gradient(90deg, #fbbf24, #f97316);
+  }
+
+  #score-final {
+    font-size: 1.1rem;
+    color: #111827;
+  }
+    .page-title {
+    background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+    border-bottom: 1px solid #f3f4f6;
+  }
+  .heading-title {
+    font-size: 2.2rem;
+    font-weight: 800;
+    letter-spacing: -0.03em;
+    color: #111827;
+  }
+  .page-title .mb-0 {
+    color: #6b7280;
+    font-size: 0.95rem;
+  }
+</style>
+<head>
+  <!-- 지도 구현 -->
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
+  <base href="/" / >
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Property Details - TheProperty Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: TheProperty
+  * Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
+  * Updated: Aug 05 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="property-details-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">WALKorea</h1>
+      </a>
+
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html">홈</a></li>
+          <li class="dropdown"><a href="/places/list"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+
+
+          <!--
+          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="#">Dropdown 1</a></li>
+              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="#">Deep Dropdown 1</a></li>
+                  <li><a href="#">Deep Dropdown 2</a></li>
+                  <li><a href="#">Deep Dropdown 3</a></li>
+                  <li><a href="#">Deep Dropdown 4</a></li>
+                  <li><a href="#">Deep Dropdown 5</a></li>
+                </ul>
+              </li>
+              <li><a href="#">Dropdown 2</a></li>
+              <li><a href="#">Dropdown 3</a></li>
+              <li><a href="#">Dropdown 4</a></li>
+            </ul>
+          </li>
+          <li><a href="contact.html">Contact</a></li>
+        -->
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="properties.html">Get Started</a>
+
+    </div>
+  </header>
+  
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              <h1 class="heading-title">{{ place.title }}</h1>
+              <p class="mb-0">
+                Odio et unde deleniti. Deserunt numquam exercitationem. Officiis quo
+                odio sint voluptas consequatur ut a odio voluptatem. Sit dolorum
+                debitis veritatis natus dolores. Quasi ratione sint. Sit quaerat
+                ipsum dolorem.
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="index.html">Home</a></li>
+            <li class="current">Property Details</li>
+          </ol>
+        </div>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <!-- Property Details Section -->
+    <section id="property-details" class="property-details section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row gy-4">
+
+          <div class="col-lg-8">
+
+            <!-- Property Gallery -->
+            <div class="property-gallery" data-aos="fade-up" data-aos-delay="200">
+              <div class="main-image-container image-zoom-container">
+                <img id="main-product-image" src="{{ place.firstimage if place.firstimage else '/static/no_image.jpg' }}" alt="{{ place.title }}" class="img-fluid main-property-image" >
+                <div class="image-nav-buttons">
+                  <button class="image-nav-btn prev-image" type="button">
+                    <i class="bi bi-chevron-left"></i>
+                  </button>
+                  <button class="image-nav-btn next-image" type="button">
+                    <i class="bi bi-chevron-right"></i>
+                  </button>
+                </div>
+              </div>
+              <div class="thumbnail-gallery thumbnail-list">
+                <div class="thumbnail-item active" data-image="assets/img/real-estate/property-exterior-3.webp">
+                  <img src="assets/img/real-estate/property-exterior-3.webp" alt="Property Exterior" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-1.webp">
+                  <img src="assets/img/real-estate/property-interior-1.webp" alt="Living Room" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-2.webp">
+                  <img src="assets/img/real-estate/property-interior-2.webp" alt="Kitchen" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-3.webp">
+                  <img src="assets/img/real-estate/property-interior-3.webp" alt="Master Bedroom" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-exterior-4.webp">
+                  <img src="assets/img/real-estate/property-exterior-4.webp" alt="Garden View" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-4.webp">
+                  <img src="assets/img/real-estate/property-interior-4.webp" alt="Bathroom" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-5.webp">
+                  <img src="assets/img/real-estate/property-interior-5.webp" alt="Dining Room" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-exterior-5.webp">
+                  <img src="assets/img/real-estate/property-exterior-5.webp" alt="Front View" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-6.webp">
+                  <img src="assets/img/real-estate/property-interior-6.webp" alt="Guest Room" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-7.webp">
+                  <img src="assets/img/real-estate/property-interior-7.webp" alt="Office Space" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-exterior-6.webp">
+                  <img src="assets/img/real-estate/property-exterior-6.webp" alt="Side View" class="img-fluid">
+                </div>
+                <div class="thumbnail-item" data-image="assets/img/real-estate/property-interior-8.webp">
+                  <img src="assets/img/real-estate/property-interior-8.webp" alt="Balcony" class="img-fluid">
+                </div>
+              </div>
+            </div><!-- End Property Gallery -->
+
+            <!-- Property Description -->
+            <div class="property-description" data-aos="fade-up" data-aos-delay="300">
+              <h3>상세정보</h3>
+              <p>{{ place.overview }}</p>
+            </div><!-- End Property Description -->
+
+            <!-- Amenities -->
+            <div class="property-amenities" data-aos="fade-up" data-aos-delay="400">
+              <h3>Amenities &amp; Features</h3>
+              <div class="row">
+                <div class="col-md-6">
+                  <h4>Interior Features</h4>
+                  <ul class="features-list">
+                    <li><i class="bi bi-check-circle"></i>Hardwood Floors</li>
+                    <li><i class="bi bi-check-circle"></i>Updated Kitchen</li>
+                    <li><i class="bi bi-check-circle"></i>Walk-in Closets</li>
+                    <li><i class="bi bi-check-circle"></i>Central Air Conditioning</li>
+                    <li><i class="bi bi-check-circle"></i>Fireplace</li>
+                    <li><i class="bi bi-check-circle"></i>High Ceilings</li>
+                  </ul>
+                </div>
+                <div class="col-md-6">
+                  <h4>Exterior Features</h4>
+                  <ul class="features-list">
+                    <li><i class="bi bi-check-circle"></i>2-Car Garage</li>
+                    <li><i class="bi bi-check-circle"></i>Swimming Pool</li>
+                    <li><i class="bi bi-check-circle"></i>Garden</li>
+                    <li><i class="bi bi-check-circle"></i>Patio/Deck</li>
+                    <li><i class="bi bi-check-circle"></i>Security System</li>
+                    <li><i class="bi bi-check-circle"></i>Sprinkler System</li>
+                  </ul>
+                </div>
+              </div>
+            </div><!-- End Amenities -->
+
+            <!-- Map Section -->
+            <div class="property-map" data-aos="fade-up" data-aos-delay="500">
+              <h3>위치</h3>
+              <div class="map-container">
+                <div id="kakaomap" style="width:100%; height:400px;">
+                </div>
+              </div>
+              <div class="d-flex justify-content-between align-items-center">
+                {% for pt in place.hashtags  %}
+                  <p>#{{ pt.tag.name}}</p>
+                {% endfor %}
+              </div>
+            </div><!-- End Map Section -->
+            
+
+          </div>
+
+          <div class="col-lg-4">
+
+            <div id="recommend-reason" class="card shadow-sm mb-3 d-none">
+              <div class="card-body">
+                <h5 id="match-title" class="card-title mb-3">
+                  내 취향과 매칭
+                </h5>
+
+                <div class="mb-2 small text-muted">기본 정보</div>
+                <div class="progress mb-2">
+                  <div id="score-base" class="progress-bar" role="progressbar"></div>
+                </div>
+
+                <div class="mb-2 small text-muted">여행 취향</div>
+                <div class="progress mb-2">
+                  <div id="score-topic" class="progress-bar bg-success" role="progressbar"></div>
+                </div>
+
+                <div class="mb-2 small text-muted">상황/거리</div>
+                <div class="progress mb-3">
+                  <div id="score-distance" class="progress-bar bg-info" role="progressbar"></div>
+                </div>
+
+                <hr>
+                <div class="d-flex justify-content-between align-items-center">
+                  <span class="small text-muted">최종 매칭 점수</span>
+                  <span id="score-final" class="fw-bold"></span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Property Details Section -->
+
+  </main>
+  
+  <script>
+    const PLACE_CONTENT_ID = {{ place.contentid }};
+  </script>
+
+  <footer id="footer" class="footer position-relative">
+
+    <div class="container">
+      <div class="row gy-5">
+
+        <div class="col-lg-4">
+          <div class="footer-content">
+            <a href="index.html" class="logo d-flex align-items-center mb-4">
+              <span class="sitename">TheProperty</span>
+            </a>
+            <p class="mb-4">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae. Donec velit neque auctor sit amet aliquam vel ullamcorper sit amet ligula.</p>
+
+            <div class="newsletter-form">
+              <h5>Stay Updated</h5>
+              <form action="forms/newsletter.php" method="post" class="php-email-form">
+                <div class="input-group">
+                  <input type="email" name="email" class="form-control" placeholder="Enter your email" required="">
+                  <button type="submit" class="btn-subscribe">
+                    <i class="bi bi-send"></i>
+                  </button>
+                </div>
+                <div class="loading">Loading</div>
+                <div class="error-message"></div>
+                <div class="sent-message">Thank you for subscribing!</div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6">
+          <div class="footer-links">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> About</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Careers</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Press</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Blog</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Contact</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6">
+          <div class="footer-links">
+            <h4>Solutions</h4>
+            <ul>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Digital Strategy</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Cloud Computing</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Data Analytics</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> AI Solutions</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Cybersecurity</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="footer-contact">
+            <h4>Get in Touch</h4>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-geo-alt"></i>
+              </div>
+              <div class="contact-info">
+                <p>2847 Maple Avenue<br>Los Angeles, CA 90210<br>United States</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-telephone"></i>
+              </div>
+              <div class="contact-info">
+                <p>+1 (555) 987-6543</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-envelope"></i>
+              </div>
+              <div class="contact-info">
+                <p>contact@example.com</p>
+              </div>
+            </div>
+
+            <div class="social-links">
+              <a href="#"><i class="bi bi-facebook"></i></a>
+              <a href="#"><i class="bi bi-twitter-x"></i></a>
+              <a href="#"><i class="bi bi-linkedin"></i></a>
+              <a href="#"><i class="bi bi-youtube"></i></a>
+              <a href="#"><i class="bi bi-github"></i></a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>Copyright</span> <strong class="px-1 sitename">MyWebsite</strong> <span>All Rights Reserved</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Cookie Policy</a>
+            </div>
+            <div class="credits">
+              <!-- All the links in the footer should remain intact. -->
+              <!-- You can delete the links only if you've purchased the pro version. -->
+              <!-- Licensing information: https://bootstrapmade.com/license/ -->
+              <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+              Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/drift-zoom/Drift.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;
+
+      const placeId = PLACE_CONTENT_ID;
+      const box = document.getElementById("recommend-reason");
+      if (!box) return;
+
+      // 1) 추천 점수 가져오기
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/places/recommend/reason/${placeId}`, {
+          headers: { "Authorization": "Bearer " + token },
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        if (!data.is_recommended) return;   // 추천 아닌 관광지는 패널 안 보임
+
+        box.classList.remove("d-none");
+
+        const toPercent = v => Math.round((v || 0) * 100);
+        const base = toPercent(data.base);
+        const topic = toPercent(data.topic);
+        const distance = toPercent(data.distance);
+        const final = toPercent(data.final);
+
+        const setBar = (id, value) => {
+          const el = document.getElementById(id);
+          if (!el) return;
+          el.style.width = value + "%";
+          el.textContent = value + "%";
+        };
+
+        setBar("score-base", base);
+        setBar("score-topic", topic);
+        setBar("score-distance", distance);
+        document.getElementById("score-final").textContent = final + "%";
+      } catch (e) {
+        console.error("load reason error", e);
+        return; // 점수 실패하면 아래 닉네임 로직도 안 돌게 하고 싶으면 이 줄 유지
+      }
+
+      // 2) 닉네임으로 제목 바꾸기
+      try {
+        const meRes = await fetch("http://127.0.0.1:8000/user/profile", {
+          headers: { "Authorization": "Bearer " + token },
+        });
+        if (meRes.ok) {
+          const me = await meRes.json();   // { nickname: "콩순이", ... } 형태
+          if (me.nickname) {
+            const titleEl = document.getElementById("match-title");
+            if (titleEl) {
+              titleEl.textContent = `${me.nickname}님 취향과 매칭`;
+            }
+          }
+        }
+      } catch (e) {
+        console.error("load me error", e);
+      }
+    });
+  </script>
+  <!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도-->
+
+
+
+
+
+
+</body>
+
+
+
+</html>
