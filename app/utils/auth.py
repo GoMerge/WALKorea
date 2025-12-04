@@ -1,12 +1,12 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from app.utils.email import send_email_code_smtp
 from app.database import get_db
 from app.models.user import User
 from jose import JWTError, jwt
+from typing import Optional
 import hmac, hashlib, random, string, jwt
 import os
 from jwt.exceptions import PyJWTError
@@ -88,7 +88,6 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     except JWTError:
         raise credentials_exception
 
-    # ★ User.id 기준으로 조회
     user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
         raise credentials_exception
@@ -99,6 +98,31 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             detail="Inactive or deleted user",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    return user
+
+def get_optional_token(request: Request) -> Optional[str]:
+    auth = request.headers.get("Authorization")
+    if not auth or not auth.lower().startswith("bearer "):
+        return None
+    return auth.split(" ", 1)[1]
+
+def get_current_user_optional(
+    token: Optional[str] = Depends(get_optional_token),
+    db: Session = Depends(get_db),
+) -> Optional[User]:
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        if user_id is None:
+            return None
+    except Exception:
+        return None
+
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user or (not user.is_active or user.deleted_at is not None):
+        return None
     return user
 
 # --- 탈퇴 유저 정리 ---
@@ -119,13 +143,13 @@ def get_current_user_from_token(token: str, db: Session) -> User:
         raise RuntimeError("SECRET_KEY 환경변수가 설정되어 있지 않습니다.")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id = payload.get("user_id")   # ★ 동일
+        user_id = payload.get("user_id") 
         if user_id is None:
             raise HTTPException(status_code=401, detail="토큰에 user_id가 없습니다.")
     except PyJWTError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
-    user = db.query(User).filter(User.id == int(user_id)).first()  # ★ 동일
+    user = db.query(User).filter(User.id == int(user_id)).first() 
     if not user:
         raise HTTPException(status_code=404, detail="User not found")
     return user

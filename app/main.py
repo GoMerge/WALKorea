@@ -1,13 +1,18 @@
 from fastapi import FastAPI, Request
 from fastapi.staticfiles import StaticFiles
+from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from app.services.schedule_notify_job import start_calendar_alarm_scheduler
-from app.database import SessionLocal
+from app.database import SessionLocal, Base, engine 
 from app.routers import (
     auth, user, oauth_google, oauth_kakao, oauth_naver,
     region_router, weather_router, calendar_router, follow, places, address_router,
-    calendar_weather_router, notification_router, 
+    calendar_weather_router, notification_router, hashtag, favorite_router,
 )
+from pathlib import Path  # ⭐ 추가!
+
+BASE_DIR = Path(__file__).parent.parent  # app/main.py → 프로젝트 루트
+templates = Jinja2Templates(directory="frontend/templates")
 
 app = FastAPI()
 
@@ -22,10 +27,10 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-
-
-
+Base.metadata.create_all(bind=engine)
 app.include_router(places.router, prefix="/places", tags=["places"])
+
+app.include_router(hashtag.router)
 
 start_calendar_alarm_scheduler(SessionLocal) 
 
@@ -53,5 +58,8 @@ app.include_router(calendar_weather_router.router, tags=["CalendarWeather"])
 
 app.include_router(address_router.router)
 app.include_router(notification_router.router)
+app.include_router(favorite_router.router)
 
-app.mount("/", StaticFiles(directory="frontend/TheProperty", html=True), name="static")
+app.mount("/", StaticFiles(directory=str(BASE_DIR / "frontend"), html=True), name="frontend")
+
+app.mount("/assets", StaticFiles(directory=str(BASE_DIR / "frontend" / "assets")), name="assets")

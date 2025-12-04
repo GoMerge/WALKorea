@@ -3,7 +3,7 @@ from sqlalchemy import (
     JSON, TIMESTAMP, Date, Float, DateTime, ForeignKey)
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
-from app.models.base import Base
+from app.database import Base
 
 
 # 공통 저장

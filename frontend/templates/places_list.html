@@ -1,0 +1,637 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  
+  <base href="/" / >
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>WALKorea</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: TheProperty
+  * Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
+  * Updated: Aug 05 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+
+<body class="properties-page">
+
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+
+      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+        <!-- Uncomment the line below if you also wish to use an image logo -->
+        <!-- <img src="assets/img/logo.webp" alt=""> -->
+        <h1 class="sitename">WALKorea</h1>
+      </a>
+
+      
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li><a href="index.html">홈</a></li>
+          <li class="dropdown"><a href="/places/list"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+
+
+          <!--
+          <li class="dropdown"><a href="#"><span>Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="#">Dropdown 1</a></li>
+              <li class="dropdown"><a href="#"><span>Deep Dropdown</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+                <ul>
+                  <li><a href="#">Deep Dropdown 1</a></li>
+                  <li><a href="#">Deep Dropdown 2</a></li>
+                  <li><a href="#">Deep Dropdown 3</a></li>
+                  <li><a href="#">Deep Dropdown 4</a></li>
+                  <li><a href="#">Deep Dropdown 5</a></li>
+                </ul>
+              </li>
+              <li><a href="#">Dropdown 2</a></li>
+              <li><a href="#">Dropdown 3</a></li>
+              <li><a href="#">Dropdown 4</a></li>
+            </ul>
+          </li>
+          <li><a href="contact.html">Contact</a></li>
+        -->
+        </ul>
+        <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+      </nav>
+
+      <a class="btn-getstarted" href="properties.html">Get Started</a>
+
+    </div>
+  </header>
+
+  <main class="main">
+
+    <!-- Page Title -->
+    <div class="page-title">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              {% set page_map = {
+                12: {'title': '관광지', 'desc': '전국의 관광지를 확인하세요!'},
+                14: {'title': '문화시설', 'desc': '다양한 문화시설을 확인하세요!'},
+                15: {'title': '축제', 'desc': '특색 있는 축제 정보를 확인하세요!'},
+                32: {'title': '숙박', 'desc': '편안한 숙박시설을 찾아보세요!'},
+                39: {'title': '음식점', 'desc': '맛있는 음식점을 추천합니다!'},
+                38: {'title': '쇼핑', 'desc': '쇼핑할 곳을 소개합니다!'},
+                28: {'title': '레포츠', 'desc': '신나는 레포츠 활동을 즐겨보세요!'}
+              } %}
+          
+              {% if tag %}
+              <!-- ⭐ 태그 검색 우선! -->
+              <h1 class="heading-title">#{{ tag }}</h1>
+              {% elif contenttypeid and contenttypeid in page_map %}
+              <!-- 기존 contenttypeid -->
+              <h1 class="heading-title">{{ page_map[contenttypeid].title }}</h1>
+              <p class="mb-0">{{ page_map[contenttypeid].desc }}</p>
+              {% else %}
+              <!-- 기본 -->
+              <h1 class="heading-title">여행지</h1>
+              <p class="mb-0">전국의 여행지를 확인하세요!</p>
+              {% endif %}
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="index.html">여행정보</a></li>
+             {% if contenttypeid and contenttypeid in page_map %}
+            <li class="current">{{ page_map[contenttypeid].title }}</li>
+             {% else %}
+            <li class="current">여행지</li>
+            {% endif %}
+          </ol>
+        </div>
+      </nav>
+    </div><!-- End Page Title -->
+
+    <!-- 관광지 목록 -->
+    <section id="properties" class="properties section">
+
+      <div class="container" data-aos="fade-up" data-aos-delay="100">
+
+        <div class="row">
+
+          <div class="col-lg-8">
+            <!-- 내 취향 추천 섹션 -->
+            <div id="recommend-section" class="mb-4 d-none">
+              <h5 class="mb-2">내 취향에 맞는 추천 여행지</h5>
+              <div id="recommend-list" class="d-flex flex-wrap gap-3"></div>
+              <hr class="mt-4" />
+            </div>
+            <!-- 정렬 -->
+            <div class="properties-header mb-4">
+              <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+                <div class="view-toggle d-flex gap-2">
+                </div>
+                <div class="sort-dropdown">
+                  <select id="sortSelect" class="form-select form-select-sm">
+                    <option value="updated" {% if sort == "updated" %}selected{% endif %}>최신순</option>
+                    <option value="created" {% if sort == "created" %}selected{% endif %}>오래된순</option>
+                  </select>
+                </div>
+               
+              </div>
+            </div>
+            {% for place in places %}
+
+
+            <!-- 목록 -->
+            <div class="properties-list view-list active" data-aos="fade-up" data-aos-delay="200">
+
+              
+              <div class="property-list-item">
+                <div class="row align-items-center">
+                  <div class="col-lg-4">
+                    <div class="property-image">
+                      <img src="{{ place.firstimage if place.firstimage else '/assets/no_image.jpg' }}" alt="{{ place.title }}" class="img-fluid">
+                    </div>
+                  </div>
+                  <div class="col-lg-8">
+                    <div class="property-content">
+                      <div class="d-flex justify-content-between align-items-start mb-2">
+                        <div>
+                          <h4 class="property-title mb-1"> {{ place.title }}</h4>
+                          <p class="property-location mb-2"><i class="bi bi-geo-alt"></i> {{ place.addr1 }}</p>
+                        </div>
+                      </div>
+                      <div class="property-features mb-3">
+                        <p class="property-location mb-2">{{ place.overview.split('.')[0] }}.</p>
+                      </div>
+
+                      <div class="d-flex justify-content-between align-items-center">
+                        {% if place.hashtags  %}
+                        <div class="property-agent">
+                          {% for pt in place.hashtags[:6]  %}
+                          <a href="/places/list?tag={{ pt.tag.name }}&page=1{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}
+                          {% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="badge bg-secondary text-decoration-none me-1">#{{ pt.tag.name }}</a>
+                          {% endfor %}
+                        </div>
+                        {% endif %}
+                        <div class="property-actions">
+                          <button class="btn btn-outline-secondary btn-sm like-btn"
+                                  data-place-id="{{ place.contentid }}">
+                            <i class="bi bi-heart"></i>
+                          </button>
+                          <a href="/places/detail/{{ place.contentid }}" class="btn btn-primary btn-sm">상세보기</a>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              
+              </div>
+
+            </div>
+            {% endfor %}
+
+            <!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 -->
+            <nav class="mt-5" data-aos="fade-up" data-aos-delay="300">
+              <ul class="pagination justify-content-center">
+
+                <!-- 첫번째 페이지-->
+                <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                   <a class="page-link" href="/places/list?page=1{% if sort %}&sort={{ sort }}{% endif %}
+                   {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                   {% endif %}" tabindex="-1">&laquo;</a>
+                </li>
+
+                <!-- 이전 페이지-->
+                {% set prev_block = page - 10 if page - 10 > 0 else 1 %}
+                  <li class="page-item {% if page == 1 %}disabled{% endif %}">
+                    <a class="page-link" href="/places/list?page={{ prev_block }}{% if sort %}&sort={{ sort }}{% endif %}
+                    {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                    {% endif %}">&lsaquo;</a>
+                  </li>
+
+                {% set start_page = ((page - 1) // 10) * 10 + 1 %}
+                {% set end_page = start_page + 9 %}
+                {% if end_page > total_pages %}
+                {% set end_page = total_pages %}
+                {% endif %}
+
+                <!-- 현재 페이지 -->
+                {% for p in range(start_page, end_page + 1) %}
+                  <li class="page-item {% if p == page %}active{% endif %}">
+                  <a class="page-link" href="/places/list?page={{ p }}{% if sort %}&sort={{ sort }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% endif %}{% if tag %}&tag={{ tag }}{% endif %}">{{ p }}</a>
+                  </li>
+                {% endfor %}
+
+                <!-- 다음 페이지 -->
+                {% set next_block = page + 10 if page + 10 <= total_pages else total_pages %}
+                  <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                    <a class="page-link" href="/places/list?page={{ next_block }}{% if sort %}&sort={{ sort }}{% endif %}
+                    {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                    {% endif %}">&rsaquo;</a>
+                  </li>
+
+
+                <!-- 마지막 페이지-->
+                <li class="page-item {% if page == total_pages %}disabled{% endif %}">
+                  <a class="page-link" href="/places/list?page={{ total_pages }}{% if sort %}&sort={{ sort }}{% endif %}
+                  {% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% if tag %}&tag={{ tag }}{% endif %}
+                  {% endif %}">&raquo;</a>
+                </li>
+              </ul>
+            </nav>
+            <!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 --><!-- 페이징 -->
+
+          </div>
+
+          <div class="col-lg-4" >
+
+            <div class="properties-sidebar">
+
+              <div class="filter-widget">
+                <h5 class="filter-title">여러 여행지를 검색해보세요</h5>
+
+                <!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 -->
+                <div class="filter-section">
+                   <form method="get" action="/places/list">
+                    <input type="hidden" name="contenttypeid" value="{{ contenttypeid or '' }}">
+                    <input type="hidden" name="addr" value="{{ addr or '' }}">
+                    <input type="hidden" name="sort" value="{{ sort }}">
+    
+                    <div class="input-group input-group-sm">
+                      <input type="text" class="form-control" name="search" placeholder="검색어 입력" value="{{ search if search }}">
+                      <button class="btn btn-primary btn-sm" type="submit">검색</button>
+                       
+                    </div>
+                  </form>
+                </div>
+                <!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 --><!-- 검색 -->
+
+
+                <!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 -->
+                <div class="filter-section">
+                  <label class="form-label">지역</label>
+                  <div class="bedroom-filter">
+                    {% set regions = ['서울', '부산', '대구', '인천', '광주', '대전', '울산', '세종', '경기', '강원', '충북', '충남', '경북', '경남', '전북', '전남', '제주'] %}
+
+                     <a href="/places/list?page=1&sort={{ sort }}{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="btn btn-outline-secondary btn-sm {% if not addr %}active{% endif %}">&num;전체</a>
+
+
+                    {% for region in regions %}
+                     <a href="/places/list?addr={{ region }}&page=1&sort={{ sort }}{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if search %}&search={{ search }}{% endif %}" 
+                      class="btn btn-outline-secondary btn-sm {% if addr == region %}active{% endif %}">
+                      &num;{{ region }}
+                    </a>
+                    {% endfor %}
+                  </div>
+                </div>
+                <!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 --><!-- 지역 태그 검색 -->
+
+
+
+
+              </div>
+
+            </div>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section><!-- /Properties Section -->
+
+  </main>
+
+  <footer id="footer" class="footer position-relative">
+
+    <div class="container">
+      <div class="row gy-5">
+
+        <div class="col-lg-4">
+          <div class="footer-content">
+            <a href="index.html" class="logo d-flex align-items-center mb-4">
+              <span class="sitename">TheProperty</span>
+            </a>
+            <p class="mb-4">Vestibulum ante ipsum primis in faucibus orci luctus et ultrices posuere cubilia curae. Donec velit neque auctor sit amet aliquam vel ullamcorper sit amet ligula.</p>
+
+            <div class="newsletter-form">
+              <h5>Stay Updated</h5>
+              <form action="forms/newsletter.php" method="post" class="php-email-form">
+                <div class="input-group">
+                  <input type="email" name="email" class="form-control" placeholder="Enter your email" required="">
+                  <button type="submit" class="btn-subscribe">
+                    <i class="bi bi-send"></i>
+                  </button>
+                </div>
+                <div class="loading">Loading</div>
+                <div class="error-message"></div>
+                <div class="sent-message">Thank you for subscribing!</div>
+              </form>
+            </div>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6">
+          <div class="footer-links">
+            <h4>Company</h4>
+            <ul>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> About</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Careers</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Press</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Blog</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Contact</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-2 col-6">
+          <div class="footer-links">
+            <h4>Solutions</h4>
+            <ul>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Digital Strategy</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Cloud Computing</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Data Analytics</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> AI Solutions</a></li>
+              <li><a href="#"><i class="bi bi-chevron-right"></i> Cybersecurity</a></li>
+            </ul>
+          </div>
+        </div>
+
+        <div class="col-lg-4">
+          <div class="footer-contact">
+            <h4>Get in Touch</h4>
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-geo-alt"></i>
+              </div>
+              <div class="contact-info">
+                <p>2847 Maple Avenue<br>Los Angeles, CA 90210<br>United States</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-telephone"></i>
+              </div>
+              <div class="contact-info">
+                <p>+1 (555) 987-6543</p>
+              </div>
+            </div>
+
+            <div class="contact-item">
+              <div class="contact-icon">
+                <i class="bi bi-envelope"></i>
+              </div>
+              <div class="contact-info">
+                <p>contact@example.com</p>
+              </div>
+            </div>
+
+            <div class="social-links">
+              <a href="#"><i class="bi bi-facebook"></i></a>
+              <a href="#"><i class="bi bi-twitter-x"></i></a>
+              <a href="#"><i class="bi bi-linkedin"></i></a>
+              <a href="#"><i class="bi bi-youtube"></i></a>
+              <a href="#"><i class="bi bi-github"></i></a>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>Copyright</span> <strong class="px-1 sitename">MyWebsite</strong> <span>All Rights Reserved</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">Privacy Policy</a>
+              <a href="#">Terms of Service</a>
+              <a href="#">Cookie Policy</a>
+            </div>
+            <div class="credits">
+              <!-- All the links in the footer should remain intact. -->
+              <!-- You can delete the links only if you've purchased the pro version. -->
+              <!-- Licensing information: https://bootstrapmade.com/license/ -->
+              <!-- Purchase the pro version with working PHP/AJAX contact form: [buy-url] -->
+              Designed by <a href="https://bootstrapmade.com/">BootstrapMade</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/drift-zoom/Drift.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+
+  <script>
+    const sortSelect = document.getElementById("sortSelect");
+    sortSelect.addEventListener("change", function() {
+      const url = new URL(window.location.href);
+      url.searchParams.delete("sort_by");
+      url.searchParams.set("sort", this.value);
+      url.searchParams.set("page", 1);
+      window.location.href = url.toString();
+    });
+
+    // 좋아요 토글 (이미 수정한 버전 기준)
+    document.addEventListener("click", async (e) => {
+      const btn = e.target.closest(".like-btn");
+      if (!btn) return;
+
+      const placeId = btn.dataset.placeId;
+      const token = localStorage.getItem("access_token");
+      if (!token) {
+        alert("로그인이 필요합니다.");
+        location.href = "/login.html";
+        return;
+      }
+
+      try {
+        const res = await fetch(`http://127.0.0.1:8000/favorites/places/${placeId}`, {
+          method: "POST",
+          headers: { "Authorization": "Bearer " + token },
+        });
+        if (!res.ok) throw new Error();
+        const data = await res.json();
+
+        const icon = btn.querySelector("i");
+        if (data.liked) {
+          btn.classList.remove("btn-outline-secondary");
+          btn.classList.add("btn-primary");
+          if (icon) icon.classList.replace("bi-heart", "bi-heart-fill");
+        } else {
+          btn.classList.add("btn-outline-secondary");
+          btn.classList.remove("btn-primary");
+          if (icon) icon.classList.replace("bi-heart-fill", "bi-heart");
+        }
+      } catch (e2) {
+        console.error(e2);
+        alert("좋아요 처리 실패");
+      }
+    });
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      const token = localStorage.getItem("access_token");
+      if (!token) return;  // 비로그인 사용자는 추천 섹션/좋아요 상태 둘 다 스킵
+
+      const section = document.getElementById("recommend-section");
+      const listEl  = document.getElementById("recommend-list");
+      if (!section || !listEl) return;
+
+      try {
+        // 1) 내가 좋아요한 place_id 들 가져오기
+        const favRes = await fetch("http://127.0.0.1:8000/favorites/places/ids", {
+          headers: { "Authorization": "Bearer " + token },
+        });
+        const likedSet = favRes.ok
+          ? new Set((await favRes.json()).map(String))
+          : new Set();
+
+        // 2) 리스트 페이지의 버튼에 미리 반영
+        document.querySelectorAll(".like-btn").forEach(btn => {
+          const placeId = btn.dataset.placeId;
+          if (!placeId) return;
+
+          const icon = btn.querySelector("i");
+          if (likedSet.has(placeId)) {
+            btn.classList.remove("btn-outline-secondary");
+            btn.classList.add("btn-primary");
+            if (icon) icon.classList.replace("bi-heart", "bi-heart-fill");
+          }
+        });
+
+        // 3) 취향 추천 리스트 불러오기
+        const res = await fetch("http://127.0.0.1:8000/places/recommend", {
+          headers: { "Authorization": "Bearer " + token },
+        });
+        if (!res.ok) return;
+
+        const data = await res.json();
+        const items = data.items || [];
+        if (!items.length) return;
+
+        section.classList.remove("d-none");
+        listEl.innerHTML = "";
+
+        // 닉네임 한 번 가져오기
+        let nickname = "내";
+        try {
+          const meRes = await fetch("http://127.0.0.1:8000/user/profile", {
+            headers: { "Authorization": "Bearer " + token },
+          });
+          if (meRes.ok) {
+            const me = await meRes.json();
+            if (me.nickname) nickname = me.nickname;
+          }
+        } catch (e) {
+          console.error("load me error", e);
+        }
+
+        const titleEl = section.querySelector("h5");
+        if (titleEl) {
+          titleEl.textContent = `${nickname}님 취향에 맞는 추천 여행지`;
+        }
+
+        const topItems = items.slice(0, 12);
+
+        topItems.forEach(p => {   
+          const hasImage = p.firstimage && p.firstimage.trim();
+          const card = document.createElement("a");
+          card.href = `/places/detail/${p.contentid || p.id}`;
+          card.className = "text-decoration-none text-reset";
+
+          const title = p.title || "";
+
+          card.innerHTML = `
+            <div class="card border-0 shadow-sm" style="width: 200px;">
+              ${
+                hasImage
+                  ? `<img src="${p.firstimage}"
+                          class="card-img-top"
+                          style="height: 130px; object-fit: cover;"
+                          alt="${title}">`
+                  : `<div class="card-img-top d-flex align-items-center justify-content-center
+                                bg-light text-muted fw-semibold"
+                            style="height: 130px; font-size: 0.9rem;">
+                          ${title.length > 8 ? title.slice(0, 8) + "…" : title}
+                        </div>`
+              }
+              <div class="card-body p-2">
+                <div class="fw-semibold small text-truncate" title="${title}">
+                  ${title}
+                </div>
+                <div class="text-muted small text-truncate" title="${p.addr1 || ''}">
+                  ${p.addr1 || ''}
+                </div>
+              </div>
+            </div>
+          `;
+          listEl.appendChild(card);
+        });
+      } catch (e) {
+        console.error("recommend load error", e);
+      }
+    });
+  </script>
+
+</body>
+
+</html>
