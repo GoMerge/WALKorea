@@ -14,6 +14,10 @@ from pathlib import Path
 BASE_DIR = Path(__file__).parent.parent  # app/main.py → 프로젝트 루트
 templates = Jinja2Templates(directory="frontend/templates")
 
+@app.get("/", response_class=HTMLResponse)
+async def read_main(request: Request):
+    return templates.TemplateResponse("main.html", {"request": request})
+
 app = FastAPI()
 
 app.add_middleware(
