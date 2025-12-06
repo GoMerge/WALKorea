@@ -9,10 +9,6 @@ from app.schemas.user import UserUpdate
 from app.services.email import email_service
 
 reset_tokens: dict = {}
-users_store = {
-    "test1": {"userid": "test1", "email": "test1@example.com", "password": hash_password("Test1234!")},
-    # 필요한 다른 사용자도 추가 가능
-}
 
 def get_profile_service(current_user: User) -> User:
     return current_user
