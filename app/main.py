@@ -5,7 +5,7 @@ from fastapi.templating import Jinja2Templates
 from fastapi.middleware.cors import CORSMiddleware
 from pathlib import Path
 
-from app.services.schedule_notify_job import start_calendar_alarm_scheduler
+# from app.services.schedule_notify_job import start_calendar_alarm_scheduler
 from app.database import SessionLocal, Base, engine
 from app.routers import (
     auth, user, oauth_google, oauth_kakao, oauth_naver,
@@ -42,7 +42,7 @@ app.add_middleware(
 )
 
 Base.metadata.create_all(bind=engine)
-start_calendar_alarm_scheduler(SessionLocal)
+# start_calendar_alarm_scheduler(SessionLocal)
 
 app.include_router(places.router, prefix="/places", tags=["places"])
 app.include_router(hashtag.router)
