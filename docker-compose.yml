@@ -4,15 +4,17 @@ services:
     build: .
     ports:
       - "${HOST_PORT}:8000"
-    volumes:
-      - ./app:/app/app
     restart: always
+    env_file:
+      - .env        # .env 파일 읽기
     environment:
       - ENV=${ENV}
 
   db:
     image: mysql:8.0
     restart: always
+    env_file:
+      - .env
     environment:
       MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD}
       MYSQL_DATABASE: ${MYSQL_DATABASE}
@@ -23,5 +25,19 @@ services:
     volumes:
       - walkorea-db:/var/lib/mysql
 
+  redis:
+    image: redis:7
+    container_name: redis
+    restart: always
+    env_file:
+      - .env                   # .env 파일 읽기
+    ports:
+      - "${REDIS_PORT}:6379"   # .env의 REDIS_PORT 사용
+    command: redis-server --appendonly yes  # 데이터 지속성
+    volumes:
+      - redis_data:/data
+
+
 volumes:
   walkorea-db:
+  redis_data:
