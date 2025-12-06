@@ -12,3 +12,5 @@ python-multipart
 python-jose[cryptography]
 apscheduler
 celery[redis]
+
+requests
