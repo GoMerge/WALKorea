@@ -2,7 +2,7 @@ from fastapi import APIRouter, Query, Depends, HTTPException, Response
 from app.services.weather_service import get_weather, get_daily_weather_vc
 from app.utils.weather_map import plot_weather_on_map
 from app.utils.weather_visualization import plot_monthly_weather_with_stddev
-from app.services.calendar_weather_service import recommend_good_days, get_avg_weather_summary
+from app.services.calendar_weather_service import recommend_good_days, get_avg_weather_summary,is_good_weather
 from app.utils.auth import get_current_user
 from app.models.user import User
 from app.models.calendar import UserCalendar
@@ -15,7 +15,7 @@ from app.schemas.weather import (
 from sqlalchemy.orm import Session
 from fastapi.responses import FileResponse
 import io, logging
-from typing import List
+from typing import List, Optional
 import matplotlib.pyplot as plt
 from app.database import get_db
 
@@ -89,19 +89,17 @@ async def recommend_calendar_weather(
 ):
     results: list[CalendarWeatherResult] = []
 
-    # items: [{address, date}, ...]
     for it in items:
         summary = await get_avg_weather_summary(it.address, it.date)
 
         avg_temp = None
         precip = None
-        is_good = None
+        is_good: Optional[bool] = None
 
         if summary:
             avg_temp = summary.get("기온(℃)")
-            precip = summary.get("강수량(mm)")
+            precip   = summary.get("강수량(mm)")
 
-            # 예시 기준: 0~25도, 강수 < 5mm 이면 '좋음'
             if avg_temp is not None and precip is not None:
                 is_good = (0 <= avg_temp <= 25) and (precip < 5)
 

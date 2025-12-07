@@ -1,11 +1,13 @@
-
 from fastapi import APIRouter, Depends, Request, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.places import (
     save_places_to_db,
     get_place_detail,
-    get_places_page
+    get_all_places,
+    fetch_detail_images,
+    fetch_detail_info,
+    build_places_context,
 )
 from app.schemas.places import PlaceResponse
 from typing import List
@@ -52,16 +54,6 @@ def read_places(db: Session = Depends(get_db)):
     return db.query(Place).order_by(Place.id.desc()).limit(per_page).all()
 
 
-#상세 조회 
-#@router.get("/detail/{contentid}")
-#def read_place_detail(contentid: int, db: Session = Depends(get_db)):
-#    '''
-#    #특정관광지 상세 조회
-#    '''
-#    return get_place_detail(db, contentid)
-
-
-
 
 
     
@@ -73,13 +65,24 @@ def read_place_detail(
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_current_user_optional),
 ):
-    
+    """
+    특정 관광지 상세 조회 및 HTML 렌더링
+    """
+    # Place 기본 정보
     place = db.query(Place).filter(Place.contentid == contentid).first()
     if not place:
         raise HTTPException(status_code=404, detail="Place not found")
     
     # 해시태그 가져오기
     hashtags = [pt.tag for pt in place.hashtags]  # Place → PlaceTag → Tag
+    
+    detail_images = fetch_detail_images(str(contentid))
+    
+    contenttypeid = place.contenttypeid  
+    
+    detail_info = fetch_detail_info(str(contentid), str(contenttypeid))
+    
+    print("📌 contenttypeid =", contenttypeid)
 
     # 상세정보가 PlaceDetail에 있다면 가져오기
     detail = db.query(PlaceDetail).filter_by(place_id=contentid).first()
@@ -106,6 +109,7 @@ def read_place_detail(
         }
     
     nearby_places = [place_to_dict(p) for p in nearby_places]
+    
 
     
     return templates.TemplateResponse(
@@ -117,7 +121,10 @@ def read_place_detail(
             "hashtags": hashtags,
             "nearby_places": nearby_places,
             "current_user": current_user,
-        },
+            "detail_images": detail_images,
+            "detail_info": detail_info,
+            
+        }
     )
   
 # 목록 필터링  
@@ -125,27 +132,44 @@ def read_place_detail(
 def list_places_filtered(
     request: Request,
     page: int = 1,
-    sort: str = "updated",
-    contenttypeid: int = None,
-    addr: str = None,
+    sort: str = "updated",  # 'updated' 최신순, 'created' 오래된순
+    contenttypeid: str  |  None = None,  # 관광타입 필터
+    addr: str = None,  # addr1 앞 2글자 필터
     search: str = None,
     tag: str = None,
-    template: str = "places_list.html",
+    template: str = "places_list.html", 
     db: Session = Depends(get_db),
     current_user: User | None = Depends(get_current_user_optional),
 ):
+    
     print(">>> /places/list current_user =", current_user.id if current_user else None)
-    per_page = 10
+    per_page = 10  # 페이지당 항목 수 고정
     offset = (page - 1) * per_page
+
+    ctx = build_places_context(
+        request=request,
+        db=db,
+        page=page,
+        sort=sort,
+        contenttypeid=contenttypeid,
+        addr=addr,
+        search=search,
+        tag=tag,
+        current_user=current_user,
+    )
 
     query = db.query(Place)
 
-    if contenttypeid:
-        query = query.filter(Place.contenttypeid == contenttypeid)
+    # contenttypeid 필터 (안전하게 수정)
+    # ✅ 안전한 int 변환
+    if contenttypeid and contenttypeid.isdigit():
+        query = query.filter(Place.contenttypeid == int(contenttypeid))
+        
 
+    # addr1 앞 2글자 필터
     if addr:
         query = query.filter(Place.addr1.startswith(addr))
-
+        
     if search:
         keyword = f"%{search}%"
         query = query.filter(
@@ -154,52 +178,43 @@ def list_places_filtered(
                 Place.overview.ilike(keyword)
             )
         )
-
+    # 해시태그 필터
     if tag:
+        print(f"🔍 태그 검색: '{tag}'")
         query = query.join(PlaceTag).join(Tag).filter(
             Tag.name.ilike(f"%{tag}%")
-        ).distinct(Place.id)
-
+        ).distinct(Place.id)  # 중복 제거
+    
+    # 정렬
     if sort == "updated":
         query = query.order_by(
-            case((Place.firstimage != '', 1), else_=0).desc(),
-            Place.updated_at.desc()
+            case((Place.firstimage != '', 1), else_=0).desc(),  # firstimage 있는 것 먼저
+            Place.updated_at.desc()  # 최신순
         )
     elif sort == "created":
         query = query.order_by(
-            case((Place.firstimage != '', 1), else_=0).desc(),
-            Place.created_at.asc()
+            case((Place.firstimage != '', 1), else_=0).desc(),  # firstimage 있는 것 먼저
+            Place.created_at.asc()  # 오래된순
         )
     else:
         query = query.order_by(
             case((Place.firstimage != '', 1), else_=0).desc(),
-            Place.id.desc()
+            Place.id.desc()                       # 기본 정렬
         )
 
     total = query.count()
     total_pages = (total + per_page - 1) // per_page
     places = query.offset(offset).limit(per_page).all()
-
+    
     pref_summary = None
     if current_user:
         places, pref_summary = sort_places_with_preferences(db, current_user.id, places)
 
     return templates.TemplateResponse(
         template,
-        {
-            "request": request,
-            "places": places,
-            "page": page,
-            "total_pages": total_pages,
-            "sort": sort,
-            "contenttypeid": contenttypeid,
-            "addr": addr,
-            "search": search,
-            "tag": tag,
-            "pref_summary": pref_summary,   # 템플릿에서 사용할 값
-        },
+        {"request": request, **ctx},
     )
-
+    
 @router.get("/recommend")
 def recommend_places(
     db: Session = Depends(get_db),
@@ -247,3 +262,34 @@ def get_reason(
         "distance": scores["distance"],
         "final": scores["total"],
     }
+    
+# places 라우터에 추가 (기존 router에)
+@router.get("/map_more")
+def map_more_page(request: Request, db: Session = Depends(get_db)):
+    """
+    지도 전용 페이지 - 전체 관광지 데이터 + 검색 + 클러스터 + 현재위치 3km
+    """
+    # 전체 places 데이터 (mapx, mapy 있는 것만)
+    places = get_all_places(db)
+    
+    # Jinja2에서 사용 가능한 딕셔너리 형태로 변환
+    places_dict = [
+        {
+            "contentid": p.contentid,
+            "title": p.title,
+            "addr1": p.addr1 or "",
+            "mapx": float(p.mapx) if p.mapx else None,
+            "mapy": float(p.mapy) if p.mapy else None
+        }
+        for p in places
+    ]
+    
+    return templates.TemplateResponse(
+        "map_more.html",
+        {
+            "request": request,
+            "places": places_dict
+        }
+    )
+    
+

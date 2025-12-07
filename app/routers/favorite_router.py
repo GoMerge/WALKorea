@@ -29,6 +29,8 @@ def my_favorite_places(
             "title": p.title,
             "addr1": p.addr1,
             "firstimage": p.firstimage,
+            "mapx": p.mapx,
+            "mapy": p.mapy,
         }
         for p in places
     ]

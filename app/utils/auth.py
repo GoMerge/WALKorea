@@ -80,11 +80,37 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    #  1. 빈 토큰 / 너무 짧은 토큰 체크
+    if not token or len(token.strip()) < 20:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or empty token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     try:
+        #  2. JWT 형식 검사 (3부분 있는지)
+        if token.count('.') != 2:
+            raise jwt.DecodeError("Invalid JWT format")
+        
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
+    except jwt.DecodeError as e:
+        #  3. DecodeError 구체적으로 잡기
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token format: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except JWTError:
         raise credentials_exception
 
@@ -99,6 +125,7 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
             headers={"WWW-Authenticate": "Bearer"},
         )
     return user
+
 
 def get_optional_token(request: Request) -> Optional[str]:
     auth = request.headers.get("Authorization")

@@ -16,8 +16,8 @@ GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "http://127.0.0.1:8000/auth/oauth/google/callback"
 
-REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile.html"
-REDIRECT_MAIN = "http://127.0.0.1:8000/index.html"
+REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile"
+REDIRECT_MAIN = "http://127.0.0.1:8000/"
 
 
 def get_google_login_url() -> dict:

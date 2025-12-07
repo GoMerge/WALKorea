@@ -56,6 +56,9 @@ def update_profile_service(user_in: UserUpdate, db: Session, current_user: User)
     if user_in.gender:
         user.gender = user_in.gender
 
+    if user_in.region_id is not None:
+        user.region_id = user_in.region_id    
+    
     db.commit()
     db.refresh(user)
     

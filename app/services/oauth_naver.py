@@ -12,8 +12,8 @@ NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
 NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
 NAVER_REDIRECT_URI = "http://127.0.0.1:8000/auth/oauth/naver/callback"
 
-REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile.html"
-REDIRECT_MAIN = "http://127.0.0.1:8000/index.html"
+REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile"
+REDIRECT_MAIN = "http://127.0.0.1:8000/"
 
 
 def get_naver_login_url() -> dict:

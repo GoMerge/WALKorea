@@ -41,6 +41,7 @@ class CalendarEventResponse(CalendarEventBase):
     is_shared: int
     shared_from_user_id: Optional[int] = None
     shared_from_event_id: Optional[int] = None
+    from_place: bool = False
 
     class Config:
         from_attributes = True

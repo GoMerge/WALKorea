@@ -1,4 +1,4 @@
-from fastapi import APIRouter, Depends
+from fastapi import APIRouter, Depends, HTTPException, status
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.utils.auth import get_current_user
@@ -25,3 +25,13 @@ def list_notifications(db: Session = Depends(get_db),
         }
         for n in items
     ]
+
+@router.delete("/", status_code=status.HTTP_204_NO_CONTENT)
+def delete_all_notifications(
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    db.query(Notification).filter(
+        Notification.user_id == current_user.id
+    ).delete(synchronize_session=False)
+    db.commit()

@@ -2,647 +2,478 @@
 <html lang="ko">
 <head>
   <meta charset="utf-8">
-  <title>마이페이지 | WALKorea</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>WALKorea - 맞춤 설정</title>
+  <meta name="description" content="한국 여행 일정 관리">
+  <meta name="keywords" content="여행, 캘린더, 일정, WALKorea">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
   <style>
-    body { background-color:#f5f7fb; }
+    body.mypage-layout { background:#f5f7fb; }
 
-    .sidebar-fixed {
-      width: 260px;
-      min-width: 260px;
-      max-width: 260px;
-      border-right: 1px solid #e5e7eb;
-      background-color:#fff;
-    }
-
-    /* 사이드바 메뉴 공통 스타일 */
-    .sidebar .menu-title {
-      font-size:0.85rem;
-      font-weight:600;
-      color:#6b7280;
-      margin-top:1rem;
-      margin-bottom:0.25rem;
+    .mypage-user-badge {
+      width:48px;height:48px;border-radius:999px;
+      background:#16a34a;color:#fff;font-weight:700;
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;margin-right:12px;
     }
 
-    .sidebar .nav-link {
-      font-size:0.95rem;
-      color:#374151;
-      padding:0.45rem 0.75rem;
-      border-radius:0.35rem;
-      margin-bottom:2px;
-    }
-
-    .sidebar .nav-link.active {
-      background-color:#e0f2fe;
-      color:#0369a1;
-      font-weight:600;
-    }
-
-    .calendar-grid {
-      display:grid;
-      grid-template-columns:repeat(7,1fr);
-      gap:4px;
-      font-size:0.85rem;
-    }
-    .calendar-day {
-      min-height:70px;
-      border-radius:4px;
-      padding:4px;
-      background-color:#fff;
-      border:1px solid #e5e7eb;
-    }
-    .calendar-day.today {
-      border:2px solid #16a34a;
-    }
-    .calendar-day .date-num {
-      font-weight:600;
+    .mypage-nav a {
+      display:block;padding:8px 10px;border-radius:10px;
+      color:#4b5563;font-size:14px;text-decoration:none;
       margin-bottom:4px;
     }
-    .weather-box {
-      background-color:#fff;
-      border-radius:0.75rem;
-      padding:0.75rem 0.85rem;
-      box-shadow:0 1px 3px rgba(15,23,42,0.08);
-      font-size:0.8rem;
+    .mypage-nav a.active {
+      background:#e5f3ff;color:#0f766e;font-weight:600;
     }
 
-    #region-weather-list div {
-      line-height:1.4;
+    /* 래퍼는 투명 */
+    .mypage-main-card {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    /* row 간격만 살짝 */
+    .mypage-main-card .row {
+      margin: 0;
+      gap: 24px;
+    }
+
+    .mypage-main-card .row.align-items-start {
+      display: flex;
+      flex-wrap: nowrap;      /* 줄바꿈 금지: 항상 좌우 */
+    }
+
+    /* 왼쪽/오른쪽 폭 고정 비율 */
+    .mypage-main-card .col-lg-3 { flex: 0 0 280px; max-width: 280px; }
+    .mypage-main-card .col-lg-9 { flex: 1 1 auto; }
+
+    .mypage-sidebar {
+      background:#ffffff;
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(15,23,42,0.08);
+      padding:20px 18px 22px;
+    }
+
+    .mypage-sidebar .border.rounded-3 {
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      background:#ffffff;
+    }
+
+    /* 오른쪽 카드 */
+    .calendar-card {
+      background:#ffffff;
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(15,23,42,0.08);
+      padding:20px 22px;
     }
   </style>
 </head>
 <body>
-<header class="navbar navbar-expand-lg navbar-light bg-white shadow-sm">
-  <div class="container">
-    <a class="navbar-brand fw-bold text-success" href="index.html">WALKorea</a>
-    <ul class="navbar-nav ms-auto gap-2">
-      <li class="nav-item"><a class="nav-link" href="recommend.html">추천 여행지</a></li>
-      <li class="nav-item"><a class="nav-link" href="calendar.html">여행 캘린더</a></li>
-      <li class="nav-item"><a class="nav-link" href="mypage_calendar.html">마이페이지</a></li>
-      <!-- 알림 아이콘 -->
-      <li class="nav-item position-relative">
-        <button id="notif-btn" class="btn btn-link nav-link p-0 position-relative">
-          <span class="fs-5">🔔</span>
-          <span id="notif-badge"
-                class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none">
-          </span>
-        </button>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">WALKorea</h1>
+      </a>
 
-        <!-- 알림 리스트 패널 -->
-        <div id="notif-panel"
-             class="card shadow-sm position-absolute end-0 mt-2 d-none"
-             style="width:260px; z-index:1050;">
-          <div class="card-header py-2 px-3 d-flex justify-content-between align-items-center">
-            <span class="small fw-semibold">알림</span>
-            <button id="notif-close" class="btn btn-sm btn-outline-secondary py-0 px-1">×</button>
-          </div>
-          <ul id="notif-list" class="list-group list-group-flush small"></ul>
-        </div>
-      </li>
-      <li class="nav-item" id="nav-login"><a class="btn btn-success" href="login.html">로그인</a></li>
-      <li class="nav-item" id="nav-signup"><a class="btn btn-primary" href="signup.html">회원가입</a></li>
-    </ul>
-  </div>
-</header>
-
-<main class="container-fluid" style="margin-top:10px;">
-  <div class="d-flex">
-    <!-- 왼쪽: 마이페이지 카테고리 -->
-    <aside class="sidebar-fixed sidebar p-3">
-      <div class="d-flex align-items-center mb-3">
-        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center"
-            style="width:40px;height:40px;">
-          <span id="side-initial">W</span>
-        </div>
-        <div class="ms-2">
-          <div class="fw-semibold" id="side-nickname">로그인 사용자</div>
-          <div class="text-muted small" id="side-email">-</div>
-        </div>
-      </div>
-
-      <div class="weather-box mb-3" id="weather-box">
-        <div class="fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
-        <div class="small text-muted mb-2" id="region-weather-desc">
-          마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
-        </div>
-        <div id="region-weather-list"></div>
-        <a class="btn btn-outline-success btn-sm mt-2 w-100" href="mypage_profile.html">
-          지역 설정하러 가기
-        </a>
-      </div>
-
-      <div class="menu-title">마이페이지</div>
-      <nav class="nav flex-column">
-        <a href="mypage_calendar.html"  class="nav-link">내 일정</a>
-        <a href="mypage_friends.html"   class="nav-link">친구 관리</a>
-        <a href="mypage_recommend.html" class="nav-link active">맞춤 관광</a>
-        <a href="mypage_profile.html"   class="nav-link">프로필 수정</a>
-        <a href="mypage_favorites.html" class="nav-link">좋아요 한 여행지</a>
+      <!-- Navigation Menu -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li class="dropdown">
+            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+          <li><a href="/places/map_more">지도</a></li>
+          <li><a href="/mypage_calendar">마이페이지</a></li>
+        </ul>
       </nav>
-    </aside>
+
+      <!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
+      <div id="nav-guest" class="d-flex align-items-center gap-2">
+        <a class="btn-getstarted" href="/signup">회원가입</a>
+        <a class="btn-getstarted" href="/login">로그인</a>
+      </div>
+
+      <!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
+      <div id="nav-user" class="d-none d-flex align-items-center gap-3">
+
+        <!-- 알림 버튼 (작게) -->
+        <div class="dropdown">
+          <button id="notifDropdown"
+                  class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <i class="bi bi-bell"></i>
+            <span id="notif-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
+              0
+            </span>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-end notif-dropdown">
+            <div class="notif-header d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">알림</span>
+              <button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
+            </div>
+            <div class="notif-body">
+              <p id="notif-empty-text" class="notif-empty text-muted small mb-2">
+                아직 알림이 없습니다.
+              </p>
+              <ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 닉네임 + 라벨 -->
+        <div class="d-flex align-items-center gap-2">
+          <div id="header-initial"
+              class="mypage-user-badge"
+              style="width:32px; height:32px; font-size:16px; margin-right:0;">
+            닉네임
+          </div>
+          <span id="header-nickname" class="fw-semibold"></span>
+        </div>
+
+        <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
+        <button id="nav-logout" class="btn-getstarted btn-logout-small">
+          로그아웃
+        </button>
+      </div>
+    </div>
+  </header>
+
+<main class="main" style="margin-top:90px;">
+  <div class="page-title">
+    <div class="heading">
+      <div class="container">
+        <div class="row d-flex justify-content-center text-center">
+          <div class="col-lg-8">
+            <h1 class="heading-title">내 일정</h1>
+            <p class="mb-0">맞춤 관광 설정 페이지입니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <nav class="breadcrumbs">
+      <div class="container">
+        <ol>
+          <li><a href="/">홈</a></li>
+          <li class="current">맞춤 관광</li>
+        </ol>
+      </div>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="mypage-main-card">
+        <div class="row align-items-start">
+
+          <!-- 왼쪽: 사용자 + 메뉴 + 날씨 -->
+          <div class="col-lg-3">
+            <div class="mypage-sidebar">
+              <div class="d-flex align-items-center mb-3">
+                <div class="mypage-user-badge" id="side-initial">닉네임</div>
+                <div>
+                  <div class="fw-semibold" id="side-nickname">닉네임</div>
+                  <div class="text-muted small" id="side-email">user@example.com</div>
+                </div>
+              </div>
+
+              <div class="border rounded-3 p-3 mb-3" id="weather-box">
+                <div class="small fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+                <div class="small text-muted mb-2" id="region-weather-desc">
+                  마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
+                </div>
+                <div id="region-weather-list"></div>
+                <a class="btn btn-outline-success btn-sm mt-2 w-100" href="/mypage_profile">
+                  지역 설정하러 가기
+                </a>
+              </div>
+
+              <div class="menu-title mb-2">마이페이지</div>
+              <nav class="mypage-nav">
+                <a href="/mypage_calendar">내 일정</a>
+                <a href="/mypage_friends">친구 관리</a>
+                <a href="/mypage_recommend" class="active">맞춤 관광</a>
+                <a href="/mypage_profile">프로필 수정</a>
+                <a href="/mypage_favorites">좋아요 한 여행지</a>
+              </nav>
+            </div>
+          </div>
 
     <!-- 오른쪽: 맞춤 관광 설정 -->
-    <section class="col-md-9 col-lg-10 p-4">
-      <div class="profile-card mb-4 d-flex align-items-center gap-3">
-        <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width:64px;height:64px;font-size:1.5rem;">
-          <span id="profile-initial">W</span>
-        </div>
-        <div>
-          <div class="fw-bold fs-5" id="profile-nickname">로그인 사용자</div>
-          <div class="text-muted small" id="profile-email">-</div>
-          <div class="text-muted small">
-            나의 여행 취향을 설정하면, 추천 여행지와 일정에 반영됩니다.
+          <div class="col-lg-9">
+            <div class="calendar-card">
+              <div class="profile-card mb-4 d-flex align-items-center gap-3">
+                <div class="rounded-circle bg-success text-white d-flex align-items-center justify-content-center" style="width:64px;height:64px;font-size:1.5rem;">
+                  <span id="profile-initial">W</span>
+                </div>
+                <div>
+                  <div class="fw-bold fs-5" id="profile-nickname">로그인 사용자</div>
+                  <div class="text-muted small" id="profile-email">-</div>
+                  <div class="text-muted small">
+                    나의 여행 취향을 설정하면, 추천 여행지와 일정에 반영됩니다.
+                  </div>
+                </div>
+              </div>
+
+              <h4 class="fw-bold mb-3">맞춤 관광 설정</h4>
+              <p class="text-muted small mb-1">
+                아래 항목을 선택하면 WALKorea가 취향에 맞는 여행지를 추천해 줄게요.
+              </p>
+              <p id="pref-summary" class="text-success small mb-3" style="display:none;"></p>
+
+              <form id="pref-form" style="max-width:720px;">
+                <h6 class="fw-bold mt-4 mb-2">1. 기본 정보</h6>
+                <div class="row g-3">
+                  <div class="col-md-4">
+                    <label class="form-label">연령대</label>
+                    <select class="form-select" id="age_group">
+                      <option value="">선택</option>
+                      <option value="10대">10대</option>
+                      <option value="20대">20대</option>
+                      <option value="30대">30대</option>
+                      <option value="40대">40대</option>
+                      <option value="50대 이상">50대 이상</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">성별</label>
+                    <select class="form-select" id="pref_gender">
+                      <option value="">선택</option>
+                      <option value="M">남성</option>
+                      <option value="F">여성</option>
+                      <option value="O">기타/선택 안 함</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">여행 스타일</label>
+                    <select class="form-select" id="travel_style">
+                      <option value="">선택</option>
+                      <option value="계획형">계획형</option>
+                      <option value="자유형">자유형</option>
+                    </select>
+                  </div>
+                </div>
+
+                <h6 class="fw-bold mt-4 mb-2">2. 여행 취향</h6>
+                <div class="mt-3">
+                  <label class="form-label d-block">함께 가는 사람</label>
+
+                  <input type="checkbox" class="btn-check" id="with-alone" autocomplete="off" value="혼자">
+                  <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-alone">혼자</label>
+
+                  <input type="checkbox" class="btn-check" id="with-friend" autocomplete="off" value="친구">
+                  <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-friend">친구</label>
+
+                  <input type="checkbox" class="btn-check" id="with-family" autocomplete="off" value="가족">
+                  <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-family">가족</label>
+
+                  <input type="checkbox" class="btn-check" id="with-couple" autocomplete="off" value="커플">
+                  <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-couple">커플</label>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label">선호 지역/테마</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="바다" id="theme-sea">
+                    <label class="form-check-label" for="theme-sea">바다</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="산" id="theme-mountain">
+                    <label class="form-check-label" for="theme-mountain">산</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="도시" id="theme-city">
+                    <label class="form-check-label" for="theme-city">도시</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="자연" id="theme-nature">
+                    <label class="form-check-label" for="theme-nature">자연</label>
+                  </div>
+                </div>
+
+                <div class="mt-3">
+                  <label class="form-label">활동 타입</label>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="문화체험" id="act-culture">
+                    <label class="form-check-label" for="act-culture">문화체험</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="맛집" id="act-food">
+                    <label class="form-check-label" for="act-food">맛집</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="휴식" id="act-rest">
+                    <label class="form-check-label" for="act-rest">휴식</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" value="관광명소" id="act-spot">
+                    <label class="form-check-label" for="act-spot">관광명소</label>
+                  </div>
+                </div>
+
+                <h6 class="fw-bold mt-4 mb-2">3. 세부 선호</h6>
+
+                <div class="row g-3 mt-1">
+                  <div class="col-md-4">
+                    <label class="form-label">사진 찍기</label>
+                    <select class="form-select" id="photo_likes">
+                      <option value="">선택</option>
+                      <option value="많이 찍는 편">많이 찍는 편</option>
+                      <option value="보통">보통</option>
+                      <option value="거의 안 찍음">거의 안 찍음</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">선호 분위기</label>
+                    <select class="form-select" id="vibe">
+                      <option value="">선택</option>
+                      <option value="조용한 곳">조용한 곳</option>
+                      <option value="적당히 북적이는 곳">적당히 북적이는 곳</option>
+                      <option value="활기찬 곳">활기찬 곳</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">활동 시간대</label>
+                    <select class="form-select" id="night_activity">
+                      <option value="">선택</option>
+                      <option value="낮활동">주로 낮 활동</option>
+                      <option value="밤활동">밤 활동 선호</option>
+                    </select>
+                  </div>
+                </div>
+
+                <div class="row g-3 mt-3">
+                  <div class="col-md-4">
+                    <label class="form-label">1인당 예산</label>
+                    <select class="form-select" id="budget_level">
+                      <option value="">선택</option>
+                      <option value="low">10만원 이하</option>
+                      <option value="mid">10~30만원</option>
+                      <option value="high">30만원 이상</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">활동 강도</label>
+                    <select class="form-select" id="activity_level">
+                      <option value="">선택</option>
+                      <option value="light">가벼운 산책 위주</option>
+                      <option value="normal">반나절 정도</option>
+                      <option value="hard">종일 빡세게</option>
+                    </select>
+                  </div>
+                  <div class="col-md-4">
+                    <label class="form-label">혼잡도 선호</label>
+                    <select class="form-select" id="crowd_level">
+                      <option value="">선택</option>
+                      <option value="any">상관 없음</option>
+                      <option value="moderate">적당히 북적</option>
+                      <option value="quiet">한적한 곳 선호</option>
+                    </select>
+                  </div>
+                </div>
+                <div class="mt-3">
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="sns_like">
+                    <label class="form-check-label" for="sns_like">SNS에 올리기 좋은 스팟 선호</label>
+                  </div>
+                  <div class="form-check form-check-inline">
+                    <input class="form-check-input" type="checkbox" id="avoid_crowd">
+                    <label class="form-check-label" for="avoid_crowd">사람 많은 곳은 피하고 싶어요</label>
+                  </div>
+                </div>
+                <div class="mt-4">
+                  <button type="submit" class="btn btn-success">설정 저장</button>
+                </div>
+              </form>
+            </div>
           </div>
         </div>
       </div>
-
-      <h4 class="fw-bold mb-3">맞춤 관광 설정</h4>
-      <p class="text-muted small mb-1">
-        아래 항목을 선택하면 WALKorea가 취향에 맞는 여행지를 추천해 줄게요.
-      </p>
-      <p id="pref-summary" class="text-success small mb-3" style="display:none;"></p>
-
-      <form id="pref-form" style="max-width:720px;">
-        <h6 class="fw-bold mt-4 mb-2">1. 기본 정보</h6>
-        <div class="row g-3">
-          <div class="col-md-4">
-            <label class="form-label">연령대</label>
-            <select class="form-select" id="age_group">
-              <option value="">선택</option>
-              <option value="10대">10대</option>
-              <option value="20대">20대</option>
-              <option value="30대">30대</option>
-              <option value="40대">40대</option>
-              <option value="50대 이상">50대 이상</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">성별</label>
-            <select class="form-select" id="pref_gender">
-              <option value="">선택</option>
-              <option value="M">남성</option>
-              <option value="F">여성</option>
-              <option value="O">기타/선택 안 함</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">여행 스타일</label>
-            <select class="form-select" id="travel_style">
-              <option value="">선택</option>
-              <option value="계획형">계획형</option>
-              <option value="자유형">자유형</option>
-            </select>
-          </div>
-        </div>
-
-        <h6 class="fw-bold mt-4 mb-2">2. 여행 취향</h6>
-        <div class="mt-3">
-          <label class="form-label d-block">함께 가는 사람</label>
-
-          <input type="checkbox" class="btn-check" id="with-alone" autocomplete="off" value="혼자">
-          <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-alone">혼자</label>
-
-          <input type="checkbox" class="btn-check" id="with-friend" autocomplete="off" value="친구">
-          <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-friend">친구</label>
-
-          <input type="checkbox" class="btn-check" id="with-family" autocomplete="off" value="가족">
-          <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-family">가족</label>
-
-          <input type="checkbox" class="btn-check" id="with-couple" autocomplete="off" value="커플">
-          <label class="btn btn-outline-secondary btn-sm me-1 mb-1" for="with-couple">커플</label>
-        </div>
-
-        <div class="mt-3">
-          <label class="form-label">선호 지역/테마</label>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="바다" id="theme-sea">
-            <label class="form-check-label" for="theme-sea">바다</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="산" id="theme-mountain">
-            <label class="form-check-label" for="theme-mountain">산</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="도시" id="theme-city">
-            <label class="form-check-label" for="theme-city">도시</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="자연" id="theme-nature">
-            <label class="form-check-label" for="theme-nature">자연</label>
-          </div>
-        </div>
-
-        <div class="mt-3">
-          <label class="form-label">활동 타입</label>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="문화체험" id="act-culture">
-            <label class="form-check-label" for="act-culture">문화체험</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="맛집" id="act-food">
-            <label class="form-check-label" for="act-food">맛집</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="휴식" id="act-rest">
-            <label class="form-check-label" for="act-rest">휴식</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" value="관광명소" id="act-spot">
-            <label class="form-check-label" for="act-spot">관광명소</label>
-          </div>
-        </div>
-
-        <h6 class="fw-bold mt-4 mb-2">3. 세부 선호</h6>
-
-        <div class="row g-3 mt-1">
-          <div class="col-md-4">
-            <label class="form-label">사진 찍기</label>
-            <select class="form-select" id="photo_likes">
-              <option value="">선택</option>
-              <option value="많이 찍는 편">많이 찍는 편</option>
-              <option value="보통">보통</option>
-              <option value="거의 안 찍음">거의 안 찍음</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">선호 분위기</label>
-            <select class="form-select" id="vibe">
-              <option value="">선택</option>
-              <option value="조용한 곳">조용한 곳</option>
-              <option value="적당히 북적이는 곳">적당히 북적이는 곳</option>
-              <option value="활기찬 곳">활기찬 곳</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">활동 시간대</label>
-            <select class="form-select" id="night_activity">
-              <option value="">선택</option>
-              <option value="낮활동">주로 낮 활동</option>
-              <option value="밤활동">밤 활동 선호</option>
-            </select>
-          </div>
-        </div>
-
-        <div class="row g-3 mt-3">
-          <div class="col-md-4">
-            <label class="form-label">1인당 예산</label>
-            <select class="form-select" id="budget_level">
-              <option value="">선택</option>
-              <option value="low">10만원 이하</option>
-              <option value="mid">10~30만원</option>
-              <option value="high">30만원 이상</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">활동 강도</label>
-            <select class="form-select" id="activity_level">
-              <option value="">선택</option>
-              <option value="light">가벼운 산책 위주</option>
-              <option value="normal">반나절 정도</option>
-              <option value="hard">종일 빡세게</option>
-            </select>
-          </div>
-          <div class="col-md-4">
-            <label class="form-label">혼잡도 선호</label>
-            <select class="form-select" id="crowd_level">
-              <option value="">선택</option>
-              <option value="any">상관 없음</option>
-              <option value="moderate">적당히 북적</option>
-              <option value="quiet">한적한 곳 선호</option>
-            </select>
-          </div>
-        </div>
-        <div class="mt-3">
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="sns_like">
-            <label class="form-check-label" for="sns_like">SNS에 올리기 좋은 스팟 선호</label>
-          </div>
-          <div class="form-check form-check-inline">
-            <input class="form-check-input" type="checkbox" id="avoid_crowd">
-            <label class="form-check-label" for="avoid_crowd">사람 많은 곳은 피하고 싶어요</label>
-          </div>
-        </div>
-        <div class="mt-4">
-          <button type="submit" class="btn btn-success">설정 저장</button>
-        </div>
-      </form>
-    </section>
-  </div>
+    </div>
+  </section>
 </main>
-
-<script>
-const token = localStorage.getItem("access_token");
-
-function formatKoreanWeekday(dateStr) {
-  if (!dateStr) return "";
-  const d = new Date(dateStr);
-  const names = ["일", "월", "화", "수", "목", "금", "토"];
-  return names[d.getDay()];
-}
-
-async function loadProfileWeather() {
-  if (!token) return;
-
-  try {
-    const res = await fetch("http://127.0.0.1:8000/weather/profile/current", {
-      headers: { "Authorization": "Bearer " + token }
-    });
-    if (!res.ok) return;
-    const data = await res.json();   // { region_name, days: [...] }
-
-    const box      = document.getElementById("weather-box");
-    const boxTitle = document.getElementById("region-weather-title");
-    const boxDesc  = document.getElementById("region-weather-desc");
-    const listBox  = document.getElementById("region-weather-list");
-    if (!data.days || !boxTitle || !boxDesc || !listBox || !box) return;
-
-    boxTitle.textContent = `${data.region_name}의 6일간 날씨`;
-    boxDesc.textContent  = "오늘을 포함한 6일치 동네 날씨예요.";
-    listBox.innerHTML = "";
-
-    data.days.forEach((d, idx) => {
-      const div = document.createElement("div");
-      div.className = "d-flex align-items-center small mb-1";
-
-      const weekday = formatKoreanWeekday(d.date);
-      const label   = idx === 0 ? "오늘" : weekday;
-
-      const temp = d.temp;
-      const tmax = d.temp_max;
-      const tmin = d.temp_min;
-
-      const tempPart = (tmax != null && tmin != null)
-        ? `${tmax.toFixed(0)}° / ${tmin.toFixed(0)}°`
-        : (temp != null ? `${temp.toFixed(0)}°` : "-°");
-
-      const iconEmoji = mapIconToEmoji(d.icon);
-      const desc = d.desc || "";
-
-      div.innerHTML = `
-        <span class="text-muted" style="width:32px;">${label}</span>
-        <span style="width:32px; text-align:center;">${iconEmoji}</span>
-        <span class="fw-semibold" style="width:80px; text-align:right;">${tempPart}</span>
-        <span class="text-muted" style="flex:1; text-align:left; margin-left:8px;">
-          ${desc}
-        </span>
-      `;
-      listBox.appendChild(div);
-    });
-  } catch (e) {
-    console.error("profile weather error", e);
-  }
-}
+<footer id="footer" class="footer position-relative">
 
 
-function mapIconToEmoji(icon) {
-  switch (icon) {
-    case "rain": return "🌧️";
-    case "snow": return "❄️";
-    case "fog": return "🌫️";
-    case "wind": return "💨";
-    case "cloudy": return "☁️";
-    case "partly-cloudy-day": return "⛅";
-    case "partly-cloudy-night": return "☁️";
-    case "clear-day": return "☀️";
-    case "clear-night": return "🌙";
-    default: return "🌤️";
-  }
-}
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>WALKorea</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">개발자 김혜영</a>
+              <a href="#">개발자 이지영</a>
+            </div>
+            <div class="credits">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
 
-async function loadPreferences() {
-  const token = localStorage.getItem("access_token");
-  if (!token) return;
+  </footer>
+<!-- 저장 완료 토스트 -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 1080;">
+  <div id="saveToast" class="toast align-items-center text-bg-success border-0" role="status" aria-live="polite" aria-atomic="true">
+    <div class="d-flex">
+      <div class="toast-body">
+        맞춤 관광 설정이 저장되었습니다.
+      </div>
+      <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+    </div>
+  </div>
+</div>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
 
-  const res = await fetch("http://127.0.0.1:8000/user/profile/preferences", {
-    headers: { "Authorization": "Bearer " + token }
+<script type="module" src="/assets/js/header.js"></script>
+<script type="module" src="/assets/js/mypage_common.js"></script>
+<script type="module" src="/assets/js/notifications.js"></script>
+
+<script type="module">
+  import { initRecommendPage } from "/assets/js/mypage_recommend.js";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    initRecommendPage().catch(err => console.error("initRecommendPage error", err));
   });
-  if (!res.ok) return;
-  const data = await res.json();
-  const pref = data.preference;
-  if (!pref) return;
-
-  // 단일 값 select들
-  document.getElementById("age_group").value       = pref.age_group       || "";
-  document.getElementById("pref_gender").value     = pref.gender          || "";
-  document.getElementById("travel_style").value    = pref.travel_style    || "";
-  document.getElementById("photo_likes").value     = pref.photo_likes     || "";
-  document.getElementById("vibe").value            = pref.vibe            || "";
-  document.getElementById("night_activity").value  = pref.night_activity  || "";
-  document.getElementById("budget_level").value    = pref.budget_level    || "";
-  document.getElementById("activity_level").value  = pref.activity_level  || "";
-  document.getElementById("crowd_level").value     = pref.crowd_level     || "";
-
-  // 체크박스: 배열 기준으로 채우기
-  const travelWith   = pref.travel_with   || [];
-  const areaTheme    = pref.area_theme    || [];
-  const activityType = pref.activity_type || [];
-
-  document.getElementById("with-alone").checked   = travelWith.includes("혼자");
-  document.getElementById("with-friend").checked  = travelWith.includes("친구");
-  document.getElementById("with-family").checked  = travelWith.includes("가족");
-  document.getElementById("with-couple").checked  = travelWith.includes("커플");
-
-  document.getElementById("theme-sea").checked      = areaTheme.includes("바다");
-  document.getElementById("theme-mountain").checked = areaTheme.includes("산");
-  document.getElementById("theme-city").checked     = areaTheme.includes("도시");
-  document.getElementById("theme-nature").checked   = areaTheme.includes("자연");
-
-  document.getElementById("act-culture").checked = activityType.includes("문화체험");
-  document.getElementById("act-food").checked    = activityType.includes("맛집");
-  document.getElementById("act-rest").checked    = activityType.includes("휴식");
-  document.getElementById("act-spot").checked    = activityType.includes("관광명소");
-
-  document.getElementById("sns_like").checked    = !!pref.sns_like;
-  document.getElementById("avoid_crowd").checked = !!pref.avoid_crowd;
-}
-
-
-// 공통: 헤더/사이드바 프로필 세팅
-async function setupHeaderAndProfile() {
-  const nav = document.querySelector(".navbar-nav");
-  const loginLi = document.getElementById("nav-login");
-  const signupLi = document.getElementById("nav-signup");
-  if (token && nav) {
-    if (loginLi) loginLi.remove();
-    if (signupLi) signupLi.remove();
-    const logoutLi = document.createElement("li");
-    logoutLi.className = "nav-item";
-    logoutLi.innerHTML = `<a class="btn btn-outline-danger" href="#">로그아웃</a>`;
-    logoutLi.querySelector("a").onclick = (e) => {
-      e.preventDefault();
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      window.location.href = "index.html";
-    };
-    nav.appendChild(logoutLi);
-  }
-  if (!token) return;
-
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
-    headers: { "Authorization": "Bearer " + token }
-  });
-  if (!res.ok) return;
-  const user = await res.json();
-
-  const nick = user.nickname || (user.name || "사용자");
-  const email = user.email || "";
-
-  const sideNick = document.getElementById("side-nickname");
-  const profNick = document.getElementById("profile-nickname");
-  if (sideNick) sideNick.textContent = nick;
-  if (profNick) profNick.textContent = nick;
-
-  const sideEmail = document.getElementById("side-email");
-  const profEmail = document.getElementById("profile-email");
-  if (sideEmail) sideEmail.textContent = email;
-  if (profEmail) profEmail.textContent = email;
-
-  const sideInit = document.getElementById("side-initial");
-  const profInit = document.getElementById("profile-initial");
-  if (sideInit) sideInit.textContent = nick[0];
-  if (profInit) profInit.textContent = nick[0];
-}
-
-// 취향 설정 저장
-async function savePreferences(e) {
-  e.preventDefault();
-  if (!token) {
-    alert("로그인이 필요합니다.");
-    window.location.href = "login.html";
-    return;
-  }
-
-  const travelWith = [];
-  if (document.getElementById("with-alone").checked)  travelWith.push("혼자");
-  if (document.getElementById("with-friend").checked) travelWith.push("친구");
-  if (document.getElementById("with-family").checked) travelWith.push("가족");
-  if (document.getElementById("with-couple").checked) travelWith.push("커플");
-
-  const areaTheme = [];
-  if (document.getElementById("theme-sea").checked)      areaTheme.push("바다");
-  if (document.getElementById("theme-mountain").checked) areaTheme.push("산");
-  if (document.getElementById("theme-city").checked)     areaTheme.push("도시");
-  if (document.getElementById("theme-nature").checked)   areaTheme.push("자연");
-
-  const activityType = [];
-  if (document.getElementById("act-culture").checked) activityType.push("문화체험");
-  if (document.getElementById("act-food").checked)    activityType.push("맛집");
-  if (document.getElementById("act-rest").checked)    activityType.push("휴식");
-  if (document.getElementById("act-spot").checked)    activityType.push("관광명소");
-
-  const payload = {
-    preference: {
-      age_group: document.getElementById("age_group").value || "알 수 없음",
-      gender: document.getElementById("pref_gender").value || "알 수 없음",
-      travel_with: travelWith,
-      travel_style: document.getElementById("travel_style").value || "계획형",
-      activity_level: document.getElementById("activity_level").value || "보통",
-      area_theme: areaTheme,
-      activity_type: activityType,
-      photo_likes: document.getElementById("photo_likes").value || "보통",
-      vibe: document.getElementById("vibe").value || "조용한 곳",
-      night_activity: document.getElementById("night_activity").value || "낮활동",
-      sns_like: document.getElementById("sns_like").checked,
-      avoid_crowd: document.getElementById("avoid_crowd").checked,
-      budget_level: document.getElementById("budget_level").value || "mid",
-      crowd_level: document.getElementById("crowd_level").value || "moderate",
-    }
-  };
-
-  const res = await fetch("http://127.0.0.1:8000/user/profile/preferences", {
-    method: "POST",
-    headers: {
-      "Content-Type":"application/json",
-      "Authorization":"Bearer " + token
-    },
-    body: JSON.stringify(payload)
-  });
-
-  if (res.ok) {
-    const summary = document.getElementById("pref-summary");
-    if (summary) {
-      summary.style.display = "block";
-      summary.textContent =
-        `설정 완료: ${document.getElementById("age_group").value || "연령 미설정"}, ` +
-        `${travelWith.join(", ") || "혼자/동행 미설정"}, ` +
-        `${areaTheme.join(", ") || "테마 미설정"} 기준으로 추천해 드릴게요.`;
-    }
-    alert("맞춤 관광 설정이 저장되었습니다.");
-  }
-}
-
-window.addEventListener("DOMContentLoaded", async () => {
-  if (!token) {
-    alert("로그인이 필요합니다.");
-    window.location.href = "login.html";
-    return;
-  }
-  await setupHeaderAndProfile();
-  await loadProfileWeather();
-  await loadPreferences();
-  document.getElementById("pref-form").addEventListener("submit", savePreferences);
-});
-let notifCount = 0;
-
-async function loadNotifications() {
-  const token = localStorage.getItem("access_token");
-  if (!token) return;
-
-  try {
-    const res = await fetch("http://127.0.0.1:8000/notifications/", {
-      headers: { "Authorization": "Bearer " + token }
-    });
-    if (!res.ok) return;
-    const items = await res.json();   // [{id, type, message, ...}, ...]
-
-    const ul = document.getElementById("notif-list");
-    if (!ul) return;
-    ul.innerHTML = "";
-
-    items.forEach(n => {
-      const li = document.createElement("li");
-      li.className = "list-group-item py-2";
-      li.textContent = n.message;
-      ul.appendChild(li);
-    });
-
-    if (items.length > 0) {
-      notifCount = items.filter(n => !n.is_read).length || items.length;
-      const badge = document.getElementById("notif-badge");
-      if (badge) {
-        badge.textContent = notifCount;
-        badge.classList.toggle("d-none", notifCount === 0);
-      }
-    }
-  } catch (e) {
-    console.error("loadNotifications error", e);
-  }
-}
-
-document.addEventListener("DOMContentLoaded", () => {
-  const btn = document.getElementById("notif-btn");
-  const panel = document.getElementById("notif-panel");
-  const closeBtn = document.getElementById("notif-close");
-
-  if (!btn || !panel) return;
-
-  btn.addEventListener("click", async () => {
-    if (panel.classList.contains("d-none")) {
-      await loadNotifications();          // 열 때마다 최신 목록
-      panel.classList.remove("d-none");
-      const badge = document.getElementById("notif-badge");
-      if (badge) badge.classList.add("d-none");   // 열면 뱃지 초기화
-    } else {
-      panel.classList.add("d-none");
-    }
-  });
-
-  if (closeBtn) {
-    closeBtn.addEventListener("click", () => panel.classList.add("d-none"));
-  }
-});
-
 </script>
 </body>
 </html>

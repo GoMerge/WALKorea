@@ -25,7 +25,7 @@ jobs:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
           key: ${{ secrets.EC2_KEY }}
-          source: "deploy/"
+          source: "app,data,db,frontend,Dockerfile,docker-compose.yml,requirements.txt"
           target: "~/WALKorea"
           overwrite: true
 

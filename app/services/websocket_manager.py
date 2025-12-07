@@ -71,13 +71,18 @@ def follow_user(db: Session, follower_id: int, following_id: int) -> Follow:
     )
     return follow
 
-def notify_calendar_shared(to_user_id: int, from_user_nickname: str, calendar_title: str):
-    msg = f"{from_user_nickname} 님이 '{calendar_title}' 캘린더를 공유했습니다."
+def notify_calendar_shared(to_user_id: int, from_user_nickname: str, calendar_title: str, date_str: str, location: str | None):
+    msg = f"{from_user_nickname} 님이 '{calendar_title}' 일정을 공유했습니다."
     notif = _create_notification(
         user_id=to_user_id,
         type_="calendar_share",
         message=msg,
-        data={"calendar_title": calendar_title},
+        data={
+            "from_user_nickname": from_user_nickname,
+            "title": calendar_title,
+            "date": date_str,
+            "location": location,
+        },
     )
     _send_ws(
         to_user_id,
@@ -85,5 +90,9 @@ def notify_calendar_shared(to_user_id: int, from_user_nickname: str, calendar_ti
             "event": "calendar_share",
             "notification_id": notif.id,
             "message": msg,
+            "from_user_nickname": from_user_nickname,
+            "title": calendar_title,
+            "date": date_str,
+            "location": location,
         },
     )

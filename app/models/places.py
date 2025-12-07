@@ -55,6 +55,7 @@ class Place(Base):
     images = relationship("PlaceImage", back_populates="place", cascade="all, delete-orphan")
     festival = relationship("Festival", back_populates="place", uselist=False)
     hashtags = relationship("PlaceTag",back_populates="place",cascade="all, delete-orphan")
+    comments = relationship("Comment", back_populates="place")
     
 
 

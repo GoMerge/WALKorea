@@ -1,15 +1,20 @@
-from fastapi import FastAPI, Request
+from fastapi import FastAPI, Request, Depends
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
+from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from sqlalchemy.orm import Session
+from app.database import get_db
 from app.services.schedule_notify_job import start_calendar_alarm_scheduler
 from app.database import SessionLocal, Base, engine 
+from app.routers import places
 from app.routers import (
     auth, user, oauth_google, oauth_kakao, oauth_naver,
     region_router, weather_router, calendar_router, follow, places, address_router,
-    calendar_weather_router, notification_router, hashtag, favorite_router,
+    calendar_weather_router, notification_router, hashtag, favorite_router, comments,
 )
-from pathlib import Path  # ⭐ 추가!
+from pathlib import Path 
+from fastapi.responses import FileResponse
 
 BASE_DIR = Path(__file__).parent.parent  # app/main.py → 프로젝트 루트
 templates = Jinja2Templates(directory="frontend/templates")
@@ -26,6 +31,8 @@ app.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+
 
 Base.metadata.create_all(bind=engine)
 app.include_router(places.router, prefix="/places", tags=["places"])
@@ -59,7 +66,49 @@ app.include_router(calendar_weather_router.router, tags=["CalendarWeather"])
 app.include_router(address_router.router)
 app.include_router(notification_router.router)
 app.include_router(favorite_router.router)
-
-app.mount("/", StaticFiles(directory=str(BASE_DIR / "frontend"), html=True), name="frontend")
+app.include_router(comments.router)
 
 app.mount("/assets", StaticFiles(directory=str(BASE_DIR / "frontend" / "assets")), name="assets")
+
+@app.get("/", response_class=HTMLResponse)
+async def main_page(request: Request, db: Session = Depends(get_db)):
+    ctx = places.build_places_context(
+        request=request,
+        db=db,
+        page=1,
+        sort="updated",
+        contenttypeid=None,
+        addr=None,
+        search=None,
+        tag=None,
+        current_user=None, 
+    )
+    return templates.TemplateResponse("places_list.html", {"request": request, **ctx})
+
+@app.get("/login")
+async def login_page():
+    return FileResponse(BASE_DIR / "frontend" / "login.html")
+
+@app.get("/signup")
+async def signup_page():
+    return FileResponse(BASE_DIR / "frontend" / "signup.html")
+
+@app.get("/mypage_calendar")
+async def mypage_calendar():
+    return FileResponse(BASE_DIR / "frontend" / "mypage_calendar.html")
+
+@app.get("/mypage_favorites")
+async def mypage_calendar():
+    return FileResponse(BASE_DIR / "frontend" / "mypage_favorites.html")
+
+@app.get("/mypage_friends")
+async def mypage_calendar():
+    return FileResponse(BASE_DIR / "frontend" / "mypage_friends.html")
+
+@app.get("/mypage_profile")
+async def mypage_calendar():
+    return FileResponse(BASE_DIR / "frontend" / "mypage_profile.html")
+
+@app.get("/mypage_recommend")
+async def mypage_calendar():
+    return FileResponse(BASE_DIR / "frontend" / "mypage_recommend.html")

@@ -2,6 +2,7 @@ from sqlalchemy import Column, String, BigInteger, Date, TIMESTAMP, DateTime, Bo
 from sqlalchemy.orm import relationship
 from sqlalchemy.sql import func
 from app.database import Base
+from app.models.comments import Comment
 
 class User(Base):
     __tablename__ = "users"
@@ -32,3 +33,4 @@ class User(Base):
     region = relationship("Region")
     user_calendars = relationship("UserCalendar", back_populates="user")
     notifications = relationship("Notification", back_populates="user")
+    comments = relationship("Comment", back_populates="user")

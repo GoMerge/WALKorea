@@ -1,7 +1,7 @@
 from fastapi import APIRouter, Depends, HTTPException
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.schemas.user import UserOut, UserUpdate, ChangePasswordRequest, PasswordResetRequest, PasswordResetConfirm, UserRegionUpdate, UserProfileCreate
+from app.schemas.user import UserOut, UserUpdate, ChangePasswordRequest, PasswordResetRequest, PasswordResetConfirm, UserRegionUpdate, PreferencePayload, UserProfileCreate
 from app.models.user import User
 from app.utils.auth import get_current_user
 from app.services.user import get_profile_service, change_password_service, update_profile_service, confirm_password_reset, delete_user_service
@@ -68,6 +68,31 @@ async def get_preferences(
     profile = get_user_profile_service(db, current_user.id)
     if not profile or not profile.preferences:
         return {"preference": None}
+    return {"preference": profile.preferences}
+
+@router.post("/profile/preferences")
+async def save_preferences(
+    payload: PreferencePayload,
+    db: Session = Depends(get_db),
+    current_user = Depends(get_current_user),
+):
+    profile = get_user_profile_service(db, current_user.id)
+
+    # 프로필 없으면 새로 생성
+    if not profile:
+        profile_in = UserProfileCreate(
+            user_id=current_user.id,
+            # 스키마에 필수 필드가 더 있으면 전부 채워야 함
+            preference=payload.preference or {},   # ← 에러 난 부분: 기본값 포함
+        )
+        profile = create_user_profile_service(db, current_user.id, profile_in)
+    else:
+        # 이미 있는 경우는 preference 만 갱신
+        profile.preferences = payload.preference
+        db.add(profile)
+        db.commit()
+        db.refresh(profile)
+
     return {"preference": profile.preferences}
 
 @router.get("/recommendations")
