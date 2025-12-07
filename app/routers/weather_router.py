@@ -1,7 +1,5 @@
 from fastapi import APIRouter, Query, Depends, HTTPException, Response
 from app.services.weather_service import get_weather, get_daily_weather_vc
-from app.utils.weather_map import plot_weather_on_map
-from app.utils.weather_visualization import plot_monthly_weather_with_stddev
 from app.services.calendar_weather_service import recommend_good_days, get_avg_weather_summary,is_good_weather
 from app.utils.auth import get_current_user
 from app.models.user import User
