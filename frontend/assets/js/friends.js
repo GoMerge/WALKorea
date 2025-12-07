@@ -1,10 +1,6 @@
-// /assets/js/friends.js
 import { initHeader } from "/assets/js/header.js";
-import { setupHeaderAndProfile, loadProfileWeather } from "/assets/js/mypage_common.js";
-import { initWebsocket, loadNotifications } from "/assets/js/notifications.js";
-import api from "./api.js";
-
-const res = await api.get("/user/profile");
+import { setupHeaderAndProfile, loadProfileWeather, requireLoginForMypage } from "/assets/js/mypage_common.js";
+import { loadNotifications } from "/assets/js/notifications.js";
 
 let currentUserId = null;
 let followingIdSet = new Set();
@@ -174,7 +170,9 @@ async function loadFollowLists() {
 // --- 페이지 초기화 (공통 모듈 활용) ---
 
 export async function initFriendsPage() {
-  if (!requireLoginForMypage()) return; 
+  if (!requireLoginForMypage()) return;
+
+  const token = localStorage.getItem("access_token");
   if (!token) {
     alert("로그인이 필요합니다.");
     window.location.href = "/login";
@@ -182,14 +180,22 @@ export async function initFriendsPage() {
   }
 
   // 공통 헤더, 마이페이지 공통 설정
-  await initHeader();              // header.js
-  await setupHeaderAndProfile();   // mypage_common.js
-  await loadProfileWeather();      // mypage_common.js
-  await loadFollowLists();         // 이 파일
-  await loadNotifications();       // notifications.js
+  await initHeader();
+  await setupHeaderAndProfile();
+  await loadProfileWeather();
 
-  // WebSocket 은 프로필 로딩 안에서 initWebsocket 호출하거나,
-  // 필요하면 여기서 직접 initWebsocket(currentUserId) 호출
+  // 🔹 현재 유저 id 먼저 세팅
+  const meRes = await fetch("http://127.0.0.1:8000/user/profile", {
+    headers: { Authorization: "Bearer " + token },
+  });
+  if (meRes.ok) {
+    const me = await meRes.json();
+    currentUserId = me.id;        // 실제 필드명에 맞춰서 (id 또는 user_id)
+  }
+
+  // 팔로잉/팔로워 + 알림
+  await loadFollowLists();
+  await loadNotifications();
 
   // 검색 이벤트 바인딩
   const input = document.getElementById("friend-search-input");

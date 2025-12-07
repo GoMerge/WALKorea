@@ -242,24 +242,22 @@
             <div class="col-lg-3">
               <div class="mypage-sidebar">
                 <div class="d-flex align-items-center mb-3">
-                  <div class="mypage-user-badge" id="side-initial">홍</div>
+                  <div class="mypage-user-badge" id="side-initial">닉네임</div>
                   <div>
-                    <div class="fw-semibold" id="side-nickname">닉네임 홍</div>
+                    <div class="fw-semibold" id="side-nickname">닉네임</div>
                     <div class="text-muted small" id="side-email">user@example.com</div>
                   </div>
                 </div>
 
-                <div class="border rounded-3 p-3 mb-3">
-                  <div class="small mb-1" id="profile-region-msg">
-                    현재 지역: (불러오는 중)
-                  </div>
-                  <div class="mb-2">
-                    <div class="small fw-semibold" id="region-weather-title">오늘 날씨</div>
-                    <div class="small text-muted" id="region-weather-desc">
-                      오늘을 포함한 6일치 동네 날씨예요.
-                    </div>
+                <div class="border rounded-3 p-3 mb-3" id="weather-box">
+                  <div class="small fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+                  <div class="small text-muted mb-2" id="region-weather-desc">
+                    마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
                   </div>
                   <div id="region-weather-list"></div>
+                  <a class="btn btn-outline-success btn-sm mt-2 w-100" href="/mypage_profile">
+                    지역 설정하러 가기
+                  </a>
                 </div>
 
                 <div class="menu-title mb-2">마이페이지</div>
@@ -268,7 +266,7 @@
                   <a href="/mypage_friends">친구 관리</a>
                   <a href="/mypage_recommend">맞춤 관광</a>
                   <a href="/mypage_profile">프로필 수정</a>
-                  <a href="/mypage_favorite" class="active">좋아요 한 여행지</a>
+                  <a href="/mypage_favorites" class="active">좋아요 한 여행지</a>
                 </nav>
               </div>
             </div>

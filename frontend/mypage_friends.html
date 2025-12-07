@@ -200,7 +200,7 @@
               style="width:32px; height:32px; font-size:16px; margin-right:0;">
             닉네임
           </div>
-          <span id="nickname-text" class="fw-semibold"></span>
+          <span id="header-nickname" class="fw-semibold"></span>
         </div>
 
         <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
@@ -252,17 +252,15 @@
                   </div>
                 </div>
 
-                <div class="border rounded-3 p-3 mb-3">
-                  <div class="small mb-1" id="profile-region-msg">
-                    현재 지역: (불러오는 중)
-                  </div>
-                  <div class="mb-2">
-                    <div class="small fw-semibold" id="region-weather-title">오늘 날씨</div>
-                    <div class="small text-muted" id="region-weather-desc">
-                      오늘을 포함한 6일치 동네 날씨예요.
-                    </div>
+                <div class="border rounded-3 p-3 mb-3" id="weather-box">
+                  <div class="small fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+                  <div class="small text-muted mb-2" id="region-weather-desc">
+                    마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
                   </div>
                   <div id="region-weather-list"></div>
+                  <a class="btn btn-outline-success btn-sm mt-2 w-100" href="/mypage_profile">
+                    지역 설정하러 가기
+                  </a>
                 </div>
 
                 <div class="menu-title mb-2">마이페이지</div>
@@ -370,14 +368,15 @@
   import { initFriendsPage } from "/assets/js/friends.js";
 
   window.addEventListener("DOMContentLoaded", async () => {
+    initFriendsPage();  // 한 줄이면 끝
     console.log('🔥 알림 완전 해결 시작!');
-    
+
     // 1. nav 전환
     const navUser = document.getElementById('nav-user');
     const navGuest = document.getElementById('nav-guest');
     navUser.classList.remove('d-none');
     navGuest.classList.add('d-none');
-    
+
     // 2. 알림 배지 업데이트
     const token = localStorage.getItem('access_token');
     if (token) {

@@ -547,8 +547,7 @@
       }
 
       btn.addEventListener("click", async () => {
-        console.log("버튼 클릭됨!");  // 디버깅용
-        
+        console.log("버튼 클릭됨!");
         const dateStr = dateInput.value;
         if (!dateStr) {
           alert("날짜를 선택해 주세요.");
@@ -556,20 +555,30 @@
         }
 
         let token = localStorage.getItem("access_token");
-
         if (!token || token.length < 10) {
           alert("로그인이 필요합니다.");
           goLoginWithReturn();
           return;
         }
 
-        // 로그인 상태: 저장 로직
-        console.log("저장 시도:", dateStr);
+        // 상세페이지 타이틀 가져오기
+        const titleEl = document.querySelector(".heading-title");
+        const title = titleEl ? titleEl.textContent.trim() : "여행 일정";
+
+        console.log("저장 시도:", title, dateStr);
+
         const res = await fetch(
-          `http://127.0.0.1:8000/calendar/places/${placeId}/events?visit_date=${dateStr}`,
+          `http://127.0.0.1:8000/calendar/places/${placeId}/events2`,
           {
             method: "POST",
-            headers: { "Authorization": "Bearer " + token }
+            headers: {
+              "Authorization": "Bearer " + token,
+              "Content-Type": "application/json",
+            },
+            body: JSON.stringify({
+              title: title,
+              visit_date: dateStr,
+            }),
           }
         );
 
@@ -580,6 +589,7 @@
           alert("저장 실패: " + (err.detail || res.status));
         }
       });
+
 
       const box = document.getElementById("recommend-reason");
       if (!box) return;

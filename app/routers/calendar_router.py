@@ -3,7 +3,7 @@ from sqlalchemy.orm import Session
 from datetime import date, datetime,timedelta
 from typing import List
 import calendar as calmod
-
+from app.services.user import get_or_create_user_calendar
 from app.schemas.calendar import (
     UserCalendarCreate,
     UserCalendarResponse,
@@ -12,6 +12,7 @@ from app.schemas.calendar import (
     ShareRequestResponse,
     ShareRequestCreate,
     ShareRespond,
+    PlaceEventCreate,
 )
 from app.services.calendar_service import (
     create_user_calendar,
@@ -44,9 +45,7 @@ def create_calendar(
     db: Session = Depends(get_db),
     current_user: User = Depends(get_current_user)
 ):
-    calendar_data.user_id = current_user.id
-    calendar_data.event_date = date.today()
-    calendar = create_user_calendar(db, calendar_data)
+    calendar = create_user_calendar(db, calendar_data, user_id=current_user.id)
     return calendar
 
 
@@ -278,11 +277,8 @@ def add_place_to_calendar(
     current_user=Depends(get_current_user),
 ):
     # 1) 유저 캘린더 찾기
-    cal = (
-        db.query(UserCalendar)
-        .filter(UserCalendar.user_id == current_user.id)
-        .first()
-    )
+    cal = get_or_create_user_calendar(db, current_user.id)
+
     if not cal:
         raise HTTPException(status_code=404, detail="캘린더가 없습니다.")
 
@@ -313,7 +309,7 @@ def add_place_to_calendar(
 @router.post("/places/{place_id}/events", response_model=CalendarEventResponse)
 def create_event_from_place(
     place_id: int,
-    visit_date: date,                     # 쿼리 파라미터로 YYYY-MM-DD
+    visit_date: date,                     # 쿼리 파라미터 (YYYY-MM-DD)
     db: Session = Depends(get_db),
     current_user=Depends(get_current_user),
 ):
@@ -326,26 +322,64 @@ def create_event_from_place(
     if not cal:
         raise HTTPException(status_code=404, detail="캘린더가 없습니다.")
 
-    # 2) 관광지 정보
+    # 2) 관광지 정보 시도
     place = db.query(Place).filter(Place.id == place_id).first()
-    if not place:
-        raise HTTPException(status_code=404, detail="관광지를 찾을 수 없습니다.")
 
     # 3) 방문 시간은 기본 09:00~10:00
     start_dt = datetime.combine(visit_date, datetime.min.time()).replace(hour=9, minute=0)
     end_dt   = start_dt + timedelta(hours=1)
 
+    # 4) 기본 제목/위치 값 – place 없을 때를 위한 기본값
+    title = place.title if place else "여행 일정"
+    location = place.addr1 if place else None
+
     ev = CalendarEvent(
         calendar_id=cal.id,
-        title=place.title,          # 관광지 제목
+        title=title,                      # 관광지 있으면 place.title, 없으면 기본 제목
         start_datetime=start_dt,
         end_datetime=end_dt,
-        location=place.addr1,       # 관광지 주소
+        location=location,                # 없으면 None
         description="관광지 상세에서 추가한 일정",
-        from_place=True, 
+        from_place=bool(place),           # place 있으면 True, 없으면 False
     )
     db.add(ev)
     db.commit()
     db.refresh(ev)
 
+    return ev
+
+@router.post("/places/{place_id}/events2", response_model=CalendarEventResponse)
+def create_event_from_place2(
+    place_id: int,
+    body: PlaceEventCreate,              # JSON body
+    db: Session = Depends(get_db),
+    current_user=Depends(get_current_user),
+):
+    cal = (
+        db.query(UserCalendar)
+        .filter(UserCalendar.user_id == current_user.id)
+        .first()
+    )
+    if not cal:
+        raise HTTPException(status_code=404, detail="캘린더가 없습니다.")
+
+    start_dt = datetime.combine(body.visit_date, datetime.min.time()).replace(hour=9, minute=0)
+    end_dt   = start_dt + timedelta(hours=1)
+
+    # place는 있으면 주소만 가져오고, 없어도 무시
+    place = db.query(Place).filter(Place.id == place_id).first()
+    location = place.addr1 if place else None
+
+    ev = CalendarEvent(
+        calendar_id=cal.id,
+        title=body.title,                 # 프론트에서 준 제목 사용
+        start_datetime=start_dt,
+        end_datetime=end_dt,
+        location=location,
+        description="관광지 상세에서 추가한 일정",
+        from_place=bool(place),
+    )
+    db.add(ev)
+    db.commit()
+    db.refresh(ev)
     return ev

@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import RedirectResponse, FileResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.schedule_notify_job import start_calendar_alarm_scheduler
@@ -14,7 +15,6 @@ from app.routers import (
     calendar_weather_router, notification_router, hashtag, favorite_router, comments,
 )
 from pathlib import Path 
-from fastapi.responses import FileResponse
 
 BASE_DIR = Path(__file__).parent.parent  # app/main.py → 프로젝트 루트
 templates = Jinja2Templates(directory="frontend/templates")
@@ -70,6 +70,8 @@ app.include_router(comments.router)
 
 app.mount("/assets", StaticFiles(directory=str(BASE_DIR / "frontend" / "assets")), name="assets")
 
+app.mount("/static", StaticFiles(directory="frontend/assets"), name="static")
+
 @app.get("/", response_class=HTMLResponse)
 async def main_page(request: Request, db: Session = Depends(get_db)):
     ctx = places.build_places_context(
@@ -112,3 +114,17 @@ async def mypage_calendar():
 @app.get("/mypage_recommend")
 async def mypage_calendar():
     return FileResponse(BASE_DIR / "frontend" / "mypage_recommend.html")
+
+@app.get("/set-profile")
+async def set_profile_page(
+    user_id: int,
+    access_token: str,
+    refresh_token: str,
+    need_profile: int = 0,
+):
+    response = FileResponse(
+        BASE_DIR / "frontend" / "set-profile.html"  
+    )
+    response.set_cookie("access_token", access_token)
+    response.set_cookie("refresh_token", refresh_token)
+    return response

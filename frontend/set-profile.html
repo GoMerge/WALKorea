@@ -209,6 +209,36 @@
         </div>
       </nav>
     </div>
+    <section class="py-4">
+      <div class="container">
+        <form id="profile-form" class="mx-auto" style="max-width:480px;">
+          <div class="mb-3">
+            <label class="form-label">닉네임</label>
+            <input type="text" name="nickname" class="form-control" required>
+            <div id="nickname-msg" class="small mt-1 text-muted"></div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">생년월일</label>
+            <input type="date" name="birthday" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">성별</label>
+            <select name="gender" class="form-select">
+              <option value="">선택 안 함</option>
+              <option value="M">남성</option>
+              <option value="F">여성</option>
+              <option value="O">기타</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            프로필 저장
+          </button>
+        </form>
+      </div>
+    </section>
   </main>
   <footer id="footer" class="footer position-relative">
 
@@ -243,9 +273,7 @@ window.addEventListener("DOMContentLoaded", function() {
     // 토큰 저장 후 주소창에서 토큰 파라미터 제거 (보안)
     if(accessToken) {
         localStorage.setItem("access_token", accessToken);
-        // 토큰 없이 user_id만 남기고 URL 정리(없으면 pathname만)
-        let newUrl = location.pathname + (userId ? `?user_id=${userId}` : "");
-        window.history.replaceState({}, document.title, newUrl);
+        window.history.replaceState({}, document.title, location.pathname);
     }
 
     // 2. 닉네임 실시간 중복 체크

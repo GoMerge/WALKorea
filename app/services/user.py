@@ -2,10 +2,12 @@ from datetime import datetime
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status
 from app.models.user import User
+from app.models.calendar import UserCalendar
 from app.models.user_profile import UserProfile
 from app.utils.auth import hash_password, verify_password
 from app.schemas.user import UserUpdate, UserOut
 from app.schemas.user import UserProfileCreate
+from app.services.calendar_service import create_default_calendar_for_user
 from app.services.email import email_service
 
 def get_profile_service(current_user: User) -> UserOut:
@@ -31,6 +33,13 @@ def get_profile_service(current_user: User) -> UserOut:
         region_name=region_name,
     )
 
+
+def get_or_create_user_calendar(db: Session, user_id: int) -> UserCalendar:
+    """마이페이지 진입 시 사용: 해당 유저 캘린더가 없으면 하나 생성"""
+    cal = db.query(UserCalendar).filter_by(user_id=user_id).first()
+    if cal:
+        return cal
+    return create_default_calendar_for_user(db, user_id)
 
 def update_profile_service(user_in: UserUpdate, db: Session, current_user: User):
     user_id = current_user.id

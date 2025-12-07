@@ -5,12 +5,35 @@ from fastapi import HTTPException, status
 from app.models.calendar import UserCalendar, CalendarPlace, CalendarEvent, CalendarShareRequest
 from app.models.places import Place
 from app.models.user import User
+from app.schemas.calendar import UserCalendarCreate
 from datetime import date, datetime
 from app.services.follow_service import is_mutual_follow
 
+def create_default_calendar_for_user(db: Session, user_id: int) -> UserCalendar:
+    """회원가입 직후 호출해서 기본 캘린더 한 개 만들어 주는 용도"""
+    calendar = UserCalendar(
+        user_id=user_id,
+        place_id=None,
+        event_date=None,   # NOT NULL이면 date.today() 등으로 바꿔야 함
+        start_time=None,
+        end_time=None,
+        memo="기본 캘린더",
+    )
+    db.add(calendar)
+    db.commit()
+    db.refresh(calendar)
+    return calendar
+
 ### 캘린더 생성/조회/삭제
-def create_user_calendar(db: Session, calendar_data):
-    calendar = UserCalendar(**calendar_data.dict())
+def create_user_calendar(db: Session, calendar_data: UserCalendarCreate, user_id: int) -> UserCalendar:
+    calendar = UserCalendar(
+        user_id=user_id,
+        place_id=calendar_data.place_id,
+        event_date=calendar_data.event_date or date.today(),
+        start_time=None,
+        end_time=None,
+        memo=calendar_data.memo or "내 여행 캘린더",
+    )
     db.add(calendar)
     db.commit()
     db.refresh(calendar)

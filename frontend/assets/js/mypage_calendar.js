@@ -57,20 +57,46 @@ async function loadCalendars() {
       ul.appendChild(li);
     });
  }
-async function ensureUserCalendarId() { 
-    const token = getToken();
-    if (userCalendarId) return userCalendarId;
+async function ensureUserCalendarId() {
+  const token = getToken();
+  if (userCalendarId) return userCalendarId;
 
-    const res = await fetch("http://127.0.0.1:8000/calendar/", {
-      headers: { "Authorization": "Bearer " + token }
+  // 1) 내 캘린더 목록 조회
+  const res = await fetch("http://127.0.0.1:8000/calendar/", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+
+  if (!res.ok) {
+    alert("캘린더 조회에 실패했습니다.");
+    return null;
+  }
+
+  const list = await res.json(); 
+
+  // 2) 없으면 자동으로 하나 생성
+  if (!list || list.length === 0) {
+    const createRes = await fetch("http://127.0.0.1:8000/calendar/", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": "Bearer " + token
+      },
+      body: JSON.stringify({})  
     });
-    const list = res.ok ? await res.json() : [];
-    if (list.length === 0) {
-      alert("캘린더가 없습니다. 백엔드에서 UserCalendar 생성 API를 맞추거나, 구조를 정리해야 합니다.");
+
+    if (!createRes.ok) {
+      alert("기본 캘린더 생성에 실패했습니다.");
       return null;
     }
-    userCalendarId = list[0].id;
+
+    const cal = await createRes.json();
+    userCalendarId = cal.id;
     return userCalendarId;
+  }
+
+  // 3) 이미 있는 경우 첫 번째 사용
+  userCalendarId = list[0].id;
+  return userCalendarId;
 }
 
 async function fetchWeatherRecommendations(events) {
@@ -187,6 +213,8 @@ async function loadEventsToCalendar(calId) {
 
       if (ev.is_shared === 1) {
         li.classList.add("shared-event-list-item");
+      } else if (ev.from_place) {
+        li.classList.add("from-place-highlight-list");
       }
 
       let emoji = "";

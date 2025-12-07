@@ -12,7 +12,7 @@ class UserCalendarBase(BaseModel):
 
 class UserCalendarCreate(BaseModel):
     place_id: Optional[int] = None
-    event_date: date
+    event_date: Optional[date] = None
     memo: Optional[str] = "내 여행 캘린더"  
 
 class UserCalendarResponse(UserCalendarBase):
@@ -82,3 +82,7 @@ class ShareRequestResponse(BaseModel):
 
 class ShareRespond(BaseModel):
     accept: bool
+
+class PlaceEventCreate(BaseModel):
+    title: str   
+    visit_date: date

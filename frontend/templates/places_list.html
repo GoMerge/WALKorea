@@ -27,7 +27,6 @@
 
   <!-- Main CSS File -->
   <link href="assets/css/main.css" rel="stylesheet">
-  <script src="./assets/js/mypage_common.js"></script>
 </head>
 
 <body>
@@ -608,17 +607,33 @@
       }
     })();
   </script>
+  <script>
+    (function () {
+      const params = new URLSearchParams(window.location.search);
+
+      const access = params.get("access_token");
+      const refresh = params.get("refresh_token");
+
+      if (access) {
+        localStorage.setItem("access_token", access);
+      }
+      if (refresh) {
+        localStorage.setItem("refresh_token", refresh);
+      }
+
+      if (access || refresh) {
+        const url = new URL(window.location.href);
+        url.search = "";
+        window.history.replaceState({}, "", url.toString());
+      }
+    })();
+  </script>
   <script type="module">
-  import { initHeader } from "/assets/js/header.js";
-  window.addEventListener("DOMContentLoaded", async () => {
-    await initHeader();                 
-  });
-</script>
-</script>
-
-
-
-
+    import { initHeader } from "/assets/js/header.js";
+    window.addEventListener("DOMContentLoaded", async () => {
+      await initHeader();                 
+    });
+  </script>
 </body>
 
 </html>

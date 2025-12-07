@@ -29,21 +29,6 @@ export function requireLoginForMypage() {
   return true;
 }
 
-function handleUnauthorized(res) {
-  if (res.status === 401) {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
-    } else {
-      window.location.reload();
-    }
-    return true;  // 401 처리했다는 뜻
-  }
-  return false;
-}
-
 
 // 공통: 헤더/사이드바 프로필 세팅
 export async function setupHeaderAndProfile() {
@@ -74,8 +59,8 @@ export async function setupHeaderAndProfile() {
   if (!res.ok) return;
   const user = await res.json();
 
-  const nick = user.nickname || (user.name || "사용자");
-  const email = user.email || "";
+  const nick = user.nickname || user.userid || user.username || "사용자";
+  const email = user.email || user.user_email || "";
 
   const sideNick = document.getElementById("side-nickname");
   const profNick = document.getElementById("profile-nickname");
