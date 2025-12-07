@@ -1,4 +1,4 @@
-from sqlalchemy import Column, BigInteger, Integer, Date, Time, String, ForeignKey, TIMESTAMP, DateTime, UniqueConstraint, func
+from sqlalchemy import Boolean, Column, BigInteger, Integer, Date, Time, String, ForeignKey, TIMESTAMP, DateTime, UniqueConstraint, func
 from sqlalchemy.orm import relationship
 from app.database import Base
 
@@ -54,6 +54,7 @@ class CalendarEvent(Base):
     created_at = Column(DateTime, server_default=func.now(), nullable=False)
     updated_at = Column(DateTime, server_default=func.now(), onupdate=func.now(), nullable=False)
 
+    from_place = Column(Boolean, nullable=False, server_default="0") 
     calendar = relationship("UserCalendar", back_populates="events")
     shared_from_user = relationship("User", foreign_keys=[shared_from_user_id])
     shared_from_event = relationship("CalendarEvent", remote_side=[id])

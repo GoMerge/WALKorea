@@ -34,6 +34,7 @@ class UserUpdate(BaseModel):
     phonenum: str
     nickname: Optional[str] = None
     gender: Optional[str] = None
+    region_id: Optional[int] = None
 
 # 비밀번호 변경/초기화
 class ChangePasswordRequest(BaseModel):
@@ -105,3 +106,6 @@ class UserPreferenceSchema(BaseModel):
 
 class UserProfileCreate(BaseModel):
     preference: UserPreferenceSchema
+
+class PreferencePayload(BaseModel):
+    preference: dict

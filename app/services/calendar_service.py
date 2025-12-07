@@ -5,7 +5,7 @@ from fastapi import HTTPException, status
 from app.models.calendar import UserCalendar, CalendarPlace, CalendarEvent, CalendarShareRequest
 from app.models.places import Place
 from app.models.user import User
-from datetime import datetime
+from datetime import date, datetime
 from app.services.follow_service import is_mutual_follow
 
 ### 캘린더 생성/조회/삭제
@@ -244,3 +244,11 @@ def respond_share_request_service(
 
     req.responded_at = func.now()
     db.commit()
+
+def _ensure_date(value) -> date:
+    if isinstance(value, date):
+        return value
+    if isinstance(value, str):
+        # "20251003" 형식
+        return datetime.strptime(value, "%Y%m%d").date()
+    raise ValueError("invalid date")
