@@ -16,7 +16,7 @@ from app.routers import (
 
 BASE_DIR = Path(__file__).parent.parent  # /app/app -> /app
 FRONTEND_DIR = BASE_DIR / "frontend"
-templates = Jinja2Templates(directory=str(FRONTEND_DIR))
+templates = Jinja2Templates(directory=str(FRONTEND_DIR / "templates"))
 
 app = FastAPI(title="WALKorea API")
 
