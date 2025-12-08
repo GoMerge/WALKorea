@@ -19,7 +19,7 @@ class User(Base):
     role = Column(String(50), default='user')
     provider = Column(String(50), nullable=True)
     provider_id = Column(String(100), nullable=True)
-    nickname = Column(String(100), unique=True, nullable=True)
+    nickname = Column(String(50), unique=True, nullable=True)
     created_at = Column(TIMESTAMP(timezone=True), server_default=func.now())
     updated_at = Column(TIMESTAMP(timezone=True), onupdate=func.now())
     deleted_at = Column(DateTime, nullable=True)
