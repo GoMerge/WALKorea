@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from typing import Optional
 import hmac, hashlib, random, string, jwt
 import os
-from jwt.exceptions import PyJWTError
+from jwt import PyJWTError
 from dotenv import load_dotenv
 
 load_dotenv()
