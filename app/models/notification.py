@@ -6,7 +6,7 @@ class Notification(Base):
     __tablename__ = "notifications"
 
     id = Column(BigInteger, primary_key=True, autoincrement=True)
-    user_id = Column(BigInteger, ForeignKey("users.id"), nullable=True)
+    user_id = Column(BigInteger, ForeignKey('users.id'), nullable=False)
 
     type = Column(String(50), nullable=False)
     message = Column(String(255), nullable=False)
