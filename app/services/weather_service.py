@@ -59,18 +59,22 @@ async def fetch_daily_from_visualcrossing(address: str) -> Dict[str, Any]:
         temp = item.get("temp")
         tmax = item.get("tempmax")
         tmin = item.get("tempmin")
+        icon = item.get("icon")  
+        
         if temp is None and tmax is not None and tmin is not None:
             temp = (tmax + tmin) / 2.0
         desc = item.get("conditions")
-        icon = item.get("icon")
-
+        
+        icon_map = {
+            "rain": "rain", "snow": "snow", "sleet": "sleet",
+            "cloudy": "cloudy", "partly-cloudy-day": "cloudy", 
+            "clear-day": "clear", "partly-cloudy-night": "cloudy"
+        }
         daily.append({
             "date": date_str,
-            "temp": temp,
-            "temp_max": tmax,
             "temp_min": tmin,
-            "desc": desc,
-            "icon": icon,
+            "temp_max": tmax,
+            "icon": icon_map.get(icon, "clear"),  # 이제 icon 정의됨
         })
 
     return {"daily": daily}
@@ -83,7 +87,7 @@ async def get_daily_weather_vc(address: str) -> Dict[str, Any]:
         return cached
 
     data = await fetch_daily_from_visualcrossing(address)
-    await set_cached(cache_key, data, expire_seconds=3600)
+    await set_cached(cache_key, data, expire_seconds=1800)  
     return data
 
 
@@ -269,28 +273,40 @@ async def get_avg_weather_summary(address: str, date_str: str):
     if not address or not date_str:
         return None
 
-    df = load_avg_weather_data()
-    dt_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
-    month, day = dt_obj.month, dt_obj.day
+    try:
+        dt_obj = datetime.datetime.strptime(date_str, "%Y-%m-%d")
+        month, day = dt_obj.month, dt_obj.day
+        
+        df = load_avg_weather_data()
+        closest_full = find_closest_fullname(address, df)
+        if not closest_full:
+            return None
 
-    closest_full = find_closest_fullname(address, df)
-    if not closest_full:
+        # month/day 정확히 매칭 → 월 평균 fallback
+        exact_match = df[
+            (df["full_name"] == closest_full) & 
+            (df["month"] == month) & 
+            (df["day"] == day)
+        ]
+        
+        if exact_match.empty:
+            # 같은 월 평균
+            month_avg = df[
+                (df["full_name"] == closest_full) & 
+                (df["month"] == month)
+            ]
+            if month_avg.empty:
+                return None
+            row = month_avg.iloc[0]
+        else:
+            row = exact_match.iloc[0]
+
+        return {
+            "full_name": closest_full,
+            "month": int(month),
+            "day": int(day),
+            "기온(℃)": float(row.get("temperature", 0)) if pd.notna(row.get("temperature")) else None,
+            "강수량(mm)": float(row.get("precipitation", 0)) if pd.notna(row.get("precipitation")) else None,
+        }
+    except Exception:
         return None
-
-    sub = df[
-        (df["full_name"] == closest_full) &
-        (df["month"] == month) &
-        (df["day"] == day)
-    ]
-    if sub.empty:
-        return None
-
-    row = sub.iloc[0]
-
-    return {
-        "full_name": closest_full,
-        "month": int(row["month"]),
-        "day": int(row["day"]),
-        "기온(℃)": float(row["temperature"]) if pd.notna(row["temperature"]) else None,
-        "강수량(mm)": float(row["precipitation"]) if pd.notna(row["precipitation"]) else None,
-    }

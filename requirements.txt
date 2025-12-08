@@ -17,4 +17,4 @@ requests
 pandas
 aiohttp
 matplotlib
-konlpy 
+konlpy
