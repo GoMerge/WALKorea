@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.services.schedule_notify_job import start_calendar_alarm_scheduler
 from app.database import SessionLocal, Base, engine 
 from app.routers import places
 from app.routers import (
