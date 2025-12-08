@@ -9,7 +9,7 @@ from jose import JWTError, jwt
 from typing import Optional
 import hmac, hashlib, random, string, jwt
 import os
-from jwt import PyJWTError
+from jwt import InvalidTokenError
 from dotenv import load_dotenv
 
 load_dotenv()
@@ -173,7 +173,7 @@ def get_current_user_from_token(token: str, db: Session) -> User:
         user_id = payload.get("user_id") 
         if user_id is None:
             raise HTTPException(status_code=401, detail="토큰에 user_id가 없습니다.")
-    except PyJWTError:
+    except InvalidTokenError:
         raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
     user = db.query(User).filter(User.id == int(user_id)).first() 
