@@ -1,8 +1,9 @@
 # app/models/follow.py
-from sqlalchemy import Column, BigInteger, TIMESTAMP, ForeignKey
+from sqlalchemy import Column, BigInteger, TIMESTAMP, ForeignKey, text
 from sqlalchemy.orm import relationship
 from app.database import Base  # 여기서 Base 임포트
 from app.models.user import User  # User 클래스 import
+from datetime import datetime
 
 class Follow(Base):
     __tablename__ = "follows"
@@ -10,7 +11,7 @@ class Follow(Base):
     follower_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     following_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     created_at = Column(
-        DateTime,
+        TIMESTAMP,
         nullable=True,
         server_default=text("CURRENT_TIMESTAMP")
     )
