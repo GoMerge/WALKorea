@@ -91,7 +91,7 @@
 </style>
 <head>
     <!-- 지도 구현 -->
-  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fd93df643bf67f10524ef70aafa1a1a6"></script>
   <base href="/">
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -294,14 +294,15 @@
 
   </footer>
 <script>
+const API_BASE = "";
 document.getElementById("naver-btn").onclick = function() {
-    window.location.href = "http://127.0.0.1:8000/auth/oauth/naver/login";
+    window.location.href = API_BASE + "/auth/oauth/naver/login";
 };
 document.getElementById("google-btn").onclick = function() {
-    window.location.href = "http://127.0.0.1:8000/auth/oauth/google/login";
+    window.location.href = API_BASE + "/auth/oauth/google/login";
 };
 document.getElementById("kakao-btn").onclick = function() {
-    window.location.href = "http://127.0.0.1:8000/auth/oauth/kakao/login";
+    window.location.href = API_BASE + "/auth/oauth/kakao/login";
 };
 
 // 로그인 폼 처리
@@ -310,7 +311,7 @@ document.getElementById("login-form").addEventListener("submit", async function(
     console.log("login form submit fired");
     
     const form = e.target;
-    const res = await fetch("http://127.0.0.1:8000/auth/login", {
+    const res = await fetch(API_BASE + "/auth/login", {
         method: "POST",
         headers: {"Content-Type": "application/x-www-form-urlencoded"},
         body: new URLSearchParams({username: form.userid.value, password: form.password.value})

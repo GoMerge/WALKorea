@@ -167,7 +167,7 @@
 <head>
   <script type="module" src="/assets/js/mypage_common.js"></script>
   <!-- 지도 구현 -->
-  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fd93df643bf67f10524ef70aafa1a1a6"></script>
   <base href="/">
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
@@ -531,6 +531,8 @@
   <script src="assets/js/main.js"></script>
 
   <script type="module">
+    const API_BASE = "";
+
     import { goLoginWithReturn } from "./assets/js/mypage_common.js";
     document.addEventListener("DOMContentLoaded", async () => {
       const placeId = PLACE_ID;
@@ -568,7 +570,7 @@
         console.log("저장 시도:", title, dateStr);
 
         const res = await fetch(
-          `http://127.0.0.1:8000/calendar/places/${placeId}/events2`,
+          API_BASE + `/calendar/places/${placeId}/events2`,
           {
             method: "POST",
             headers: {
@@ -596,7 +598,7 @@
 
       // 1) 추천 점수 가져오기
       try {
-        const res = await fetch(`http://127.0.0.1:8000/places/recommend/reason/${placeId}`, {
+        const res = await fetch(API_BASE + `/places/recommend/reason/${placeId}`, {
           headers: { "Authorization": "Bearer " + token },
         });
 
@@ -630,7 +632,7 @@
 
       // 2) 닉네임으로 제목 바꾸기
       try {
-        const meRes = await fetch("http://127.0.0.1:8000/user/profile", {
+        const meRes = await fetch(API_BASE + "/user/profile", {
           headers: { "Authorization": "Bearer " + token },
         });
         if (meRes.ok) {
@@ -821,7 +823,7 @@ document.addEventListener("DOMContentLoaded", function() {
   
   async function loadUserProfile() {
     try {
-      const res = await fetch("http://127.0.0.1:8000/user/profile", {
+      const res = await fetch(API_BASE + "/user/profile", {
         headers: { "Authorization": "Bearer " + token }
       });
       if (res.ok) currentUser = await res.json();
@@ -838,7 +840,7 @@ document.addEventListener("DOMContentLoaded", function() {
         headers["Authorization"] = "Bearer " + token;
       }
 
-    const res = await fetch(`http://127.0.0.1:8000/places/${PLACE_ID}/comments`, {
+    const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
       headers,
     });
 
@@ -887,7 +889,7 @@ document.addEventListener("DOMContentLoaded", function() {
     btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>등록중...`;
     
     try {
-      const res = await fetch(`http://127.0.0.1:8000/places/${PLACE_ID}/comments`, {
+      const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
         method: "POST",
         headers: {
           "Authorization": "Bearer " + token,
@@ -977,7 +979,7 @@ document.addEventListener("DOMContentLoaded", function() {
     if (!confirm("댓글을 삭제하시겠습니까?")) return;
     
     try {
-      const res = await fetch(`http://127.0.0.1:8000/places/${PLACE_ID}/comments/${commentId}`, {
+      const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments/${commentId}`, {
         method: "DELETE",
         headers: { "Authorization": "Bearer " + token }
       });

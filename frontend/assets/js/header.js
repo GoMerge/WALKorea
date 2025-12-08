@@ -1,5 +1,7 @@
 import { initNotifications, initWebsocket } from './notifications.js';
 
+const API_BASE = "";
+
 function getToken() {
   return localStorage.getItem("access_token");
 }
@@ -23,7 +25,7 @@ export async function initHeader() {
     return;
   }
 
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+  const res = await fetch(API_BASE + "/user/profile", {
     headers: { Authorization: "Bearer " + token },
   });
   if (!res.ok) return;

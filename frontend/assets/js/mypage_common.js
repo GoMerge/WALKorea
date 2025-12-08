@@ -1,3 +1,5 @@
+const API_BASE = "";
+
 export let userBaseAddress = null;
 
 // 토큰 헬퍼 (캘린더에서 이미 쓰는 getToken 그대로 사용)
@@ -39,7 +41,7 @@ export async function setupHeaderAndProfile() {
 
   if (!token) return;
 
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+  const res = await fetch(API_BASE + "/user/profile", {
     headers: { "Authorization": "Bearer " + token }
   });
   if (!res.ok) return;
@@ -115,7 +117,7 @@ export async function requireCompletedProfile() {
   const token = localStorage.getItem("access_token");
   if (!token) return false;
 
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+  const res = await fetch(API_BASE + "/user/profile", {
     headers: { Authorization: "Bearer " + token },
   });
   if (!res.ok) return false;
@@ -168,7 +170,7 @@ export async function loadProfileWeather() {
   if (!token) return;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/weather/profile/current", {
+    const res = await fetch(API_BASE + "/weather/profile/current", {
       headers: { "Authorization": "Bearer " + token }
     });
     if (!res.ok) return;

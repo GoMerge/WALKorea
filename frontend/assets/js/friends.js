@@ -2,6 +2,8 @@ import { initHeader } from "/assets/js/header.js";
 import { setupHeaderAndProfile, loadProfileWeather, requireLoginForMypage } from "/assets/js/mypage_common.js";
 import { loadNotifications } from "/assets/js/notifications.js";
 
+const API_BASE = "";
+
 let currentUserId = null;
 let followingIdSet = new Set();
 const token = localStorage.getItem("access_token");
@@ -12,7 +14,7 @@ async function searchFriendsByNickname(query) {
   if (!token || !query.trim()) return;
 
   const res = await fetch(
-    `http://127.0.0.1:8000/follow/search-by-nickname/?nickname=${encodeURIComponent(query)}`,
+     API_BASE + `/follow/search-by-nickname/?nickname=${encodeURIComponent(query)}`,
     { headers: { "Authorization": "Bearer " + token } }
   );
   if (!res.ok) {
@@ -67,7 +69,7 @@ async function searchFriendsByNickname(query) {
 async function followUser(targetUserId) {
   if (!token) return;
 
-  const res = await fetch("http://127.0.0.1:8000/follow/", {
+  const res = await fetch(API_BASE + "/follow/", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
@@ -90,7 +92,7 @@ async function unfollowUser(followingId, name) {
   if (!token) return;
   if (!confirm(`'${name}' 팔로우를 취소할까요?`)) return;
 
-  const res = await fetch(`http://127.0.0.1:8000/follow/${followingId}`, {
+  const res = await fetch( API_BASE + `/follow/${followingId}`, {
     method: "DELETE",
     headers: { "Authorization": "Bearer " + token }
   });
@@ -109,10 +111,10 @@ async function loadFollowLists() {
   if (!token) return;
 
   const [followingRes, followerRes] = await Promise.all([
-    fetch("http://127.0.0.1:8000/follow/following", {
+    fetch(API_BASE + "/follow/following", {
       headers: { "Authorization": "Bearer " + token }
     }),
-    fetch("http://127.0.0.1:8000/follow/followers", {
+    fetch(API_BASE + "/follow/followers", {
       headers: { "Authorization": "Bearer " + token }
     })
   ]);
@@ -185,7 +187,7 @@ export async function initFriendsPage() {
   await loadProfileWeather();
 
   // 🔹 현재 유저 id 먼저 세팅
-  const meRes = await fetch("http://127.0.0.1:8000/user/profile", {
+  const meRes = await fetch(API_BASE + "/user/profile", {
     headers: { Authorization: "Bearer " + token },
   });
   if (meRes.ok) {
