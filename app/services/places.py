@@ -67,6 +67,9 @@ def fetch_place_detail(contentid: str) -> dict:
     }
 
     res = requests.get(url, params=params)
+    if res.status_code == 429:
+        print("❌ detailCommon2 429 Too Many Requests – 한도 초과, 저장 중단")
+        raise RuntimeError("TourAPI rate limit 429")
     res.raise_for_status()
     item = res.json()["response"]["body"]["items"]["item"]
 
@@ -568,3 +571,4 @@ def build_places_context(
         "pref_summary": pref_summary,
 
     }
+
