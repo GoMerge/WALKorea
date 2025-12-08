@@ -4,10 +4,6 @@ from app.schemas.weather import SimpleWeather
 from app.utils.weather import is_good_weather, is_good_weather_from_avg
 from app.utils.convert_address import convert_address_to_coordinates
 from app.services.weather_service import get_avg_weather_summary, get_daily_weather_vc
-<<<<<<< HEAD
-=======
-# from app.services.weather_prediction_service import predict_temperature
->>>>>>> 1397ebca396d01ba59f35c6f7d5d14cdb9dd3b1f
 
 
 async def resolve_region_fullname_from_address(address: str, db: Session) -> str | None:

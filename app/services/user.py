@@ -9,10 +9,6 @@ from app.schemas.user import UserUpdate, UserOut, UserProfileCreate
 from app.services.calendar_service import create_default_calendar_for_user
 from app.services.email import email_service
 
-<<<<<<< HEAD
-
-=======
->>>>>>> 1397ebca396d01ba59f35c6f7d5d14cdb9dd3b1f
 def get_profile_service(current_user: User) -> UserOut:
     region_name = None
     if getattr(current_user, "region", None):
@@ -105,10 +101,6 @@ def delete_user_service(db: Session, current_user: User):
     current_user.is_active = False
     db.commit()
     return {"msg": "회원 탈퇴가 완료되었습니다."}
-<<<<<<< HEAD
-
-=======
->>>>>>> 1397ebca396d01ba59f35c6f7d5d14cdb9dd3b1f
 
 def update_user_region(db: Session, user_id: int, region_id: int):
     user = db.query(User).filter(User.id == user_id).first()
@@ -146,8 +138,5 @@ def update_user_profile_service(db: Session, user_id: int, profile_in: UserProfi
     profile.preferences = profile_in.preference.dict()
     db.commit()
     db.refresh(profile)
-<<<<<<< HEAD
+    
     return profile
-=======
-    return profile
->>>>>>> 1397ebca396d01ba59f35c6f7d5d14cdb9dd3b1f

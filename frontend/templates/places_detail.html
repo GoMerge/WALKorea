@@ -962,6 +962,9 @@ document.addEventListener("DOMContentLoaded", function() {
   function formatTimeAgo(dateStr) {
     const now = new Date();
     const date = new Date(dateStr);
+
+     // UTC → KST 변환 (+9시간)
+    date.setHours(date.getHours() + 9);
     const diff = now - date;
     
     if (diff < 60 * 1000) return "방금 전";

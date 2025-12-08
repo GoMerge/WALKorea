@@ -6,6 +6,7 @@ from fastapi.responses import HTMLResponse, FileResponse
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from sqlalchemy.orm import Session
+
 from app.database import get_db, Base, engine
 from app.routers import (
     auth, user, oauth_google, oauth_kakao, oauth_naver,
@@ -50,7 +51,7 @@ app.include_router(notification_router.router)
 app.include_router(favorite_router.router)
 app.include_router(comments.router)
 
-# 정적 파일 마운트 (HEAD 방식 - 일관성)
+# 정적 파일 마운트
 app.mount("/assets", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="assets")
 app.mount("/static", StaticFiles(directory=str(FRONTEND_DIR / "assets")), name="static")
 
@@ -59,7 +60,7 @@ async def log_headers(request: Request, call_next):
     response = await call_next(request)
     return response
 
-# 메인 페이지 (origin/main)
+# 메인 페이지
 @app.get("/", response_class=HTMLResponse)
 async def main_page(request: Request, db: Session = Depends(get_db)):
     from app.services import places as places_service
@@ -83,7 +84,7 @@ async def main_page(request: Request, db: Session = Depends(get_db)):
         traceback.print_exc()
         raise HTTPException(status_code=500, detail="main_page failed")
 
-# 나머지 HTML 라우트들 (HEAD)
+# HTML 라우트들
 @app.get("/login")
 async def login_page():
     return FileResponse(FRONTEND_DIR / "login.html")
