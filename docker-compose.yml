@@ -24,7 +24,7 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "3308:3306"
+      - "3308:3306"          # 호스트 3308 → 컨테이너 3306
     volumes:
       - walkorea-db:/var/lib/mysql
     healthcheck:
