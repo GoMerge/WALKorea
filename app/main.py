@@ -39,8 +39,6 @@ app.include_router(places.router, prefix="/places", tags=["places"])
 
 app.include_router(hashtag.router)
 
-start_calendar_alarm_scheduler(SessionLocal) 
-
 @app.middleware("http")
 async def log_headers(request: Request, call_next):
     response = await call_next(request)
