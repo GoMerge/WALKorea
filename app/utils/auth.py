@@ -6,10 +6,10 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.models.user import User
 from jose import JWTError, jwt
-from typing import Optional
-import hmac, hashlib, random, string, jwt
-import os
 from jwt import InvalidTokenError
+from typing import Optional
+import hmac, hashlib, random, string
+import os
 from dotenv import load_dotenv
 
 load_dotenv()
