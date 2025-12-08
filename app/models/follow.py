@@ -9,7 +9,11 @@ class Follow(Base):
 
     follower_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
     following_id = Column(BigInteger, ForeignKey("users.id", ondelete="CASCADE"), primary_key=True)
-    created_at = Column(TIMESTAMP, server_default="CURRENT_TIMESTAMP")
+    created_at = Column(
+        DateTime,
+        nullable=True,
+        server_default=text("CURRENT_TIMESTAMP")
+    )
 
     follower = relationship(User, foreign_keys=[follower_id])
     following = relationship(User, foreign_keys=[following_id])
