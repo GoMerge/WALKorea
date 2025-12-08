@@ -1,0 +1,62 @@
+.dropdown-menu.notif-dropdown {
+  min-width: 320px;
+  max-width: 360px;
+  border-radius: 18px !important;
+  padding: 10px 14px;
+  box-shadow: 0 12px 30px rgba(15, 23, 42, 0.12);
+}
+
+
+/* 제목/전체삭제 줄 간격 조금 */
+.notif-header {
+  margin-bottom: 6px;
+}
+
+/* 알림 한 줄도 살짝 둥글게 */
+.notif-item {
+  border-radius: 10px;
+  padding: 4px 6px;
+}
+
+.notif-close-btn {
+  border: none;
+  background: transparent;
+  color: #9ca3af;
+  font-size: 14px;
+  line-height: 1;
+  padding: 0 2px;
+  cursor: pointer;
+}
+
+.notif-close-btn:hover {
+  color: #ef4444;   /* 살짝 빨간 톤 */
+}
+
+.notif-avatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 999px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 16px;
+  background: #22c55e;
+  color: #fff;
+}
+
+
+.notif-avatar-follow   { background-color: #22c55e; }
+.notif-avatar-calendar { background-color: #3b82f6; }
+.notif-avatar-default  { background-color: #6b7280; }
+
+/* 아이콘 폰트(bootstrap-icons) 사용 예시 */
+.notif-avatar-follow::before {
+  content: "\f4d0";      /* bi-person-plus-fill 코드 */
+  font-family: "bootstrap-icons";
+}
+
+.notif-avatar-calendar::before {
+  content: "\f1e2";      /* bi-calendar-event */
+  font-family: "bootstrap-icons";
+}
+

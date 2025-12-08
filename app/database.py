@@ -14,7 +14,7 @@ MYSQL_PASSWORD = os.getenv("MYSQL_PASSWORD")
 MYSQL_HOST = os.getenv("MYSQL_HOST", "localhost")  # 없으면 localhost 기본값
 
 MYSQL_PASSWORD_ENCODED = quote_plus(os.getenv("MYSQL_PASSWORD"))
-DATABASE_URL = f"mysql+pymysql://{os.getenv('MYSQL_USER')}:{MYSQL_PASSWORD_ENCODED}@{os.getenv('MYSQL_HOST', 'localhost')}:{os.getenv('DB_PORT')}/{os.getenv('MYSQL_DATABASE')}"
+DATABASE_URL = f"mysql+pymysql://{os.getenv('MYSQL_USER')}:{MYSQL_PASSWORD_ENCODED}@{os.getenv('MYSQL_HOST')}:{os.getenv('DB_PORT')}/{os.getenv('MYSQL_DATABASE')}"
 
 engine = create_engine(DATABASE_URL)
 SessionLocal = sessionmaker(autocommit=False, autoflush=False, bind=engine)

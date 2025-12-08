@@ -1,0 +1,572 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <!-- 지도 구현 -->
+   
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258&libraries=services,clusterer,geometry"></script>
+  <base href="/" / >
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Property Details - TheProperty Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: TheProperty
+  * Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
+  * Updated: Aug 05 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+  <script src="./assets/js/mypage_common.js"></script>
+  <style>
+    body { 
+        padding-top: 80px; 
+        margin: 0;
+        font-family: Arial, sans-serif;
+    }
+    html { height: 100%; }
+    main {
+        height: calc(100vh - 80px); 
+        margin: 0;
+    }
+    .main { 
+        display: flex; 
+        height: 100%; 
+    }
+    #map { 
+        flex: 1; 
+        height: 100%; 
+    }
+    .sidebar {
+        width: 350px;
+        padding: 20px;
+        overflow-y: auto;
+        background: #fff;
+        box-shadow: -2px 0 10px rgba(0,0,0,0.1);
+        height: 100%;
+    }
+    input, button {
+        width: 100%;
+        padding: 12px;
+        box-sizing: border-box;
+        margin-bottom: 12px;
+        border-radius: 8px;
+        border: 1px solid #ccc;
+        font-size: 14px;
+    }
+    .search-btn {
+        background: #fee500 !important;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+        color: #333;
+    }
+    .current-btn {
+        background: #4CAF50 !important;
+        color: white !important;
+        border: none;
+        cursor: pointer;
+        font-weight: bold;
+    }
+    .search-btn:hover, .current-btn:hover {
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    }
+    .place-item {
+        border-bottom: 1px solid #eee;
+        padding: 15px;
+        cursor: pointer;
+        border-radius: 6px;
+        margin-bottom: 5px;
+    }
+    .place-item:hover {
+        background: #f0f8ff;
+    }
+    .place-name {
+        font-weight: 600;
+        font-size: 15px;
+        color: #2c3e50;
+    }
+    .place-addr {
+        font-size: 13px;
+        color: #7f8c8d;
+        margin-top: 4px;
+    }
+    .place-dist {
+        color: #e74c3c;
+        font-weight: bold;
+        font-size: 13px;
+        margin-top: 4px;
+    }
+    .loading { 
+        text-align: center; 
+        color: #666; 
+        padding: 40px; 
+        font-size: 16px;
+    }
+</style>
+
+</head>
+
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">WALKorea</h1>
+      </a>
+
+      <!-- Navigation Menu -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li class="dropdown">
+            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+          <li><a href="/places/map_more">지도</a></li>
+          <li><a href="/mypage_calendar">마이페이지</a></li>
+        </ul>
+      </nav>
+
+      <!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
+      <div id="nav-guest" class="d-flex align-items-center gap-2">
+        <a class="btn-getstarted" href="/signup">회원가입</a>
+        <a class="btn-getstarted" href="/login">로그인</a>
+      </div>
+
+      <!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
+      <div id="nav-user" class="d-none d-flex align-items-center gap-3">
+
+        <!-- 알림 버튼 (작게) -->
+        <div class="dropdown">
+          <button id="notifDropdown"
+                  class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <i class="bi bi-bell"></i>
+            <span id="notif-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
+              0
+            </span>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-end notif-dropdown">
+            <div class="notif-header d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">알림</span>
+              <button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
+            </div>
+            <div class="notif-body">
+              <p id="notif-empty-text" class="notif-empty text-muted small mb-2">
+                아직 알림이 없습니다.
+              </p>
+              <ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 닉네임 + 라벨 -->
+        <div class="d-flex align-items-center gap-2">
+          <div id="header-initial"
+              class="mypage-user-badge"
+              style="width:32px; height:32px; font-size:16px; margin-right:0;">
+            닉네임
+          </div>
+          <span id="header-nickname" class="fw-semibold"></span>
+        </div>
+
+        <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
+        <button id="nav-logout" class="btn-getstarted btn-logout-small">
+          로그아웃
+        </button>
+      </div>
+    </div>
+  </header>
+  <!-- 목록 끝 -->
+
+   <main>
+        <div class="main">
+            <div id="map"></div>
+            <div class="sidebar">
+                <div class="search-box">
+                    <input type="text" id="keyword" placeholder="🔍 관광지 이름 검색 (예: 경복궁)">
+                    <button class="search-btn" id="searchBtn">검색</button>
+                    <button class="current-btn" id="currentBtn" onclick="showNearbyPlaces()">📍 현재 위치 3km 관광지 찾기</button>
+
+                </div>
+                <div id="placeList">
+                    <div class="loading">지도와 관광지 데이터 로딩 중...</div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+  <footer id="footer" class="footer position-relative">
+
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>WALKorea</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">개발자 김혜영</a>
+              <a href="#">개발자 이지영</a>
+            </div>
+            <div class="credits">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+  <!-- Scroll Top -->
+  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
+
+  <!-- Preloader -->
+  <div id="preloader"></div>
+
+  <!-- Vendor JS Files -->
+  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+  <script src="assets/vendor/php-email-form/validate.js"></script>
+  <script src="assets/vendor/aos/aos.js"></script>
+  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+  <script src="assets/vendor/drift-zoom/Drift.min.js"></script>
+
+  <!-- Main JS File -->
+  <script src="assets/js/main.js"></script>
+  <script type="module">
+  import { initHeader } from "/assets/js/header.js";
+  window.addEventListener("DOMContentLoaded", async () => {
+    await initHeader();                 
+  });
+</script>
+
+  <!-- 지도 스크립트 -->
+<script>
+(() => {
+    let map, clusterer, markers = [], userLocation = null;
+    const placesData = {{ places | tojson | safe }};
+    let openInfoWindow = null;  // ⭐ 모든 인포윈도우를 단일 관리
+
+    console.log('📍 관광지 데이터 로드:', placesData.length, '개');
+
+    function getDistance(lat1, lng1, lat2, lng2) {
+        function deg2rad(deg) { return deg * (Math.PI / 180); }
+        const R = 6371;
+        const dLat = deg2rad(lat2 - lat1);
+        const dLng = deg2rad(lng2 - lng1);
+        const a =
+            Math.sin(dLat / 2) ** 2 +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) *
+            Math.sin(dLng / 2) ** 2;
+        const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+        return R * c;
+    }
+
+    /** 모든 인포윈도우 닫기 */
+    function closeOpenInfoWindow() {
+        if (openInfoWindow) {
+            openInfoWindow.close();
+            openInfoWindow = null;
+        }
+    }
+
+    /** 지도 초기화 */
+    function initMap() {
+        map = new kakao.maps.Map(document.getElementById('map'), {
+            center: new kakao.maps.LatLng(37.5665, 126.9780),
+            level: 7
+        });
+
+        clusterer = new kakao.maps.MarkerClusterer({
+            map: map,
+            averageCenter: true,
+            minLevel: 8
+        });
+
+        // ⭐ 지도 클릭 시 인포윈도우 닫기
+        kakao.maps.event.addListener(map, 'click', closeOpenInfoWindow);
+
+        document.getElementById('placeList').innerHTML =
+            '<div class="loading">검색하거나 "현재 위치 3km 관광지 찾기" 버튼을 눌러주세요</div>';
+
+        requestCurrentLocation();
+    }
+
+    /** 현재 위치 요청 */
+    function requestCurrentLocation() {
+        if (!navigator.geolocation) return;
+
+        navigator.geolocation.getCurrentPosition(
+            success => {
+                userLocation = new kakao.maps.LatLng(
+                    success.coords.latitude,
+                    success.coords.longitude
+                );
+
+                map.setCenter(userLocation);
+                map.setLevel(7);
+
+                const imgSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+                const imgSize = new kakao.maps.Size(24, 35);
+                const imgOption = { offset: new kakao.maps.Point(12, 35) };
+
+                const markerImg = new kakao.maps.MarkerImage(imgSrc, imgSize, imgOption);
+
+                const userMarker = new kakao.maps.Marker({
+                    position: userLocation,
+                    map: map,
+                    image: markerImg,
+                    zIndex: 1000
+                });
+
+                const info = new kakao.maps.InfoWindow({
+                    content: `
+                        <div style="padding:16px; background:#FFF8E1; border-radius:8px;">
+                            <h6 style="margin:0; color:#D84315;">📍 현재 위치</h6>
+                        </div>`
+                });
+
+                // ⭐ 사용자 위치도 동일한 규칙 적용
+                let open = false;
+                kakao.maps.event.addListener(userMarker, 'click', () => {
+                    closeOpenInfoWindow();
+
+                    if (!open) {
+                        info.open(map, userMarker);
+                        openInfoWindow = info;
+                    }
+                    open = !open;
+                });
+
+                console.log("📍 위치 확인 완료");
+            },
+            err => console.log("위치 오류:", err),
+            { enableHighAccuracy: true, timeout: 10000 }
+        );
+    }
+
+    /** -----------------------------
+     *  마커 + 목록 생성 함수
+     * ----------------------------- */
+    function createNearbyMarkers(places, title) {
+        clusterer.clear();
+        markers = [];
+
+        const placeList = document.getElementById('placeList');
+
+        if (!places || places.length === 0) {
+            placeList.innerHTML = `
+                <div class="loading" style="padding:40px; text-align:center;">
+                    <h4 style="color:#e74c3c;">${title}</h4>
+                    <p>결과가 없습니다.</p>
+                </div>`;
+            return;
+        }
+
+        const bounds = new kakao.maps.LatLngBounds();
+        if (userLocation) bounds.extend(userLocation);
+
+        places.forEach((p) => {
+            if (!p.mapy || !p.mapx) return;
+
+            const pos = new kakao.maps.LatLng(p.mapy, p.mapx);
+            bounds.extend(pos);
+
+            const marker = new kakao.maps.Marker({
+                position: pos,
+                map: map,
+                title: p.title
+            });
+
+            const iw = new kakao.maps.InfoWindow({
+                content: `
+                    <div style="padding:12px; background:white; border-radius:8px;">
+                        <h6 style="margin:0 0 5px 0;">${p.title}</h6>
+                        <p style="margin:0; font-size:12px; color:#666;">${p.addr1 || ''}</p>
+                    </div>`
+            });
+
+            // ⭐ 마커 클릭 시 단일 openInfoWindow 관리
+            kakao.maps.event.addListener(marker, 'click', () => {
+                if (openInfoWindow === iw) {
+                    iw.close();
+                    openInfoWindow = null;
+                    return;
+                }
+
+                closeOpenInfoWindow();
+                iw.open(map, marker);
+                openInfoWindow = iw;
+            });
+
+            markers.push(marker);
+        });
+
+        clusterer.addMarkers(markers);
+        map.setBounds(bounds);
+
+        updatePlaceList(places, title);
+    }
+
+    /** 현재 위치 3km 관광지 */
+    window.showNearbyPlaces = function () {
+        if (!userLocation) {
+            alert("위치 정보를 먼저 확인해주세요!");
+            return;
+        }
+
+        const ulat = userLocation.getLat();
+        const ulng = userLocation.getLng();
+
+        const nearbyPlaces = placesData.filter(p => {
+            if (!p.mapy || !p.mapx) return false;
+            const dist = getDistance(ulat, ulng, p.mapy, p.mapx);
+            return dist <= 3;
+        });
+
+        const sorted = nearbyPlaces.sort((a, b) =>
+            a.title.localeCompare(b.title)
+        );
+
+        createNearbyMarkers(sorted, `📍 현재 위치 기준 3km 관광지`);
+    };
+
+    /** 목록 업데이트 */
+    function updatePlaceList(places, title) {
+        const placeList = document.getElementById('placeList');
+        if (!places.length) {
+            placeList.innerHTML = '<div class="loading">결과가 없습니다.</div>';
+            return;
+        }
+
+        let html = `<h4 style="color:#2c3e50; margin-bottom:15px;">${title} (${places.length}개)</h4>`;
+
+        places.slice(0, 20).forEach(place => {
+            html += `
+            <div class="place-item" 
+                onclick="moveToPlace(${place.mapy}, ${place.mapx}, '${place.title.replace(/'/g, "\\'")}', '${(place.addr1 || '').replace(/'/g, "\\'")}', '${place.contentid || ''}')">
+                <div class="place-name">${place.title}</div>
+                <div class="place-addr">${place.addr1 || '주소정보 없음'}</div>
+            </div>`;
+        });
+
+        placeList.innerHTML = html;
+    }
+
+    /** 상세보기 클릭 → 지도 이동 */
+    window.moveToPlace = (lat, lng, title, addr, contentid) => {
+        closeOpenInfoWindow();
+
+        const pos = new kakao.maps.LatLng(lat, lng);
+        map.setCenter(pos);
+        map.setLevel(7);
+
+        const marker = new kakao.maps.Marker({ position: pos, map: map });
+
+        const iw = new kakao.maps.InfoWindow({
+            content: `
+                <div style="padding:12px; background:white; border-radius:8px;">
+                    <h6 style="margin:0;">${title}</h6>
+                    <p style="margin:5px 0; font-size:12px;">${addr}</p>
+                    ${contentid ? `<a href="/places/detail/${contentid}" style="font-size:11px; color:#007bff;">상세보기</a>` : ''}
+                </div>`
+        });
+
+        iw.open(map, marker);
+        openInfoWindow = iw;
+    };
+
+    /** 검색 */
+    window.searchPlaces = function (keyword) {
+        if (!keyword.trim()) {
+            alert("검색어를 입력해주세요!");
+            return;
+        }
+
+        const key = keyword.toLowerCase();
+        const filtered = placesData.filter(p =>
+            (p.title && p.title.toLowerCase().includes(key)) ||
+            (p.addr1 && p.addr1.toLowerCase().includes(key))
+        );
+
+        createNearbyMarkers(filtered, `🔍 "${keyword}" 검색결과`);
+    };
+
+    document.addEventListener('DOMContentLoaded', () => {
+        document.getElementById('searchBtn').onclick = () => {
+            const keyword = document.getElementById('keyword').value.trim();
+            window.searchPlaces(keyword);
+        };
+
+        document.getElementById('keyword').addEventListener('keypress', e => {
+            if (e.key === 'Enter') document.getElementById('searchBtn').click();
+        });
+    });
+
+    kakao.maps.load(initMap);
+})();
+</script>
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+  
+
+</body>
+
+</html>

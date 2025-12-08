@@ -1,0 +1,419 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>WALKorea - 사용자 설정 변경</title>
+  <meta name="description" content="한국 여행 일정 관리">
+  <meta name="keywords" content="여행, 캘린더, 일정, WALKorea">
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+  <style>
+    body.mypage-layout { background:#f5f7fb; }
+
+    .mypage-user-badge {
+      width:48px;height:48px;border-radius:999px;
+      background:#16a34a;color:#fff;font-weight:700;
+      display:flex;align-items:center;justify-content:center;
+      font-size:22px;margin-right:12px;
+    }
+
+    .mypage-nav a {
+      display:block;padding:8px 10px;border-radius:10px;
+      color:#4b5563;font-size:14px;text-decoration:none;
+      margin-bottom:4px;
+    }
+    .mypage-nav a.active {
+      background:#e5f3ff;color:#0f766e;font-weight:600;
+    }
+
+    /* 래퍼는 투명 */
+    .mypage-main-card {
+      background: transparent;
+      border: none;
+      box-shadow: none;
+      padding: 0;
+    }
+
+    /* row 간격만 살짝 */
+    .mypage-main-card .row {
+      margin: 0;
+      gap: 24px;
+    }
+
+    .mypage-main-card .row.align-items-start {
+      display: flex;
+      flex-wrap: nowrap;      /* 줄바꿈 금지: 항상 좌우 */
+    }
+
+    /* 왼쪽/오른쪽 폭 고정 비율 */
+    .mypage-main-card .col-lg-3 { flex: 0 0 280px; max-width: 280px; }
+    .mypage-main-card .col-lg-9 { flex: 1 1 auto; }
+
+    .mypage-sidebar {
+      background:#ffffff;
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(15,23,42,0.08);
+      padding:20px 18px 22px;
+    }
+
+    .mypage-sidebar .border.rounded-3 {
+      border:1px solid #e5e7eb;
+      border-radius:14px;
+      background:#ffffff;
+    }
+
+    /* 오른쪽 카드 */
+    .calendar-card {
+      background:#ffffff;
+      border-radius:18px;
+      box-shadow:0 10px 30px rgba(15,23,42,0.08);
+      padding:20px 22px;
+    }
+  </style>
+</head>
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">WALKorea</h1>
+      </a>
+
+      <!-- Navigation Menu -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li class="dropdown">
+            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+          <li><a href="/places/map_more">지도</a></li>
+          <li><a href="/mypage_calendar">마이페이지</a></li>
+        </ul>
+      </nav>
+
+      <!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
+      <div id="nav-guest" class="d-flex align-items-center gap-2">
+        <a class="btn-getstarted" href="/signup">회원가입</a>
+        <a class="btn-getstarted" href="/login">로그인</a>
+      </div>
+
+      <!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
+      <div id="nav-user" class="d-none d-flex align-items-center gap-3">
+
+        <!-- 알림 버튼 (작게) -->
+        <div class="dropdown">
+          <button id="notifDropdown"
+                  class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <i class="bi bi-bell"></i>
+            <span id="notif-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
+              0
+            </span>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-end notif-dropdown">
+            <div class="notif-header d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">알림</span>
+              <button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
+            </div>
+            <div class="notif-body">
+              <p id="notif-empty-text" class="notif-empty text-muted small mb-2">
+                아직 알림이 없습니다.
+              </p>
+              <ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 닉네임 + 라벨 -->
+        <div class="d-flex align-items-center gap-2">
+          <div id="header-initial"
+              class="mypage-user-badge"
+              style="width:32px; height:32px; font-size:16px; margin-right:0;">
+            닉네임
+          </div>
+          <span id="header-nickname" class="fw-semibold"></span>
+        </div>
+
+        <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
+        <button id="nav-logout" class="btn-getstarted btn-logout-small">
+          로그아웃
+        </button>
+      </div>
+    </div>
+  </header>
+
+<main class="main" style="margin-top:90px;">
+  <div class="page-title">
+    <div class="heading">
+      <div class="container">
+        <div class="row d-flex justify-content-center text-center">
+          <div class="col-lg-8">
+            <h1 class="heading-title">프로필 수정</h1>
+            <p class="mb-0">사용자 설정 변경이 가능합니다.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+    <nav class="breadcrumbs">
+      <div class="container">
+        <ol>
+          <li><a href="/">홈</a></li>
+          <li class="current">프로필 수정</li>
+        </ol>
+      </div>
+    </nav>
+  </div>
+
+  <section class="section">
+    <div class="container">
+      <div class="mypage-main-card">
+        <div class="row align-items-start">
+
+          <!-- 왼쪽: 사용자 + 메뉴 + 날씨 -->
+          <div class="col-lg-3">
+            <div class="mypage-sidebar">
+              <div class="d-flex align-items-center mb-3">
+                <div class="mypage-user-badge" id="side-initial">닉네임</div>
+                <div>
+                  <div class="fw-semibold" id="side-nickname">닉네임</div>
+                  <div class="text-muted small" id="side-email">user@example.com</div>
+                </div>
+              </div>
+
+              <div class="border rounded-3 p-3 mb-3" id="weather-box">
+                <div class="small fw-semibold mb-1" id="region-weather-title">동네를 선택해 주세요</div>
+                <div class="small text-muted mb-2" id="region-weather-desc">
+                  마이페이지 &gt; 프로필 수정에서 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.
+                </div>
+                <div id="region-weather-list"></div>
+                <a class="btn btn-outline-success btn-sm mt-2 w-100" href="/mypage_profile">
+                  지역 설정하러 가기
+                </a>
+              </div>
+
+              <div class="menu-title mb-2">마이페이지</div>
+              <nav class="mypage-nav">
+                <a href="/mypage_calendar">내 일정</a>
+                <a href="/mypage_friends">친구 관리</a>
+                <a href="/mypage_recommend">맞춤 관광</a>
+                <a href="/mypage_profile" class="active">프로필 수정</a>
+                <a href="/mypage_favorites">좋아요 한 여행지</a>
+              </nav>
+            </div>
+          </div>
+
+          <div class="col-lg-9">
+            <div class="calendar-card">
+              <div class="row g-4">
+                <div class="col-lg-7">
+                  <div class="card shadow-sm h-100">
+                    <div class="card-body">
+                      <!-- 여기부터 기존 내 정보 form 내용 그대로 -->
+                      <h3 class="mb-3 fw-bold">내 정보</h3>
+                      <p class="text-muted small mb-4">
+                        가입 시 입력한 기본 정보를 확인하고 일부를 수정할 수 있습니다.
+                      </p>
+                      <form id="profile-form">
+                        <div class="mb-3">
+                          <label class="form-label">아이디</label>
+                          <input type="text" class="form-control" id="userid" disabled>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">이메일</label>
+                          <input type="email" class="form-control" id="email" disabled>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">닉네임</label>
+                          <input type="text" class="form-control" id="nickname">
+                          <div id="nickname-msg" class="small mt-1"></div>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">휴대폰 번호</label>
+                          <input type="text" class="form-control" id="phonenum" placeholder="01012345678">
+                          <div id="phone-msg" class="small mt-1"></div>
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">생년월일</label>
+                          <input type="date" class="form-control" id="birthday">
+                        </div>
+                        <div class="mb-3">
+                          <label class="form-label">성별</label>
+                          <select class="form-select" id="gender">
+                            <option value="">선택</option>
+                            <option value="M">남성</option>
+                            <option value="F">여성</option>
+                            <option value="O">기타</option>
+                          </select>
+                        </div>
+
+                        <!-- 거주 지역 -->
+                        <div class="mb-3">
+                          <label class="form-label">거주 지역</label>
+                          <div class="d-flex gap-2">
+                            <input type="text" class="form-control" id="edit-region-label"
+                                  placeholder="지역을 선택해주세요" readonly>
+                            <button type="button" class="btn btn-outline-secondary"
+                                    data-bs-toggle="modal" data-bs-target="#regionModal">
+                              지역 선택
+                            </button>
+                          </div>
+                          <input type="hidden" id="edit-region-id">
+                        </div>
+
+                        <button type="submit" class="btn btn-success w-100 mt-2">정보 저장</button>
+                      </form>
+                    </div>
+                  </div>
+                </div>
+
+                <!-- 우측: 비밀번호 변경 / 계정 관리 -->
+                <div class="col-lg-5">
+                  <div class="card shadow-sm mb-4">
+                    <div class="card-body">
+                      <h4 class="fw-bold mb-3">비밀번호 변경</h4>
+                      <form id="pw-form">
+                        <div class="mb-2">
+                          <label class="form-label">현재 비밀번호</label>
+                          <input type="password" class="form-control" id="current_password" required>
+                        </div>
+                        <div class="mb-2">
+                          <label class="form-label">새 비밀번호</label>
+                          <div class="input-group">
+                            <input type="password" class="form-control" id="new_password" required>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggle_new_pw">
+                              보기
+                            </button>
+                          </div>
+                        </div>
+                        <div class="mb-2">
+                          <label class="form-label">새 비밀번호 확인</label>
+                          <div class="input-group">
+                            <input type="password" class="form-control" id="new_password_confirm" required>
+                            <button type="button" class="btn btn-outline-secondary btn-sm" id="toggle_new_pw2">
+                              보기
+                            </button>
+                          </div>
+                        </div>
+                        <div id="pw-msg" class="small mt-1"></div>
+                        <button type="submit" class="btn btn-outline-primary w-100 mt-2">비밀번호 변경</button>
+                      </form>
+                    </div>
+                  </div>
+
+                  <div class="card shadow-sm">
+                    <div class="card-body">
+                      <h4 class="fw-bold mb-3">계정 관리</h4>
+                      <button id="logout-btn" class="btn btn-outline-secondary w-100 mb-2">로그아웃</button>
+                      <button id="delete-btn" class="btn btn-outline-danger w-100">회원 탈퇴</button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
+</main>
+<footer id="footer" class="footer position-relative">
+
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>WALKorea</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">개발자 김혜영</a>
+              <a href="#">개발자 이지영</a>
+            </div>
+            <div class="credits">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+<!-- 지역 선택 모달 -->
+<div class="modal fade" id="regionModal" tabindex="-1">
+  <div class="modal-dialog modal-lg modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header py-2">
+        <h5 class="modal-title">거주 지역 선택</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body">
+        <div class="row g-2" style="max-height:320px; overflow-y:auto;">
+          <div class="col-3 border-end">
+            <div class="fw-semibold small mb-1">시·도</div>
+            <ul class="list-group list-group-flush small" id="sido-list"></ul>
+          </div>
+          <div class="col-4 border-end">
+            <div class="fw-semibold small mb-1">시·군·구</div>
+            <ul class="list-group list-group-flush small" id="sigungu-list"></ul>
+          </div>
+          <div class="col-5">
+            <div class="fw-semibold small mb-1">동·읍·면</div>
+            <ul class="list-group list-group-flush small" id="dong-list"></ul>
+          </div>
+        </div>
+      </div>
+      <div class="modal-footer py-2">
+        <div class="me-auto small text-muted" id="region-selected-text">선택된 지역: 없음</div>
+        <button type="button" class="btn btn-secondary btn-sm" data-bs-dismiss="modal">취소</button>
+        <button type="button" class="btn btn-success btn-sm" id="region-apply-btn">적용</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+
+<script type="module">
+  import { initProfilePage } from "/assets/js/mypage_profile.js";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    initProfilePage();
+  });
+</script>
+</body>
+</html>

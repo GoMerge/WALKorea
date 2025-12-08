@@ -2,13 +2,22 @@ import os
 import requests
 from sqlalchemy.orm import Session
 from fastapi import HTTPException
+from fastapi.responses import RedirectResponse
+from urllib.parse import urlencode
 
 from app.models.user import User
-from app.utils.auth import (create_access_token,create_refresh_token,hash_refresh_token)
+from app.utils.auth import (
+    create_access_token,
+    create_refresh_token,
+    hash_refresh_token,
+)
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
 REDIRECT_URI = "http://127.0.0.1:8000/auth/oauth/google/callback"
+
+REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile"
+REDIRECT_MAIN = "http://127.0.0.1:8000/"
 
 
 def get_google_login_url() -> dict:
@@ -24,7 +33,7 @@ def get_google_login_url() -> dict:
     }
 
 
-def handle_google_callback(code: str, db: Session) -> dict:
+def handle_google_callback(code: str, db: Session) -> RedirectResponse:
     """구글 OAuth2 콜백 처리"""
 
     # 1. 구글 토큰 발급
@@ -63,34 +72,39 @@ def handle_google_callback(code: str, db: Session) -> dict:
             name=user_info.get("name") or "무명 사용자",
             provider="google",
             provider_id=provider_id,
+            is_active=True,
         )
-        db.add(user)
-        db.commit()
-        db.refresh(user)
+    else:
+        # 이미 기존 회원이면 provider 정보만 업데이트해서 연동
+        user.provider = "google"
+        user.provider_id = provider_id
 
-    # 4. JWT 발급
+    db.add(user)
+    db.commit()
+    db.refresh(user)
+
+
+    # 4. JWT 발급 + refresh 저장
     access_jwt = create_access_token({"user_id": str(user.id)})
     refresh_jwt = create_refresh_token({"user_id": str(user.id)})
     user.refresh_token = hash_refresh_token(refresh_jwt)
     db.commit()
 
-    # 5. 닉네임 여부 확인 후 응답
-    if not user.nickname:
-        return {
-            "msg": "닉네임 설정이 필요합니다.",
-            "redirect": f"/auth/set-nickname?user_id={user.id}",
+    # 5. 프로필(닉네임/생일/성별) 비어있으면 set-profile.html로
+    need_profile = not user.nickname or not user.birthday or not user.gender
+
+    if need_profile:
+        params = urlencode({
+            "user_id": user.id,
             "access_token": access_jwt,
             "refresh_token": refresh_jwt,
-        }
+            "need_profile": 1,
+        })
+        return RedirectResponse(f"{REDIRECT_PROFILE}?{params}")
 
-    return {
-        "msg": "로그인 성공",
-        "user": {
-            "id": user.id,
-            "email": user.email,
-            "name": user.name,
-            "nickname": user.nickname,
-        },
+    # 전부 있으면 메인으로
+    params_ok = urlencode({
         "access_token": access_jwt,
         "refresh_token": refresh_jwt,
-    }
+    })
+    return RedirectResponse(f"{REDIRECT_MAIN}?{params_ok}")

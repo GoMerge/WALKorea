@@ -7,7 +7,7 @@ pymysql
 passlib
 jwt
 sendgrid
-bcrypt
+bcrypt # bcrypt==3.2.2
 python-multipart
 python-jose[cryptography]
 apscheduler

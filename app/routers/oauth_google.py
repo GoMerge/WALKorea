@@ -1,4 +1,5 @@
 from fastapi import APIRouter, Request, Depends, HTTPException
+from fastapi.responses import RedirectResponse
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -9,8 +10,9 @@ router = APIRouter()
 
 @router.get("/login")
 def google_login():
-    """구글 로그인 페이지로 리다이렉트 URL 반환"""
-    return get_google_login_url()
+    """구글 로그인 페이지로 즉시 리다이렉트"""
+    url = get_google_login_url()["login_url"]
+    return RedirectResponse(url)
 
 
 @router.get("/callback")

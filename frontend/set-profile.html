@@ -1,0 +1,348 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <title>프로필 설정 | WALKorea</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+</head>
+<body>
+<main class="container py-5">
+  <!DOCTYPE html>
+<html lang="ko">
+    <style>
+        .social-login {
+            display: flex;
+            gap: 8px;
+            justify-content: space-between;
+        }
+
+        .btn-oauth {
+            flex: 1;
+            height: 44px;
+            border-radius: 999px;
+            font-size: 14px;
+            font-weight: 500;
+            border-width: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            padding: 0 12px;
+        }
+
+        .btn-oauth + .btn-oauth {
+            margin-left: 0;
+        }
+
+        .oauth-logo {
+            width: 18px;
+            height: 18px;
+            margin-right: 6px;
+        }
+
+        /* 개별 색상만 다르게 */
+        .btn-oauth-naver {
+            background-color: #03c75a;
+            border-color: #03c75a;
+            color: #fff;
+        }
+
+        .btn-oauth-google {
+            background-color: #f5f5f5;   /* 이전: #fff */
+            border-color: #d0d0d0;       /* 살짝 진한 회색 */
+            color: #444;
+        }
+
+        .btn-oauth-google:hover {
+            background-color: #e8e8e8;
+            border-color: #c4c4c4;
+        }
+
+        .btn-oauth-kakao {
+            background-color: #fee500;
+            border-color: #fee500;
+            color: #3c1e1e;
+        }
+    </style>
+<head>
+    <!-- 지도 구현 -->
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
+  <base href="/">
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Property Details - TheProperty Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: TheProperty
+  * Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
+  * Updated: Aug 05 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+    
+</head>
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">WALKorea</h1>
+      </a>
+
+      <!-- Navigation Menu -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li class="dropdown">
+            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+          <li><a href="/places/map_more">지도</a></li>
+          <li><a href="/mypage_calendar">마이페이지</a></li>
+        </ul>
+      </nav>
+
+      <!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
+      <div id="nav-guest" class="d-flex align-items-center gap-2">
+        <a class="btn-getstarted" href="/signup">회원가입</a>
+        <a class="btn-getstarted" href="/login">로그인</a>
+      </div>
+
+      <!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
+      <div id="nav-user" class="d-none d-flex align-items-center gap-3">
+
+        <!-- 알림 버튼 (작게) -->
+        <div class="dropdown">
+          <button id="notifDropdown"
+                  class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <i class="bi bi-bell"></i>
+            <span id="notif-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
+              0
+            </span>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-end notif-dropdown">
+            <div class="notif-header d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">알림</span>
+              <button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
+            </div>
+            <div class="notif-body">
+              <p id="notif-empty-text" class="notif-empty text-muted small mb-2">
+                아직 알림이 없습니다.
+              </p>
+              <ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 닉네임 + 라벨 -->
+        <div class="d-flex align-items-center gap-2">
+          <div id="header-initial"
+              class="mypage-user-badge"
+              style="width:32px; height:32px; font-size:16px; margin-right:0;">
+            닉네임
+          </div>
+          <span id="header-nickname" class="fw-semibold"></span>
+        </div>
+
+        <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
+        <button id="nav-logout" class="btn-getstarted btn-logout-small">
+          로그아웃
+        </button>
+      </div>
+    </div>
+  </header>
+  <main class="main">
+    <div class="page-title">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              <h1 class="heading-title">사용자 설정</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="/">WALKorea</a></li>
+            <li class="current">사용자 설정</li>
+          </ol>
+        </div>
+      </nav>
+    </div>
+    <section class="py-4">
+      <div class="container">
+        <form id="profile-form" class="mx-auto" style="max-width:480px;">
+          <div class="mb-3">
+            <label class="form-label">닉네임</label>
+            <input type="text" name="nickname" class="form-control" required>
+            <div id="nickname-msg" class="small mt-1 text-muted"></div>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">생년월일</label>
+            <input type="date" name="birthday" class="form-control">
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">성별</label>
+            <select name="gender" class="form-select">
+              <option value="">선택 안 함</option>
+              <option value="M">남성</option>
+              <option value="F">여성</option>
+              <option value="O">기타</option>
+            </select>
+          </div>
+
+          <button type="submit" class="btn btn-primary w-100">
+            프로필 저장
+          </button>
+        </form>
+      </div>
+    </section>
+  </main>
+  <footer id="footer" class="footer position-relative">
+
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>WALKorea</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">개발자 김혜영</a>
+              <a href="#">개발자 이지영</a>
+            </div>
+            <div class="credits">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+<script>
+window.addEventListener("DOMContentLoaded", function() {
+    // 1. 쿼리스트링에서 토큰 추출 + localStorage 저장 + URL 숨김
+    const params = new URLSearchParams(location.search);
+    const accessToken = params.get("access_token");
+    const userId = params.get("user_id");
+    // 토큰 저장 후 주소창에서 토큰 파라미터 제거 (보안)
+    if(accessToken) {
+        localStorage.setItem("access_token", accessToken);
+        window.history.replaceState({}, document.title, location.pathname);
+    }
+
+    // 2. 닉네임 실시간 중복 체크
+    const form = document.getElementById("profile-form");
+    const nickInput = form.nickname;
+    const msgBox = document.getElementById("nickname-msg");
+    let nickTimeout = null;
+    nickInput.addEventListener("input", function() {
+      clearTimeout(nickTimeout);
+      const val = nickInput.value.trim();
+      if(val.length < 2) {
+        msgBox.textContent = "닉네임을 2자 이상 입력하세요.";
+        msgBox.className = "small text-danger mt-1";
+        return;
+      }
+      nickTimeout = setTimeout(async ()=> {
+        const res = await fetch("/auth/check-nickname?nickname=" + encodeURIComponent(val));
+        const data = await res.json();
+        if(data.result === "dup") {
+          msgBox.textContent = "이미 사용 중인 닉네임입니다.";
+          msgBox.className = "small text-danger mt-1";
+        } else {
+          msgBox.textContent = "사용 가능한 닉네임입니다.";
+          msgBox.className = "small text-success mt-1";
+        }
+      }, 400);
+    });
+
+    // 3. 폼 제출
+    form.onsubmit = async function(e) {
+      e.preventDefault();
+      const nickname = form.nickname.value.trim();
+      const birthday = form.birthday.value;
+      const gender = form.gender.value;
+      if(nickname.length < 2) {
+        msgBox.textContent = "닉네임을 2자 이상 입력하세요.";
+        msgBox.className = "small text-danger mt-1";
+        return;
+      }
+      // 중복 최종 확인
+      const resCheck = await fetch("/auth/check-nickname?nickname=" + encodeURIComponent(nickname));
+      const check = await resCheck.json();
+      if(check.result === "dup") {
+        msgBox.textContent = "이미 사용 중인 닉네임입니다.";
+        msgBox.className = "small text-danger mt-1";
+        return;
+      }
+      // FormData 방식 POST
+      const submitData = new FormData();
+      submitData.append("user_id", userId || "");
+      submitData.append("nickname", nickname);
+      submitData.append("birthday", birthday);
+      submitData.append("gender", gender);
+      // access_token은 localStorage에서 꺼내서 append
+      submitData.append("access_token", localStorage.getItem("access_token"));
+
+      const resp = await fetch("/auth/set-profile", {
+        method: "POST",
+        body: submitData
+      });
+      if(resp.ok) {
+        alert("프로필 설정 완료! 메인으로 이동합니다.");
+        window.location.href = "/";
+      } else {
+        const err = await resp.json().catch(()=>null);
+        alert("오류: " + ((err && err.detail) || "프로필 설정 실패"));
+      }
+    }
+});
+</script>
+</body>
+</html>

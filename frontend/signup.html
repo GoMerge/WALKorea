@@ -1,0 +1,493 @@
+<html lang="ko">
+<head>
+  <!-- 지도 구현 -->
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
+  <base href="/">
+  <meta charset="utf-8">
+  <meta content="width=device-width, initial-scale=1.0" name="viewport">
+  <title>Property Details - TheProperty Bootstrap Template</title>
+  <meta name="description" content="">
+  <meta name="keywords" content="">
+
+  
+
+  <!-- Favicons -->
+  <link href="assets/img/favicon.png" rel="icon">
+  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
+
+  <!-- Fonts -->
+  <link href="https://fonts.googleapis.com" rel="preconnect">
+  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+
+  <!-- Vendor CSS Files -->
+  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
+  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+
+  <!-- Main CSS File -->
+  <link href="assets/css/main.css" rel="stylesheet">
+
+  <!-- =======================================================
+  * Template Name: TheProperty
+  * Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
+  * Updated: Aug 05 2025 with Bootstrap v5.3.7
+  * Author: BootstrapMade.com
+  * License: https://bootstrapmade.com/license/
+  ======================================================== -->
+</head>
+<body>
+  <header id="header" class="header d-flex align-items-center fixed-top">
+    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
+      
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+        <h1 class="sitename">WALKorea</h1>
+      </a>
+
+      <!-- Navigation Menu -->
+      <nav id="navmenu" class="navmenu">
+        <ul>
+          <li class="dropdown">
+            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+            <ul>
+              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+            </ul>
+          </li>
+          <li><a href="/places/map_more">지도</a></li>
+          <li><a href="/mypage_calendar">마이페이지</a></li>
+        </ul>
+      </nav>
+
+      <!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
+      <div id="nav-guest" class="d-flex align-items-center gap-2">
+        <a class="btn-getstarted" href="/signup">회원가입</a>
+        <a class="btn-getstarted" href="/login">로그인</a>
+      </div>
+
+      <!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
+      <div id="nav-user" class="d-none d-flex align-items-center gap-3">
+
+        <!-- 알림 버튼 (작게) -->
+        <div class="dropdown">
+          <button id="notifDropdown"
+                  class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
+                  type="button"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false">
+            <i class="bi bi-bell"></i>
+            <span id="notif-badge"
+                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
+              0
+            </span>
+          </button>
+
+          <div class="dropdown-menu dropdown-menu-end notif-dropdown">
+            <div class="notif-header d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">알림</span>
+              <button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
+            </div>
+            <div class="notif-body">
+              <p id="notif-empty-text" class="notif-empty text-muted small mb-2">
+                아직 알림이 없습니다.
+              </p>
+              <ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
+            </div>
+          </div>
+        </div>
+
+        <!-- 닉네임 + 라벨 -->
+        <div class="d-flex align-items-center gap-2">
+          <div id="header-initial"
+              class="mypage-user-badge"
+              style="width:32px; height:32px; font-size:16px; margin-right:0;">
+            닉네임
+          </div>
+          <span id="header-nickname" class="fw-semibold"></span>
+        </div>
+
+        <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
+        <button id="nav-logout" class="btn-getstarted btn-logout-small">
+          로그아웃
+        </button>
+      </div>
+    </div>
+  </header>
+<main class="main">
+    <div class="page-title">
+      <div class="heading">
+        <div class="container">
+          <div class="row d-flex justify-content-center text-center">
+            <div class="col-lg-8">
+              <h1 class="heading-title">회원가입</h1>
+            </div>
+          </div>
+        </div>
+      </div>
+      <nav class="breadcrumbs">
+        <div class="container">
+          <ol>
+            <li><a href="/">WALKorea</a></li>
+            <li class="current">회원가입</li>
+          </ol>
+        </div>
+      </nav>
+<div class="container py-5">
+    <div class="row justify-content-center">
+        <div class="col-md-6 col-lg-5">
+            <div class="card shadow-sm">
+                <div class="card-body">
+                    <h3 class="mb-4 text-center">회원가입</h3>
+                    <form id="signup-form" autocomplete="off">
+                        <input type="text" class="form-control mb-2" name="name" placeholder="이름" required>
+                        <input type="text" class="form-control mb-2" name="userid" id="userid" placeholder="아이디" required>
+                        <p id="useridMsg" class="mb-1" style="font-size:0.95em;"></p>
+                        <div class="input-group mb-2">
+                            <input type="email" class="form-control" name="email" placeholder="이메일" required>
+                            <button type="button" class="btn btn-outline-secondary" id="sendCodeBtn">인증코드 전송</button>
+                        </div>
+                        <div class="input-group mb-2">
+                            <input type="text" class="form-control" name="code" placeholder="이메일 인증코드">
+                            <button type="button" class="btn btn-outline-success" id="verifyCodeBtn">확인</button>
+                        </div>
+                        <p id="emailVerifiedMsg" class="mt-1 mb-2 text-success" style="display:none;"></p>
+                        <input type="password" class="form-control mb-2" name="password" id="password" placeholder="비밀번호" required>
+                        <p id="pwConditionMsg" class="mb-1" style="font-size:0.95em;"></p>
+                        <input type="password" class="form-control mb-2" name="password_confirm" id="password_confirm" placeholder="비밀번호 확인" required>
+                        <p id="pwCheckMsg" class="mb-1" style="font-size:0.95em;"></p>
+                        <input type="text" class="form-control mb-2" name="nickname" id="nickname" placeholder="닉네임" required>
+                        <p id="nicknameMsg" class="mb-1" style="font-size:0.95em;"></p>
+                        <input type="text" class="form-control mb-2" name="phonenum" id="phonenum" placeholder="휴대폰 번호">
+                        <p id="phoneMsg" class="mb-1" style="font-size:0.95em;"></p>
+                        <input type="date" class="form-control mb-2" name="birthday" placeholder="생년월일">
+                        <select class="form-select mb-2" name="gender">
+                            <option value="">성별 선택</option>
+                            <option value="M">남성</option>
+                            <option value="F">여성</option>
+                            <option value="O">기타</option>
+                        </select>
+                        <button type="submit" class="btn btn-primary w-100 mt-2" id="signupBtn" disabled>회원가입</button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- 중복 이메일 안내 모달 -->
+<div class="modal fade" id="emailExistsModal" tabindex="-1">
+  <div class="modal-dialog modal-dialog-centered">
+    <div class="modal-content">
+      <div class="modal-header border-0 pb-0">
+        <h5 class="modal-title">알림</h5>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+      <div class="modal-body text-center">
+        <p class="mb-3">이미 회원가입 된 이메일입니다.</p>
+        <div class="d-flex justify-content-center gap-2">
+            <button type="button" class="btn btn-success" onclick="goToLogin()">로그인하러 가기</button>
+            <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">확인</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+</main>
+<footer id="footer" class="footer position-relative">
+
+
+    <div class="footer-bottom">
+      <div class="container">
+        <div class="row align-items-center">
+          <div class="col-lg-6">
+            <div class="copyright">
+              <p>© <span>WALKorea</span></p>
+            </div>
+          </div>
+          <div class="col-lg-6">
+            <div class="footer-bottom-links">
+              <a href="#">개발자 김혜영</a>
+              <a href="#">개발자 이지영</a>
+            </div>
+            <div class="credits">
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </footer>
+
+
+<!-- Bootstrap JS for modal (필수!) -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+<script>
+function showEmailExistsModal() {
+    const modal = new bootstrap.Modal(document.getElementById('emailExistsModal'));
+    modal.show();
+}
+function goToLogin() {
+    window.location.href = '/login'; // 로그인 페이지 경로에 맞게 수정
+}
+
+document.querySelector('select[name="gender"]').addEventListener("change", checkFormValidity);
+document.querySelector('input[name="birthday"]').addEventListener("change", checkFormValidity);
+document.querySelector('input[name="name"]').addEventListener("change", checkFormValidity);
+
+
+const useridInput = document.getElementById("userid");
+const useridMsg = document.getElementById("useridMsg");
+useridInput.addEventListener("input", async function() {
+    const val = useridInput.value.trim();
+    if (!val) {
+        useridMsg.textContent = "";
+        return;
+    }
+    // 최소 글자수 등 추가 가능
+    const res = await fetch(`http://127.0.0.1:8000/auth/check-id?userid=${encodeURIComponent(val)}`);
+    const data = await res.json().catch(()=>null);
+    if (res.ok && data && data.result === "ok") {
+        useridMsg.textContent = "사용 가능한 아이디입니다.";
+        useridMsg.className = "mb-1 text-success";
+    } else {
+        useridMsg.textContent = "중복된 아이디입니다.";
+        useridMsg.className = "mb-1 text-danger";
+    }
+});
+
+const nicknameInput = document.getElementById("nickname");
+const nicknameMsg = document.getElementById("nicknameMsg");
+nicknameInput.addEventListener("input", async function() {
+    const val = nicknameInput.value.trim();
+    if (!val) {
+        nicknameMsg.textContent = "";
+        return;
+    }
+    const res = await fetch(`http://127.0.0.1:8000/auth/check-nickname?nickname=${encodeURIComponent(val)}`);
+    const data = await res.json().catch(()=>null);
+    if (res.ok && data && data.result === "ok") {
+        nicknameMsg.textContent = "사용 가능한 닉네임입니다.";
+        nicknameMsg.className = "mb-1 text-success";
+    } else {
+        nicknameMsg.textContent = "중복된 닉네임입니다.";
+        nicknameMsg.className = "mb-1 text-danger";
+    }
+});
+
+
+
+document.getElementById("sendCodeBtn").onclick = async function() {
+    const email = document.querySelector('input[name="email"]').value;
+    if (!email) return alert("이메일을 입력하세요.");
+    const formData = new FormData();
+    formData.append("email", email);
+
+    const res = await fetch("http://127.0.0.1:8000/auth/send-email-code", {
+        method: "POST",
+        body: formData
+    });
+
+    let err = null;
+    if (!res.ok) {
+        try { err = await res.json(); } catch(e) {}
+        console.log("에러 응답:", err);
+        if (err && err.detail && err.detail.includes("이미 회원가입 된 이메일")) {
+            showEmailExistsModal();
+        } else {
+            alert("이메일 전송 실패. 입력값을 다시 확인하세요.");
+        }
+    } else {
+        alert("인증코드가 전송되었습니다.");
+    }
+};
+
+document.getElementById("verifyCodeBtn").onclick = async function() {
+    const email = document.querySelector('input[name="email"]').value;
+    const code = document.querySelector('input[name="code"]').value;
+    const formData = new FormData();
+    formData.append("email", email);
+    formData.append("code", code);
+
+    const msgElem = document.getElementById("emailVerifiedMsg");
+    const res = await fetch("http://127.0.0.1:8000/auth/verify-email-code", {
+        method: "POST",
+        body: formData
+    });
+    if (res.ok) {
+        alert("이메일 인증 성공!");
+        msgElem.textContent = "이메일 인증 완료";
+        msgElem.style.display = "block";
+        msgElem.className = "mt-1 mb-2 text-success";
+    } else {
+        let errMsg = "인증 실패. 코드/입력을 확인하세요.";
+        try {
+            const err = await res.json();
+            if (err && err.detail) errMsg = "인증 실패: " + err.detail;
+        } catch (e) {}
+        alert(errMsg);
+        msgElem.textContent = "";
+        msgElem.style.display = "none";
+    }
+};
+
+
+const pwCheckInput = document.getElementById("password_confirm");
+const pwCheckMsg = document.getElementById("pwCheckMsg");
+pwCheckInput.addEventListener("input", function() {
+    const pwVal = pwInput.value;
+    const confirmVal = pwCheckInput.value;
+    if (!confirmVal) {
+        pwCheckMsg.textContent = "";
+        return;
+    }
+    if (pwVal === confirmVal) {
+        pwCheckMsg.textContent = "사용 가능한 비밀번호";
+        pwCheckMsg.className = "mb-1 text-success";
+    } else {
+        pwCheckMsg.textContent = "비밀번호가 일치하지 않습니다";
+        pwCheckMsg.className = "mb-1 text-danger";
+    }
+});
+
+
+const pwInput = document.getElementById("password");
+const pwMsg = document.getElementById("pwConditionMsg");
+pwInput.addEventListener("input", function() {
+    pwMsg.textContent = "테스트: 입력 감지!";
+    const val = pwInput.value;
+    let msgs = [];
+    if (val.length < 8) msgs.push("최소 8자 이상 입력");
+    if (!/[A-Z]/.test(val)) msgs.push("최소 대문자 1자 이상 입력");
+    if (!/[a-z]/.test(val)) msgs.push("최소 소문자 1자 이상 입력");
+    if (!/[0-9]/.test(val)) msgs.push("최소 숫자 1자 이상 입력");
+    if (!/[^A-Za-z0-9]/.test(val)) msgs.push("최소 특수문자 1자 이상 입력");
+
+    if (msgs.length) {
+        pwMsg.textContent = "- " + msgs.join(', ');
+        pwMsg.className = "mb-1 text-danger";
+    } else {
+        pwMsg.textContent = "사용 가능한 비밀번호입니다";
+        pwMsg.className = "mb-1 text-success";
+    }
+});
+
+const phoneInput = document.getElementById("phonenum");
+const phoneMsg = document.getElementById("phoneMsg");
+
+// 입력 시 숫자 이외 문자 자동 제거
+phoneInput.addEventListener("input", function() {
+    let val = phoneInput.value.replace(/\D/g, ''); // 숫자 아닌 것 제거
+    phoneInput.value = val; // 자동 교정
+
+    if (!val) {
+        phoneMsg.textContent = "";
+        return;
+    }
+    // 010으로 시작, 총 11자리(예: 01012345678)
+    if (/^010\d{8}$/.test(val)) {
+        phoneMsg.textContent = "사용 가능한 휴대폰 번호입니다.";
+        phoneMsg.className = "mb-1 text-success";
+    } else {
+        phoneMsg.textContent = "휴대폰 번호를 01012345678 형식의 11자리 숫자로 입력하세요.";
+        phoneMsg.className = "mb-1 text-danger";
+    }
+});
+
+
+document.getElementById("signup-form").addEventListener("submit", async function(e) {
+    const phoneVal = phoneInput.value;
+    if (phoneVal && !/^010\d{8}$/.test(phoneVal)) {
+        e.preventDefault();
+        alert("휴대폰 번호를 올바르게 입력해주세요 (예: 01012345678, 숫자만)");
+        phoneInput.focus();
+        return;
+    }
+    e.preventDefault();
+    const form = e.target;
+    if (form.password.value !== form.password_confirm.value) return alert("비밀번호가 일치하지 않습니다.");
+    const userObj = {
+        userid: form.userid.value,
+        email: form.email.value,
+        password: form.password.value,
+        name: form.name.value,
+        nickname: form.nickname.value,
+        phonenum: form.phonenum.value,
+        birthday: form.birthday.value,
+        gender: form.gender.value
+    };
+    const res = await fetch("http://127.0.0.1:8000/auth/signup", {
+        method: "POST",
+        headers: {"Content-Type": "application/json"},
+        body: JSON.stringify(userObj)
+    });
+    if (res.ok) {
+        // 회원가입 성공 알림 → 확인 누르면 로그인 화면으로 이동
+        alert("회원가입이 완료되었습니다.");
+        window.location.href = "/login";  // 경로는 실제 로그인 파일 명에 맞게!
+    } else {
+        const err = await res.json().catch(()=>null);
+        alert((err && err.detail) || "회원가입 실패");
+    }
+});
+
+function checkFormValidity() {
+    const name = document.querySelector('input[name="name"]').value.trim();
+    const userid = useridInput.value.trim();
+    const email = document.querySelector('input[name="email"]').value.trim();
+    const code = document.querySelector('input[name="code"]').value.trim();
+    const pw = pwInput.value;
+    const pwConfirm = pwCheckInput.value;
+    const nickname = nicknameInput.value.trim();
+    const phone = phoneInput.value.trim();
+    const birthday = document.querySelector('input[name="birthday"]').value.trim();
+    const gender = document.querySelector('select[name="gender"]').value;
+
+    // 개별 항목 상태
+    const nameValid = !!name;
+    const useridValid = useridMsg.classList.contains('text-success');
+    const emailValid = !!email;
+    const codeValid = !!code && document.getElementById("emailVerifiedMsg").textContent.includes("완료");
+    const pwValid =
+        pw.length >= 8 &&
+        /[A-Z]/.test(pw) &&
+        /[a-z]/.test(pw) &&
+        /[0-9]/.test(pw) &&
+        /[^A-Za-z0-9]/.test(pw);
+    const pwChkValid = pw === pwConfirm && !!pw;
+    const nicknameValid = nicknameMsg.classList.contains('text-success');
+    const phoneValid = /^010\d{8}$/.test(phone);
+    const birthdayValid = !!birthday;
+    const genderValid = !!gender;
+
+    // 전체 체크
+    const allValid =
+        nameValid && useridValid && emailValid && codeValid &&
+        pwValid && pwChkValid && nicknameValid &&
+        phoneValid && birthdayValid && genderValid;
+
+    // 버튼 활성화
+    document.getElementById("signupBtn").disabled = !allValid;
+
+    // 콘솔 확인도 allValid 선언 "이후"에!
+    console.log({
+        nameValid, useridValid, emailValid, codeValid,
+        pwValid, pwChkValid, nicknameValid,
+        phoneValid, birthdayValid, genderValid,
+        allValid  // 반드시 포함!
+    });
+}
+
+</script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

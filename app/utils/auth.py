@@ -1,18 +1,22 @@
 from passlib.context import CryptContext
 from datetime import datetime, timedelta
-from fastapi import Depends, HTTPException, status
+from fastapi import Depends, HTTPException, status, Request
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
-from app.utils.email import send_email_code_smtp
 from app.database import get_db
 from app.models.user import User
 from jose import JWTError, jwt
-import hmac, hashlib, random, string
+from typing import Optional
+import hmac, hashlib, random, string, jwt
+import os
+from jwt.exceptions import PyJWTError
+from dotenv import load_dotenv
 
+load_dotenv()
+SECRET_KEY = os.getenv("SECRET_KEY")
 oauth2_scheme = OAuth2PasswordBearer(tokenUrl="/auth/login")
 
 pwd_context = CryptContext(schemes=["bcrypt"], deprecated="auto")
-SECRET_KEY = "your_secret_key_here"  # 환경변수로 관리 권장
 ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
@@ -76,24 +80,76 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
         detail="Could not validate credentials",
         headers={"WWW-Authenticate": "Bearer"},
     )
+    
+    #  1. 빈 토큰 / 너무 짧은 토큰 체크
+    if not token or len(token.strip()) < 20:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Invalid or empty token",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    
     try:
+        #  2. JWT 형식 검사 (3부분 있는지)
+        if token.count('.') != 2:
+            raise jwt.DecodeError("Invalid JWT format")
+        
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        userid = payload.get("sub")
-        if userid is None:
+        user_id = payload.get("user_id")
+        if user_id is None:
             raise credentials_exception
+    except jwt.DecodeError as e:
+        #  3. DecodeError 구체적으로 잡기
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail=f"Invalid token format: {str(e)}",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
+    except jwt.ExpiredSignatureError:
+        raise HTTPException(
+            status_code=status.HTTP_401_UNAUTHORIZED,
+            detail="Token expired",
+            headers={"WWW-Authenticate": "Bearer"},
+        )
     except JWTError:
         raise credentials_exception
-    
-    user = db.query(User).filter(User.userid == userid).first()
+
+    user = db.query(User).filter(User.id == int(user_id)).first()
     if user is None:
         raise credentials_exception
-    
+
     if not user.is_active or user.deleted_at is not None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
             detail="Inactive or deleted user",
             headers={"WWW-Authenticate": "Bearer"},
         )
+    return user
+
+
+def get_optional_token(request: Request) -> Optional[str]:
+    auth = request.headers.get("Authorization")
+    if not auth or not auth.lower().startswith("bearer "):
+        return None
+    return auth.split(" ", 1)[1]
+
+def get_current_user_optional(
+    token: Optional[str] = Depends(get_optional_token),
+    db: Session = Depends(get_db),
+) -> Optional[User]:
+    if not token:
+        return None
+    try:
+        payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
+        user_id = payload.get("user_id")
+        if user_id is None:
+            return None
+    except Exception:
+        return None
+
+    user = db.query(User).filter(User.id == int(user_id)).first()
+    if not user or (not user.is_active or user.deleted_at is not None):
+        return None
     return user
 
 # --- 탈퇴 유저 정리 ---
@@ -109,21 +165,18 @@ def delete_expired_users(db: Session, expire_days: int = 30):
     db.commit()
 
 # --- 토큰으로 사용자 조회 ---
-def get_current_user_from_token(token: str, db: Session):
+def get_current_user_from_token(token: str, db: Session) -> User:
+    if SECRET_KEY is None:
+        raise RuntimeError("SECRET_KEY 환경변수가 설정되어 있지 않습니다.")
     try:
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
-        user_id_or_sub = payload.get("user_id") or payload.get("sub")
-        if user_id_or_sub is None:
-            raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Invalid token")
+        user_id = payload.get("user_id") 
+        if user_id is None:
+            raise HTTPException(status_code=401, detail="토큰에 user_id가 없습니다.")
+    except PyJWTError:
+        raise HTTPException(status_code=401, detail="Invalid authentication credentials")
 
-        user = None
-        if str(user_id_or_sub).isdigit():
-            user = db.query(User).filter(User.id == int(user_id_or_sub)).first()
-        if not user:
-            user = db.query(User).filter(User.userid == str(user_id_or_sub)).first()
-        if not user:
-            raise HTTPException(status_code=status.HTTP_404_NOT_FOUND, detail="User not found")
-
-        return user
-    except JWTError:
-        raise HTTPException(status_code=status.HTTP_401_UNAUTHORIZED, detail="Token decode error")
+    user = db.query(User).filter(User.id == int(user_id)).first() 
+    if not user:
+        raise HTTPException(status_code=404, detail="User not found")
+    return user
