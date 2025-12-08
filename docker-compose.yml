@@ -6,9 +6,12 @@ services:
       - "${HOST_PORT}:8000"
     restart: always
     env_file:
-      - .env        # .env 파일 읽기
+      - .env
     environment:
       - ENV=${ENV}
+    depends_on:
+      db:
+        condition: service_healthy
 
   db:
     image: mysql:8.0
@@ -21,22 +24,26 @@ services:
       MYSQL_USER: ${MYSQL_USER}
       MYSQL_PASSWORD: ${MYSQL_PASSWORD}
     ports:
-      - "${DB_PORT}:3306"
+      - "3308:3306"          # 호스트 3308 → 컨테이너 3306
     volumes:
       - walkorea-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      interval: 5s
+      timeout: 5s
+      retries: 10
 
   redis:
     image: redis:7
     container_name: redis
     restart: always
     env_file:
-      - .env                   # .env 파일 읽기
+      - .env
     ports:
-      - "6379:6379"   # .env의 REDIS_PORT 사용
-    command: redis-server --appendonly yes  # 데이터 지속성
+      - "6379:6379"
+    command: redis-server --appendonly yes
     volumes:
       - redis_data:/data
-
 
 volumes:
   walkorea-db:
