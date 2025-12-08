@@ -5,61 +5,42 @@ function getToken() {
 }
 
 export async function initHeader() {
-  console.log('🚀 initHeader 시작!');
-  const token = getToken();
-  console.log('🔑 토큰:', token ? '있음' : '없음');
+  const token = localStorage.getItem("access_token");
 
   const navGuest = document.getElementById("nav-guest");
-  const navUser = document.getElementById("nav-user");
-  const logoutBtn = document.getElementById("nav-logout");
-  const nickSpan = document.getElementById("header-nickname");  
-  const initialDiv = document.getElementById("header-initial");
+  const navUser  = document.getElementById("nav-user");
+  const headerNickname = document.getElementById("header-nickname");
+  const headerInitial  = document.getElementById("header-initial");
+
+  if (!headerNickname || !headerInitial) return;
 
   if (!token) {
     if (navGuest) navGuest.classList.remove("d-none");
-    if (navUser) navUser.classList.add("d-none");
+    if (navUser)  navUser.classList.add("d-none");
     return;
   }
 
-  if (navGuest) navGuest.classList.add("d-none");
-  if (navUser) navUser.classList.remove("d-none");
-
-  try {
-    const res = await fetch("http://127.0.0.1:8000/user/profile", {
-      headers: { Authorization: "Bearer " + token },
-    });
-    if (!res.ok) return;
-
-    const profile = await res.json();
-    console.log("👤 프로필:", profile);
-
-    const nick = profile.nickname || profile.name || "사용자";
-    if (nickSpan) nickSpan.textContent = nick;
-    if (initialDiv) initialDiv.textContent = nick[0];
-
-    if (profile.id) {
-      await initNotifications();
-      initWebsocket(profile.id);
-    }
-  } catch (e) {
-    console.error("header profile load error", e);
-  }
-
-  if (logoutBtn) {
-    logoutBtn.addEventListener("click", (e) => {
-      e.preventDefault();
-      localStorage.removeItem("access_token");
-      localStorage.removeItem("refresh_token");
-      window.location.href = "/";
-    });
-  }
-
-   document.querySelectorAll("a[href='/login']").forEach(btn => {
-    btn.onclick = (e) => {
-      e.preventDefault();
-      window.goLoginWithReturn();
-    };
+  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+    headers: { Authorization: "Bearer " + token },
   });
+  if (!res.ok) return;
+  const user = await res.json();
+
+  const needProfile = !user.nickname;   // 닉네임만 필수
+
+  if (needProfile) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    if (navGuest) navGuest.classList.remove("d-none");
+    if (navUser)  navUser.classList.add("d-none");
+    return;
+  }
+
+  // 닉네임 있는 로그인 사용자
+  if (navGuest) navGuest.classList.add("d-none");
+  if (navUser)  navUser.classList.remove("d-none");
+  headerNickname.textContent = user.nickname;
+  headerInitial.textContent  = user.nickname[0];
 }
 
 function requireLoginForMypage() {

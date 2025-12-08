@@ -1,5 +1,5 @@
 import { loadProfileWeather } from "./mypage_common.js";
-import { requireLoginForMypage } from "/assets/js/mypage_common.js";
+import { requireLoginForMypage, requireCompletedProfile } from "/assets/js/mypage_common.js";
 
 let currentYear, currentMonth;
 let eventsCache = {};
@@ -997,6 +997,9 @@ async function showShareConfirmDialog(req) {
 export async function initCalendarPage() {
   if (!requireLoginForMypage()) {
     return;  // 로그인 안 되어 있으면 아래 로직 실행 안 함
+  }
+  if (!(await requireCompletedProfile())) {
+    return;
   }
 
   const placeInput = document.getElementById("ev-place");

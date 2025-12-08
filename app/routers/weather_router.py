@@ -67,7 +67,6 @@ async def get_events_with_weather(user_id: int, db: Session = Depends(get_db)):
 @router.get("/monthly-visual")
 def get_monthly_weather(region: str = None):
     plt.figure()
-    plot_monthly_weather_with_stddev(region_name=region)
     buf = io.BytesIO()
     plt.savefig(buf, format="png")
     buf.seek(0)
@@ -77,7 +76,6 @@ def get_monthly_weather(region: str = None):
 @router.get("/map")
 def get_weather_map(season: str = None):
     out_file = "weather_map.html"
-    plot_weather_on_map(csv_path="data/avgWeather_with_fullname.csv", season=season, file_out=out_file)
     return FileResponse(out_file, media_type="text/html")
 
 @router.post("/calendar/weather/recommend", response_model=CalendarWeatherResponse)

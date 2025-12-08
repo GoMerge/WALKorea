@@ -1,9 +1,9 @@
-from fastapi import FastAPI, Request, Depends
+from fastapi import FastAPI, Request, Depends, Query
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi.responses import RedirectResponse, FileResponse
+from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
 from app.services.schedule_notify_job import start_calendar_alarm_scheduler
@@ -15,6 +15,7 @@ from app.routers import (
     calendar_weather_router, notification_router, hashtag, favorite_router, comments,
 )
 from pathlib import Path 
+from typing import Optional
 
 BASE_DIR = Path(__file__).parent.parent  # app/main.py → 프로젝트 루트
 templates = Jinja2Templates(directory="frontend/templates")
@@ -115,16 +116,19 @@ async def mypage_calendar():
 async def mypage_calendar():
     return FileResponse(BASE_DIR / "frontend" / "mypage_recommend.html")
 
+@app.get("/resetpw")
+async def mypage_calendar():
+    return FileResponse(BASE_DIR / "frontend" / "resetpw.html")
+
 @app.get("/set-profile")
 async def set_profile_page(
-    user_id: int,
-    access_token: str,
-    refresh_token: str,
+    user_id: Optional[int] = Query(None),
+    access_token: Optional[str] = Query(None),
+    refresh_token: Optional[str] = Query(None),
     need_profile: int = 0,
 ):
-    response = FileResponse(
-        BASE_DIR / "frontend" / "set-profile.html"  
-    )
-    response.set_cookie("access_token", access_token)
-    response.set_cookie("refresh_token", refresh_token)
+    response = FileResponse(BASE_DIR / "frontend" / "set-profile.html")
+    if access_token and refresh_token:
+        response.set_cookie("access_token", access_token)
+        response.set_cookie("refresh_token", refresh_token)
     return response

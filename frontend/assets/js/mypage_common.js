@@ -37,7 +37,23 @@ export async function setupHeaderAndProfile() {
   const loginLi = document.getElementById("nav-login");
   const signupLi = document.getElementById("nav-signup");
 
-  if (token && nav) {
+  if (!token) return;
+
+  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+    headers: { "Authorization": "Bearer " + token }
+  });
+  if (!res.ok) return;
+  const user = await res.json();
+
+  const needProfile = !user.nickname;
+
+  if (needProfile) {
+    localStorage.removeItem("access_token");
+    localStorage.removeItem("refresh_token");
+    return;
+  }
+
+  if (nav) {
     if (loginLi) loginLi.remove();
     if (signupLi) signupLi.remove();
     const logoutLi = document.createElement("li");
@@ -51,16 +67,15 @@ export async function setupHeaderAndProfile() {
     };
     nav.appendChild(logoutLi);
   }
-  if (!token) return;
-
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
-    headers: { "Authorization": "Bearer " + token }
-  });
-  if (!res.ok) return;
-  const user = await res.json();
 
   const nick = user.nickname || user.userid || user.username || "사용자";
-  const email = user.email || user.user_email || "";
+  const rawEmail = user.email || user.user_email || "";
+  let email = rawEmail;
+  if (rawEmail.length > 20) {
+    const [local, domain] = rawEmail.split("@");
+    const shortLocal = local.length > 8 ? local.slice(0, 8) + "..." : local;
+    email = `${shortLocal}@${domain}`;
+  }
 
   const sideNick = document.getElementById("side-nickname");
   const profNick = document.getElementById("profile-nickname");
@@ -83,17 +98,46 @@ export async function setupHeaderAndProfile() {
   if (!user.region_id) {
     if (regionMsg)    regionMsg.textContent = "";
     if (weatherTitle) weatherTitle.textContent = "동네를 선택해 주세요";
-    if (weatherDesc)  weatherDesc.textContent  =
+    if (weatherDesc)  weatherDesc.textContent =
       "프로필에서 거주 지역을 설정하면, 이곳에 6일간의 날씨를 보여줄게요.";
     userBaseAddress = null;
   } else {
     const base = user.region_full_name || user.region_name;
     if (regionMsg)    regionMsg.textContent = "";
     if (weatherTitle) weatherTitle.textContent = `${base}의 날씨`;
-    if (weatherDesc)  weatherDesc.textContent  =
+    if (weatherDesc)  weatherDesc.textContent =
       "오늘을 포함한 6일치 동네 날씨예요.";
     userBaseAddress = base;
   }
+}
+
+export async function requireCompletedProfile() {
+  const token = localStorage.getItem("access_token");
+  if (!token) return false;
+
+  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+    headers: { Authorization: "Bearer " + token },
+  });
+  if (!res.ok) return false;
+
+  const user = await res.json();
+  const needProfile =
+    !user.nickname || !user.birthday || !user.gender;
+
+  if (needProfile) {
+    alert("프로필 정보를 먼저 입력해 주세요.");
+    const token = localStorage.getItem("access_token");
+    const userId = user.id; 
+    const params = new URLSearchParams({
+      user_id: userId,
+      access_token: token,
+      refresh_token: localStorage.getItem("refresh_token") || "",
+      need_profile: "1",
+    });
+    window.location.href = "/set-profile?" + params.toString();
+    return false;
+  }
+  return true;
 }
 
 // 요일/아이콘 유틸

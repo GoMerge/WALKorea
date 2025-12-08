@@ -629,9 +629,26 @@
     })();
   </script>
   <script type="module">
+    // 쿼리에서 토큰 꺼내서 localStorage에 저장
+    (function saveTokensFromQuery() {
+      const params = new URLSearchParams(window.location.search);
+      const access = params.get("access_token");
+      const refresh = params.get("refresh_token");
+      if (access && refresh) {
+        localStorage.setItem("access_token", access);
+        localStorage.setItem("refresh_token", refresh);
+        const url = new URL(window.location.href);
+        url.searchParams.delete("access_token");
+        url.searchParams.delete("refresh_token");
+        window.history.replaceState({}, "", url.toString());
+      }
+    })();
     import { initHeader } from "/assets/js/header.js";
-    window.addEventListener("DOMContentLoaded", async () => {
-      await initHeader();                 
+    import { setupHeaderAndProfile } from "/assets/js/mypage_common.js";
+
+    document.addEventListener("DOMContentLoaded", async () => {
+      await initHeader();
+      await setupHeaderAndProfile();
     });
   </script>
 </body>
