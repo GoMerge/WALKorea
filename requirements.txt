@@ -14,3 +14,7 @@ apscheduler
 celery[redis]
 jinja2
 requests
+pandas
+aiohttp
+matplotlib
+konlpy 
