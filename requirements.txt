@@ -5,10 +5,16 @@ pydantic[email]
 dotenv
 pymysql
 passlib
-jwt
+PyJWT==2.8.0
 sendgrid
-bcrypt # bcrypt==3.2.2
+bcrypt
 python-multipart
 python-jose[cryptography]
 apscheduler
 celery[redis]
+jinja2
+requests
+pandas
+aiohttp
+matplotlib
+konlpy 

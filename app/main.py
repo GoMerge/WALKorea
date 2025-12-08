@@ -1,4 +1,4 @@
-from fastapi import FastAPI, Request, Depends, Query
+from fastapi import FastAPI, Request, Depends, Query, HTTPException
 from fastapi.staticfiles import StaticFiles
 from fastapi.templating import Jinja2Templates
 from fastapi.responses import HTMLResponse
@@ -6,7 +6,6 @@ from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import FileResponse
 from sqlalchemy.orm import Session
 from app.database import get_db
-from app.services.schedule_notify_job import start_calendar_alarm_scheduler
 from app.database import SessionLocal, Base, engine 
 from app.routers import places
 from app.routers import (
@@ -39,8 +38,6 @@ Base.metadata.create_all(bind=engine)
 app.include_router(places.router, prefix="/places", tags=["places"])
 
 app.include_router(hashtag.router)
-
-start_calendar_alarm_scheduler(SessionLocal) 
 
 @app.middleware("http")
 async def log_headers(request: Request, call_next):
@@ -75,18 +72,25 @@ app.mount("/static", StaticFiles(directory="frontend/assets"), name="static")
 
 @app.get("/", response_class=HTMLResponse)
 async def main_page(request: Request, db: Session = Depends(get_db)):
-    ctx = places.build_places_context(
-        request=request,
-        db=db,
-        page=1,
-        sort="updated",
-        contenttypeid=None,
-        addr=None,
-        search=None,
-        tag=None,
-        current_user=None, 
-    )
-    return templates.TemplateResponse("places_list.html", {"request": request, **ctx})
+    try:
+        ctx = places.build_places_context(
+            request=request,
+            db=db,
+            page=1,
+            sort="updated",
+            contenttypeid=None,
+            addr=None,
+            search=None,
+            tag=None,
+            current_user=None,
+        )
+        return templates.TemplateResponse("places_list.html", {"request": request, **ctx})
+    except Exception as e:
+        import traceback
+        print("🔥 / main_page error:", e)
+        traceback.print_exc()
+        raise HTTPException(status_code=500, detail="main_page failed")
+
 
 @app.get("/login")
 async def login_page():

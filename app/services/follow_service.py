@@ -1,6 +1,6 @@
 from sqlalchemy.orm import Session
 from fastapi import HTTPException, status, WebSocket
-from app.services.websocket_manager import active_connections, _create_notification
+from app.services.websocket_manager import active_connections, create_notification
 from starlette.websockets import WebSocketState
 from app.models.follow import Follow  # ORM 모델
 from app.models.user import User
@@ -41,7 +41,7 @@ def follow_user(db: Session, follower_id: int, following_id: int) -> Follow:
     msg = f"{nickname} 님이 나를 팔로우했습니다."
 
     # DB Notification 생성
-    notif = _create_notification(
+    notif = create_notification(
         user_id=following_id,
         type_="follow",
         message=msg,
