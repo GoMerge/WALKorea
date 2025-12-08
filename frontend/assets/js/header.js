@@ -10,6 +10,9 @@ export async function initHeader() {
   const navGuest = document.getElementById("nav-guest");
   const navUser  = document.getElementById("nav-user");
   const headerNickname = document.getElementById("header-nickname");
+  if (headerNickname) {
+    headerNickname.textContent = nickname ?? "";
+  }
   const headerInitial  = document.getElementById("header-initial");
 
   if (!headerNickname || !headerInitial) return;
