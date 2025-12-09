@@ -82,44 +82,29 @@ def create_refresh_token(data: dict) -> str:
     return jwt.encode(to_encode, SECRET_KEY, algorithm=ALGORITHM)
 
 # --- 현재 사용자 가져오기 ---
-def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(get_db)) -> User:
+def get_current_user(
+    token: str = Depends(oauth2_scheme),
+    db: Session = Depends(get_db)
+) -> User:
     credentials_exception = HTTPException(
         status_code=status.HTTP_401_UNAUTHORIZED,
-        detail="Could not validate credentials",
+        detail="TokenExpiredOrInvalid",      # 프론트에서 이 문자열 보고 처리
         headers={"WWW-Authenticate": "Bearer"},
     )
-    
-    #  1. 빈 토큰 / 너무 짧은 토큰 체크
+
+    # 1. 빈 토큰 / 너무 짧은 토큰 체크
     if not token or len(token.strip()) < 20:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Invalid or empty token",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    
+        raise credentials_exception
+
     try:
-        #  2. JWT 형식 검사 (3부분 있는지)
-        if token.count('.') != 2:
-            raise jwt.DecodeError("Invalid JWT format")
-        
+
         payload = jwt.decode(token, SECRET_KEY, algorithms=[ALGORITHM])
         user_id = payload.get("user_id")
         if user_id is None:
             raise credentials_exception
-    except jwt.DecodeError as e:
-        #  3. DecodeError 구체적으로 잡기
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail=f"Invalid token format: {str(e)}",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
-    except jwt.ExpiredSignatureError:
-        raise HTTPException(
-            status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Token expired",
-            headers={"WWW-Authenticate": "Bearer"},
-        )
+
     except JWTError:
+        # 만료, 서명 오류, 포맷 오류 모두 여기서 401 처리
         raise credentials_exception
 
     user = db.query(User).filter(User.id == int(user_id)).first()
@@ -129,9 +114,10 @@ def get_current_user(token: str = Depends(oauth2_scheme), db: Session = Depends(
     if not user.is_active or user.deleted_at is not None:
         raise HTTPException(
             status_code=status.HTTP_401_UNAUTHORIZED,
-            detail="Inactive or deleted user",
+            detail="InactiveOrDeletedUser",
             headers={"WWW-Authenticate": "Bearer"},
         )
+
     return user
 
 

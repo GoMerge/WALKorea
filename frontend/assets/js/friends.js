@@ -23,8 +23,8 @@ async function searchFriendsByNickname(query) {
     li.textContent = "검색 결과가 없습니다.";
     ul.appendChild(li);
     return;
-}
   }
+ 
 
   const res = await fetch(
     API_BASE + `/follow/search-by-nickname/?nickname=${encodeURIComponent(query)}`,

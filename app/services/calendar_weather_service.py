@@ -1,10 +1,13 @@
+import csv
 from sqlalchemy.orm import Session
+from pathlib import Path
 from app.models.region import Region
 from app.schemas.weather import SimpleWeather
 from app.utils.weather import is_good_weather, is_good_weather_from_avg
 from app.utils.convert_address import convert_address_to_coordinates
 from app.services.weather_service import get_avg_weather_summary, get_daily_weather_vc
 
+CSV_PATH = Path(__file__).resolve().parent.parent.parent / "data" / "avgWeather_with_fullname.csv"
 
 async def resolve_region_fullname_from_address(address: str, db: Session) -> str | None:
     coords = convert_address_to_coordinates(address)
@@ -23,12 +26,62 @@ async def resolve_region_fullname_from_address(address: str, db: Session) -> str
     return region.full_name if region else None
 
 
+def candidates_from_address(address: str) -> list[str]:
+    parts = address.strip().split()
+    cands = []
+    for i in range(len(parts), 1, -1):  # 예: [전체, '인천광역시 중구', '인천광역시']
+        cands.append(" ".join(parts[:i]))
+    return cands
+
 async def get_weather_info_for_schedule(address: str, date_str: str):
-    avg_weather = await get_avg_weather_summary(address, date_str)
-    
+    """
+    avg_weather: CSV에서 평년 '기온(℃)'(평균기온), '강수량\n(mm)'(강수량)을 읽어온 dict
+    predicted_temperature: 추후 예보 붙일 자리, 지금은 None
+    """
+    avg_weather = None
+
+    month = int(date_str[5:7])
+    day = int(date_str[8:10])
+    keys = candidates_from_address(address)
+
+    if CSV_PATH.exists():
+        with CSV_PATH.open(encoding="cp949") as f:
+            reader = csv.DictReader(f)
+
+            for row in reader:
+                full = (row.get("full_name") or "").strip()
+                if full not in keys:
+                    continue
+
+                # CSV에서 '월', '날짜' 값은 float/문자열일 수 있으므로 안전하게 변환
+                try:
+                    row_month = int(float(row.get("월", 0)))
+                    row_day = int(float(row.get("날짜", 0)))
+                except ValueError:
+                    continue
+
+                if row_month != month or row_day != day:
+                    continue
+
+                # 여기서 매칭 성공
+                t_raw = row.get("기온(℃)", "")
+                p_raw = row.get("강수량\n(mm)", "")
+
+                try:
+                    t = float(t_raw) if t_raw != "" else None
+                except ValueError:
+                    t = None
+                try:
+                    p = float(p_raw) if p_raw != "" else None
+                except ValueError:
+                    p = None
+
+                avg_weather = {"기온(℃)": t, "강수량(mm)": p}
+                break
+
     return {
         "avg_weather": avg_weather,
-        "predicted_temperature": None,  
+        "predicted_temperature": None,
     }
 
 
