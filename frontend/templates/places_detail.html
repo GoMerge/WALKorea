@@ -1,998 +1,998 @@
 <!DOCTYPE html>
 <html lang="en">
 <style>
-  .page-title {
-    background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
-    border-bottom: 1px solid #f3f4f6;
-  }
-  .heading-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: -0.03em;
-    color: #111827;
-  }
-  .page-title .mb-0 {
-    color: #6b7280;
-    font-size: 0.95rem;
+.page-title {
+background: linear-gradient(180deg, #f9fafb 0%, #ffffff 100%);
+border-bottom: 1px solid #f3f4f6;
+}
+.heading-title {
+font-size: 2.2rem;
+font-weight: 800;
+letter-spacing: -0.03em;
+color: #111827;
+}
+.page-title .mb-0 {
+color: #6b7280;
+font-size: 0.95rem;
 
-  
-  }
 
-  .comments-section {
-  background: #f8fafc;
-  padding: 40px 0;
-  border-top: 1px solid #e2e8f0;
+}
+
+.comments-section {
+background: #f8fafc;
+padding: 40px 0;
+border-top: 1px solid #e2e8f0;
 }
 
 .comment-item {
-  background: white;
-  border-radius: 16px;
-  padding: 20px;
-  margin-bottom: 16px;
-  box-shadow: 0 4px 20px rgba(0,0,0,0.08);
-  border-left: 4px solid #3b82f6;
-  transition: all 0.2s;
+background: white;
+border-radius: 16px;
+padding: 20px;
+margin-bottom: 16px;
+box-shadow: 0 4px 20px rgba(0,0,0,0.08);
+border-left: 4px solid #3b82f6;
+transition: all 0.2s;
 }
 
 .comment-item:hover {
-  box-shadow: 0 8px 30px rgba(0,0,0,0.12);
-  transform: translateY(-2px);
+box-shadow: 0 8px 30px rgba(0,0,0,0.12);
+transform: translateY(-2px);
 }
 
 .comment-header {
-  display: flex;
-  align-items: flex-start;
-  gap: 12px;
-  margin-bottom: 12px;
+display: flex;
+align-items: flex-start;
+gap: 12px;
+margin-bottom: 12px;
 }
 
 .comment-avatar {
-  width: 42px;
-  height: 42px;
-  border-radius: 50%;
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-weight: 600;
-  font-size: 16px;
-  flex-shrink: 0;
+width: 42px;
+height: 42px;
+border-radius: 50%;
+background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+color: white;
+display: flex;
+align-items: center;
+justify-content: center;
+font-weight: 600;
+font-size: 16px;
+flex-shrink: 0;
 }
 
 .comment-meta {
-  flex: 1;
-  min-width: 0;
+flex: 1;
+min-width: 0;
 }
 
 .comment-author {
-  font-weight: 600;
-  color: #1e293b;
-  font-size: 0.95rem;
-  margin-bottom: 2px;
+font-weight: 600;
+color: #1e293b;
+font-size: 0.95rem;
+margin-bottom: 2px;
 }
 
 .comment-time {
-  color: #64748b;
-  font-size: 0.8rem;
+color: #64748b;
+font-size: 0.8rem;
 }
 
 .comment-actions {
-  display: flex;
-  gap: 8px;
+display: flex;
+gap: 8px;
 }
 
 .btn-comment-action {
-  background: none;
-  border: 1px solid #e2e8f0;
-  color: #64748b;
-  padding: 4px 12px;
-  border-radius: 6px;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: all 0.2s;
+background: none;
+border: 1px solid #e2e8f0;
+color: #64748b;
+padding: 4px 12px;
+border-radius: 6px;
+font-size: 0.8rem;
+cursor: pointer;
+transition: all 0.2s;
 }
 
 .btn-comment-action:hover {
-  background: #3b82f6;
-  color: white;
-  border-color: #3b82f6;
+background: #3b82f6;
+color: white;
+border-color: #3b82f6;
 }
 
 .comment-content {
-  color: #374151;
-  line-height: 1.6;
-  word-break: break-word;
+color: #374151;
+line-height: 1.6;
+word-break: break-word;
 }
 
 #submit-comment:disabled {
-  opacity: 0.6;
-  cursor: not-allowed;
+opacity: 0.6;
+cursor: not-allowed;
 }
 #recommend-reason.card {
-  border: none;
-  border-radius: 20px;
-  box-shadow: 0 18px 35px rgba(15, 23, 42, 0.10);
-  background: #ffffff;
-  padding-top: 18px;
+border: none;
+border-radius: 20px;
+box-shadow: 0 18px 35px rgba(15, 23, 42, 0.10);
+background: #ffffff;
+padding-top: 18px;
 }
 
 #recommend-reason .card-title {
-  font-size: 0.95rem;
-  font-weight: 700;
-  color: #111827;
+font-size: 0.95rem;
+font-weight: 700;
+color: #111827;
 }
 
 #recommend-reason .small.text-muted {
-  color: #9ca3af !important;
+color: #9ca3af !important;
 }
 #recommend-reason .progress {
-  height: 22px;
-  border-radius: 999px;
-  background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
-  box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
+height: 22px;
+border-radius: 999px;
+background: linear-gradient(180deg, #f3f4f6 0%, #e5e7eb 100%);
+box-shadow: inset 0 1px 2px rgba(15, 23, 42, 0.08);
 }
 
 /* 공통 막대 채워지는 부분: 파스텔톤 + 중앙 살짝 밝게 */
 #recommend-reason .progress-bar {
-  border-radius: 999px;
-  font-size: 0.7rem;
-  line-height: 22px;
-  color: #f9fafb;
-  text-shadow: 0 0 2px rgba(0,0,0,0.15);
+border-radius: 999px;
+font-size: 0.7rem;
+line-height: 22px;
+color: #f9fafb;
+text-shadow: 0 0 2px rgba(0,0,0,0.15);
 }
 
 /* 기본 정보: 민트 */
 #score-base.progress-bar {
-  background: linear-gradient(90deg, #6ee7b7 0%, #22c55e 100%);
+background: linear-gradient(90deg, #6ee7b7 0%, #22c55e 100%);
 }
 
 /* 여행 취향: 파스텔 블루 */
 #score-topic.progress-bar {
-  background: linear-gradient(90deg, #93c5fd 0%, #3b82f6 100%);
+background: linear-gradient(90deg, #93c5fd 0%, #3b82f6 100%);
 }
 
 /* 상황/거리: 파스텔 오렌지 */
 #score-distance.progress-bar {
-  background: linear-gradient(90deg, #fed7aa 0%, #fb923c 100%);
+background: linear-gradient(90deg, #fed7aa 0%, #fb923c 100%);
 }
 
 /* 최종 점수 텍스트 */
 #score-final {
-  font-size: 1.05rem;
-  font-weight: 700;
-  color: #111827;
+font-size: 1.05rem;
+font-weight: 700;
+color: #111827;
 }
 </style>
 <head>
-  <script type="module" src="/assets/js/mypage_common.js"></script>
-  <!-- 지도 구현 -->
-  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fd93df643bf67f10524ef70aafa1a1a6"></script>
-  <base href="/">
-  <meta charset="utf-8">
-  <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Property Details - TheProperty Bootstrap Template</title>
-  <meta name="description" content="">
-  <meta name="keywords" content="">
+<script type="module" src="/assets/js/mypage_common.js"></script>
+<!-- 지도 구현 -->
+<script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fd93df643bf67f10524ef70aafa1a1a6"></script>
+<base href="/">
+<meta charset="utf-8">
+<meta content="width=device-width, initial-scale=1.0" name="viewport">
+<title>Property Details - TheProperty Bootstrap Template</title>
+<meta name="description" content="">
+<meta name="keywords" content="">
 
-  
 
-  <!-- Favicons -->
-  <link href="assets/img/favicon.png" rel="icon">
-  <link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- Fonts -->
-  <link href="https://fonts.googleapis.com" rel="preconnect">
-  <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
+<!-- Favicons -->
+<link href="assets/img/favicon.png" rel="icon">
+<link href="assets/img/apple-touch-icon.png" rel="apple-touch-icon">
 
-  <!-- Vendor CSS Files -->
-  <link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-  <link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
-  <link href="assets/vendor/aos/aos.css" rel="stylesheet">
-  <link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
-  <link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
-  <link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
+<!-- Fonts -->
+<link href="https://fonts.googleapis.com" rel="preconnect">
+<link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Raleway:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">
 
-  <!-- Main CSS File -->
-  <link href="assets/css/main.css" rel="stylesheet">
+<!-- Vendor CSS Files -->
+<link href="assets/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+<link href="assets/vendor/bootstrap-icons/bootstrap-icons.css" rel="stylesheet">
+<link href="assets/vendor/aos/aos.css" rel="stylesheet">
+<link href="assets/vendor/glightbox/css/glightbox.min.css" rel="stylesheet">
+<link href="assets/vendor/swiper/swiper-bundle.min.css" rel="stylesheet">
+<link href="assets/vendor/drift-zoom/drift-basic.css" rel="stylesheet">
 
-  <!-- =======================================================
-  * Template Name: TheProperty
-  * Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
-  * Updated: Aug 05 2025 with Bootstrap v5.3.7
-  * Author: BootstrapMade.com
-  * License: https://bootstrapmade.com/license/
-  ======================================================== -->
+<!-- Main CSS File -->
+<link href="assets/css/main.css" rel="stylesheet">
+
+<!-- =======================================================
+* Template Name: TheProperty
+* Template URL: https://bootstrapmade.com/theproperty-bootstrap-real-estate-template/
+* Updated: Aug 05 2025 with Bootstrap v5.3.7
+* Author: BootstrapMade.com
+* License: https://bootstrapmade.com/license/
+======================================================== -->
 </head>
 
 <body>
-  <header id="header" class="header d-flex align-items-center fixed-top">
-    <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-      
-      <!-- Logo -->
-      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
-        <h1 class="sitename">WALKorea</h1>
-      </a>
+<header id="header" class="header d-flex align-items-center fixed-top">
+<div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
 
-      <!-- Navigation Menu -->
-      <nav id="navmenu" class="navmenu">
-        <ul>
-          <li class="dropdown">
-            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
-            <ul>
-              <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
-              <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
-              <li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
-              <li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
-              <li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
-              <li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
-              <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
-            </ul>
-          </li>
-          <li><a href="/places/map_more">지도</a></li>
-          <li><a href="/mypage_calendar">마이페이지</a></li>
-        </ul>
-      </nav>
+<!-- Logo -->
+<a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
+<h1 class="sitename">WALKorea</h1>
+</a>
 
-      <!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
-      <div id="nav-guest" class="d-flex align-items-center gap-2">
-        <a class="btn-getstarted" href="/signup">회원가입</a>
-        <a class="btn-getstarted" href="/login">로그인</a>
-      </div>
+<!-- Navigation Menu -->
+<nav id="navmenu" class="navmenu">
+<ul>
+<li class="dropdown">
+<a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+<ul>
+<li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
+<li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
+<li><a href="/places/list?contenttypeid=15&page=1&sort=updated">축제</a></li>
+<li><a href="/places/list?contenttypeid=32&page=1&sort=updated">숙박</a></li>
+<li><a href="/places/list?contenttypeid=39&page=1&sort=updated">음식점</a></li>
+<li><a href="/places/list?contenttypeid=38&page=1&sort=updated">쇼핑</a></li>
+<li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
+</ul>
+</li>
+<li><a href="/places/map_more">지도</a></li>
+<li><a href="/mypage_calendar">마이페이지</a></li>
+</ul>
+</nav>
 
-      <!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
-      <div id="nav-user" class="d-none d-flex align-items-center gap-3">
+<!-- 비로그인: 로그인/회원가입 버튼 (기존 스타일 적용) -->
+<div id="nav-guest" class="d-flex align-items-center gap-2">
+<a class="btn-getstarted" href="/signup">회원가입</a>
+<a class="btn-getstarted" href="/login">로그인</a>
+</div>
 
-        <!-- 알림 버튼 (작게) -->
-        <div class="dropdown">
-          <button id="notifDropdown"
-                  class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
-                  type="button"
-                  data-bs-toggle="dropdown"
-                  aria-expanded="false">
-            <i class="bi bi-bell"></i>
-            <span id="notif-badge"
-                  class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
-              0
-            </span>
-          </button>
+<!-- 로그인: 알림/닉네임/로그아웃 (기존 스타일 적용) -->
+<div id="nav-user" class="d-none d-flex align-items-center gap-3">
 
-          <div class="dropdown-menu dropdown-menu-end notif-dropdown">
-            <div class="notif-header d-flex justify-content-between align-items-center">
-              <span class="fw-semibold">알림</span>
-              <button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
-            </div>
-            <div class="notif-body">
-              <p id="notif-empty-text" class="notif-empty text-muted small mb-2">
-                아직 알림이 없습니다.
-              </p>
-              <ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
-            </div>
-          </div>
-        </div>
+<!-- 알림 버튼 (작게) -->
+<div class="dropdown">
+<button id="notifDropdown"
+class="btn btn-outline-success btn-sm position-relative px-2 py-1 dropdown-toggle"
+type="button"
+data-bs-toggle="dropdown"
+aria-expanded="false">
+<i class="bi bi-bell"></i>
+<span id="notif-badge"
+class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger d-none small">
+0
+</span>
+</button>
 
-        <!-- 닉네임 + 라벨 -->
-        <div class="d-flex align-items-center gap-2">
-          <div id="header-initial"
-              class="mypage-user-badge"
-              style="width:32px; height:32px; font-size:16px; margin-right:0;">
-            닉네임
-          </div>
-          <span id="header-nickname" class="fw-semibold"></span>
-        </div>
+<div class="dropdown-menu dropdown-menu-end notif-dropdown">
+<div class="notif-header d-flex justify-content-between align-items-center">
+<span class="fw-semibold">알림</span>
+<button id="notif-clear-all" class="btn btn-link btn-sm text-danger p-0">전체삭제</button>
+</div>
+<div class="notif-body">
+<p id="notif-empty-text" class="notif-empty text-muted small mb-2">
+아직 알림이 없습니다.
+</p>
+<ul id="notif-list" class="notif-list list-unstyled mb-0"></ul>
+</div>
+</div>
+</div>
 
-        <!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
-        <button id="nav-logout" class="btn-getstarted btn-logout-small">
-          로그아웃
-        </button>
-      </div>
-    </div>
-  </header>
-  <!-- 목록 끝 -->
+<!-- 닉네임 + 라벨 -->
+<div class="d-flex align-items-center gap-2">
+<div id="header-initial"
+class="mypage-user-badge"
+style="width:32px; height:32px; font-size:16px; margin-right:0;">
+닉네임
+</div>
+<span id="header-nickname" class="fw-semibold"></span>
+</div>
 
-  <main class="main">
+<!-- 로그아웃 버튼: 로그인/회원가입 버튼 스타일 재사용 -->
+<button id="nav-logout" class="btn-getstarted btn-logout-small">
+로그아웃
+</button>
+</div>
+</div>
+</header>
+<!-- 목록 끝 -->
 
-    <!-- Page Title -->
-    <div class="page-title">
-      <div class="heading">
-        <div class="container">
-          <div class="row d-flex justify-content-center text-center">
-            <div class="col-lg-8">
-              <h1 class="heading-title">{{ place.title }}</h1>
+<main class="main">
 
-              {% if place.hashtags  %}
-              <div class="property-agent">
-                {% for pt in place.hashtags[:6]  %}
-                <a href="/places/list?tag={{ pt.tag.name }}&page=1{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}
-                {% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="badge bg-secondary text-decoration-none me-1">#{{ pt.tag.name }}</a>
-                {% endfor %}
-              </div>
-              {% endif %}
-            </div>
-          </div>
-        </div>
-      </div>
-      <nav class="breadcrumbs">
-        <div class="container">
-          <ol>
-            <li><a href="/">여행정보</a></li>
-            <li class="current">상세보기</li>
-          </ol>
-        </div>
-      </nav>
-    </div><!-- End Page Title -->
+<!-- Page Title -->
+<div class="page-title">
+<div class="heading">
+<div class="container">
+<div class="row d-flex justify-content-center text-center">
+<div class="col-lg-8">
+<h1 class="heading-title">{{ place.title }}</h1>
+
+{% if place.hashtags %}
+<div class="property-agent">
+{% for pt in place.hashtags[:6] %}
+<a href="/places/list?tag={{ pt.tag.name }}&page=1{% if contenttypeid %}&contenttypeid={{ contenttypeid }}{% endif %}{% if sort %}&sort={{ sort }}{% endif %}
+{% if addr %}&addr={{ addr }}{% endif %}{% if search %}&search={{ search }}{% endif %}" class="badge bg-secondary text-decoration-none me-1">#{{ pt.tag.name }}</a>
+{% endfor %}
+</div>
+{% endif %}
+</div>
+</div>
+</div>
+</div>
+<nav class="breadcrumbs">
+<div class="container">
+<ol>
+<li><a href="/">여행정보</a></li>
+<li class="current">상세보기</li>
+</ol>
+</div>
+</nav>
+</div><!-- End Page Title -->
 
 <!-- Property Details Section -->
-    <section id="property-details" class="property-details section">
+<section id="property-details" class="property-details section">
 
-      <div class="container" data-aos="fade-up" data-aos-delay="100">
+<div class="container" data-aos="fade-up" data-aos-delay="100">
 
-        <div class="row gy-4">
+<div class="row gy-4">
 
-          <div class="col-lg-8">
+<div class="col-lg-8">
 
-            <!-- Property Gallery -->
-            <div class="property-gallery" data-aos="fade-up" data-aos-delay="200">
-              <div class="main-image-container image-zoom-container">
-                <img id="main-product-image" src="{{ place.firstimage if place.firstimage else '/static/no_image.jpg' }}" alt="{{ place.title }}" class="img-fluid main-property-image" >
-                <div class="image-nav-buttons">
-                  <button class="image-nav-btn prev-image" type="button">
-                    <i class="bi bi-chevron-left"></i>
-                  </button>
-                  <button class="image-nav-btn next-image" type="button">
-                    <i class="bi bi-chevron-right"></i>
-                  </button>
-                </div>
-              </div>
-              <div class="thumbnail-gallery thumbnail-list">
-                 {% for img in detail_images %}
-                <div class="thumbnail-item{% if loop.first %} active{% endif %}" data-image="{{ img.originimgurl }}">
-                  <img src="{{ img.originimgurl }}" alt="Tour Image" class="img-fluid">
-                </div>
-                {% endfor %}
-              </div>
-            </div><!-- End Property Gallery -->
+<!-- Property Gallery -->
+<div class="property-gallery" data-aos="fade-up" data-aos-delay="200">
+<div class="main-image-container image-zoom-container">
+<img id="main-product-image" src="{{ place.firstimage if place.firstimage else '/static/no_image.jpg' }}" alt="{{ place.title }}" class="img-fluid main-property-image" >
+<div class="image-nav-buttons">
+<button class="image-nav-btn prev-image" type="button">
+<i class="bi bi-chevron-left"></i>
+</button>
+<button class="image-nav-btn next-image" type="button">
+<i class="bi bi-chevron-right"></i>
+</button>
+</div>
+</div>
+<div class="thumbnail-gallery thumbnail-list">
+{% for img in detail_images %}
+<div class="thumbnail-item{% if loop.first %} active{% endif %}" data-image="{{ img.originimgurl }}">
+<img src="{{ img.originimgurl }}" alt="Tour Image" class="img-fluid">
+</div>
+{% endfor %}
+</div>
+</div><!-- End Property Gallery -->
 
-            <!-- Property Description -->
-            <div class="property-description" data-aos="fade-up" data-aos-delay="300">
-              <h3>상세정보</h3>
-              <p>{{ place.overview }}</p>
-            </div><!-- End Property Description -->
+<!-- Property Description -->
+<div class="property-description" data-aos="fade-up" data-aos-delay="300">
+<h3>상세정보</h3>
+<p>{{ place.overview }}</p>
+</div><!-- End Property Description -->
 
-            <!-- Amenities -->
-            <div class="property-amenities" data-aos="fade-up" data-aos-delay="400">
-            <h3>그 외 정보</h3>
+<!-- Amenities -->
+<div class="property-amenities" data-aos="fade-up" data-aos-delay="400">
+<h3>그 외 정보</h3>
 
-            {% if detail_info %}
-            <ul class="features-list">
-              {% for item in detail_info %}
-              <li>
-                  <i class="bi bi-check-circle"></i>
-                  <strong>{{ item.label }}  :   </strong>   {{ item.value }}
-              </li>
-              {% endfor %}
-            </ul>
-              {% else %}
-              <p class="text-muted">추가 정보가 없습니다.</p>
-              {% endif %}
-            </div><!-- End Amenities -->
+{% if detail_info %}
+<ul class="features-list">
+{% for item in detail_info %}
+<li>
+<i class="bi bi-check-circle"></i>
+<strong>{{ item.label }} : </strong> {{ item.value }}
+</li>
+{% endfor %}
+</ul>
+{% else %}
+<p class="text-muted">추가 정보가 없습니다.</p>
+{% endif %}
+</div><!-- End Amenities -->
 
-            <!-- Map Section -->
-            <div class="property-map" data-aos="fade-up" data-aos-delay="500">
-              <h3>위치</h3>
-              <div class="map-container">
-                <div id="kakaomap" style="width:100%; height:400px;">
-                </div>
-              </div>
-              <div class="d-flex justify-content-between align-items-center">
-                <h6>{{ place.title }} 지도정보와 근처 관광지도 함께 확인해보세요!</h6>
-              </div>
-            </div><!-- End Map Section -->
-            <!-- 지도 섹션 바로 아래 -->
-            <section class="comments-section section" data-aos="fade-up">
-              <div class="container">
-                <div class="d-flex justify-content-between align-items-center mb-4">
-                  <h3><i class="bi bi-chat-dots text-primary me-2"></i>댓글 (<span id="comment-count">0</span>)</h3>
-                  <small class="text-muted">최대 500자</small>
-                </div>
-                
-                <!-- 댓글 입력 -->
-                <div class="comment-input-section mb-4 p-4 bg-light rounded-3">
-                  <div class="row g-3 align-items-end">
-                    <div class="col-lg-9 col-md-8">
-                      <textarea 
-                        id="comment-text" 
-                        class="form-control" 
-                        rows="2" 
-                        placeholder="이 장소에 대한 소감이나 팁을 남겨주세요!"
-                        maxlength="500"
-                      ></textarea>
-                      <div class="form-text">
-                        <span id="char-count">0</span>/500자
-                      </div>
-                    </div>
-                    <div class="col-lg-3 col-md-4">
-                      <button id="submit-comment" class="btn btn-primary w-100" disabled>
-                        <i class="bi bi-send"></i> 로그인 후 작성
-                      </button>
-                    </div>
-                  </div>
-                </div>
+<!-- Map Section -->
+<div class="property-map" data-aos="fade-up" data-aos-delay="500">
+<h3>위치</h3>
+<div class="map-container">
+<div id="kakaomap" style="width:100%; height:400px;">
+</div>
+</div>
+<div class="d-flex justify-content-between align-items-center">
+<h6>{{ place.title }} 지도정보와 근처 관광지도 함께 확인해보세요!</h6>
+</div>
+</div><!-- End Map Section -->
+<!-- 지도 섹션 바로 아래 -->
+<section class="comments-section section" data-aos="fade-up">
+<div class="container">
+<div class="d-flex justify-content-between align-items-center mb-4">
+<h3><i class="bi bi-chat-dots text-primary me-2"></i>댓글 (<span id="comment-count">0</span>)</h3>
+<small class="text-muted">최대 500자</small>
+</div>
 
-                <!-- 댓글 목록 -->
-                <div id="comments-container">
-                  <div class="text-center py-5">
-                    <i class="bi bi-chat-square-text fs-1 text-muted mb-3"></i>
-                    <h5 class="text-muted">첫 번째 댓글을 남겨보세요!</h5>
-                  </div>
-              </div>
-            </section>
-          </div>
+<!-- 댓글 입력 -->
+<div class="comment-input-section mb-4 p-4 bg-light rounded-3">
+<div class="row g-3 align-items-end">
+<div class="col-lg-9 col-md-8">
+<textarea
+id="comment-text"
+class="form-control"
+rows="2"
+placeholder="이 장소에 대한 소감이나 팁을 남겨주세요!"
+maxlength="500"
+></textarea>
+<div class="form-text">
+<span id="char-count">0</span>/500자
+</div>
+</div>
+<div class="col-lg-3 col-md-4">
+<button id="submit-comment" class="btn btn-primary w-100" disabled>
+<i class="bi bi-send"></i> 로그인 후 작성
+</button>
+</div>
+</div>
+</div>
 
-          <div class="col-lg-4">
+<!-- 댓글 목록 -->
+<div id="comments-container">
+<div class="text-center py-5">
+<i class="bi bi-chat-square-text fs-1 text-muted mb-3"></i>
+<h5 class="text-muted">첫 번째 댓글을 남겨보세요!</h5>
+</div>
+</div>
+</section>
+</div>
 
-            <div id="recommend-reason" class="card shadow-sm mb-3 d-none">
-              <div class="card-body">
-                <h5 id="match-title" class="card-title mb-3">
-                  내 취향과 매칭
-                </h5>
+<div class="col-lg-4">
 
-                <div class="mb-2 small text-muted">기본 정보</div>
-                <div class="progress mb-2">
-                  <div id="score-base" class="progress-bar" role="progressbar"></div>
-                </div>
+<div id="recommend-reason" class="card shadow-sm mb-3 d-none">
+<div class="card-body">
+<h5 id="match-title" class="card-title mb-3">
+내 취향과 매칭
+</h5>
 
-                <div class="mb-2 small text-muted">여행 취향</div>
-                <div class="progress mb-2">
-                  <div id="score-topic" class="progress-bar bg-success" role="progressbar"></div>
-                </div>
+<div class="mb-2 small text-muted">기본 정보</div>
+<div class="progress mb-2">
+<div id="score-base" class="progress-bar" role="progressbar"></div>
+</div>
 
-                <div class="mb-2 small text-muted">상황/거리</div>
-                <div class="progress mb-3">
-                  <div id="score-distance" class="progress-bar bg-info" role="progressbar"></div>
-                </div>
+<div class="mb-2 small text-muted">여행 취향</div>
+<div class="progress mb-2">
+<div id="score-topic" class="progress-bar bg-success" role="progressbar"></div>
+</div>
 
-                <hr>
-                <div class="d-flex justify-content-between align-items-center">
-                  <span class="small text-muted">최종 매칭 점수</span>
-                  <span id="score-final" class="fw-bold"></span>
-                </div>
-              </div>
-            </div>
-            <div class="card">
-              <div class="card-body">
-                <h5 class="card-title">캘린더 일정에 저장하기</h5>
-                <div class="mb-2">
-                  <label class="form-label">방문 날짜</label>
-                  <input type="date" id="visit-date" class="form-control">
-                </div>
-                <button class="btn btn-success w-100" id="btn-save-to-calendar">
-                  저장하기
-                </button>
-              </div>
-            </div>
-          </div>
+<div class="mb-2 small text-muted">상황/거리</div>
+<div class="progress mb-3">
+<div id="score-distance" class="progress-bar bg-info" role="progressbar"></div>
+</div>
 
-        </div>
+<hr>
+<div class="d-flex justify-content-between align-items-center">
+<span class="small text-muted">최종 매칭 점수</span>
+<span id="score-final" class="fw-bold"></span>
+</div>
+</div>
+</div>
+<div class="card">
+<div class="card-body">
+<h5 class="card-title">캘린더 일정에 저장하기</h5>
+<div class="mb-2">
+<label class="form-label">방문 날짜</label>
+<input type="date" id="visit-date" class="form-control">
+</div>
+<button class="btn btn-success w-100" id="btn-save-to-calendar">
+저장하기
+</button>
+</div>
+</div>
+</div>
 
-      </div>
+</div>
 
-    </section><!-- /Property Details Section -->
+</div>
+
+</section><!-- /Property Details Section -->
 <!-- /Property Details Section -->
 
-  </main>
+</main>
 
-  <script>
-    const PLACE_ID = {{ place.contentid }};
-  </script>
+<script>
+const PLACE_ID = {{ place.contentid }};
+</script>
 
-  <footer id="footer" class="footer position-relative">
-
-
-    <div class="footer-bottom">
-      <div class="container">
-        <div class="row align-items-center">
-          <div class="col-lg-6">
-            <div class="copyright">
-              <p>© <span>WALKorea</span></p>
-            </div>
-          </div>
-          <div class="col-lg-6">
-            <div class="footer-bottom-links">
-              <a href="#">개발자 김혜영</a>
-              <a href="#">개발자 이지영</a>
-            </div>
-            <div class="credits">
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-
-  </footer>
-
-  <!-- Scroll Top -->
-  <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
-
-  <!-- Preloader -->
-  <div id="preloader"></div>
-
-  <!-- Vendor JS Files -->
-  <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
-  <script src="assets/vendor/php-email-form/validate.js"></script>
-  <script src="assets/vendor/aos/aos.js"></script>
-  <script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
-  <script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
-  <script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
-  <script src="assets/vendor/drift-zoom/Drift.min.js"></script>
-
-  <!-- Main JS File -->
-  <script src="assets/js/main.js"></script>
-
-  <script type="module">
-    const API_BASE = "";
-
-    import { goLoginWithReturn } from "./assets/js/mypage_common.js";
-    document.addEventListener("DOMContentLoaded", async () => {
-      const placeId = PLACE_ID;
-      
-      const token = localStorage.getItem("access_token");
-      
-      
-      const btn = document.getElementById("btn-save-to-calendar");
-      const dateInput = document.getElementById("visit-date");
-
-      if (!btn || !dateInput) {
-        console.warn("캘린더 저장 UI를 찾을 수 없습니다.");
-        return;
-      }
-
-      btn.addEventListener("click", async () => {
-        console.log("버튼 클릭됨!");
-        const dateStr = dateInput.value;
-        if (!dateStr) {
-          alert("날짜를 선택해 주세요.");
-          return;
-        }
-
-        let token = localStorage.getItem("access_token");
-        if (!token || token.length < 10) {
-          alert("로그인이 필요합니다.");
-          goLoginWithReturn();
-          return;
-        }
-
-        // 상세페이지 타이틀 가져오기
-        const titleEl = document.querySelector(".heading-title");
-        const title = titleEl ? titleEl.textContent.trim() : "여행 일정";
-
-        console.log("저장 시도:", title, dateStr);
-
-        const res = await fetch(
-          API_BASE + `/calendar/places/${placeId}/events2`,
-          {
-            method: "POST",
-            headers: {
-              "Authorization": "Bearer " + token,
-              "Content-Type": "application/json",
-            },
-            body: JSON.stringify({
-              title: title,
-              visit_date: dateStr,
-            }),
-          }
-        );
-
-        if (res.ok) {
-          alert("캘린더에 저장했습니다.");
-        } else {
-          const err = await res.json().catch(() => ({}));
-          alert("저장 실패: " + (err.detail || res.status));
-        }
-      });
+<footer id="footer" class="footer position-relative">
 
 
-      const box = document.getElementById("recommend-reason");
-      if (!box) return;
+<div class="footer-bottom">
+<div class="container">
+<div class="row align-items-center">
+<div class="col-lg-6">
+<div class="copyright">
+<p>© <span>WALKorea</span></p>
+</div>
+</div>
+<div class="col-lg-6">
+<div class="footer-bottom-links">
+<a href="#">개발자 김혜영</a>
+<a href="#">개발자 이지영</a>
+</div>
+<div class="credits">
+</div>
+</div>
+</div>
+</div>
+</div>
 
-      // 1) 추천 점수 가져오기
-      try {
-        const res = await fetch(API_BASE + `/places/recommend/reason/${placeId}`, {
-          headers: { "Authorization": "Bearer " + token },
-        });
+</footer>
 
-        if (!res.ok) return;
-        const data = await res.json();
-        if (!data.is_recommended) return;   
+<!-- Scroll Top -->
+<a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-        box.classList.remove("d-none");
+<!-- Preloader -->
+<div id="preloader"></div>
 
-        const toPercent = v => Math.round((v || 0) * 100);
-        const base = toPercent(data.base);
-        const topic = toPercent(data.topic);
-        const distance = toPercent(data.distance);
-        const final = toPercent(data.final);
+<!-- Vendor JS Files -->
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+<script src="assets/vendor/php-email-form/validate.js"></script>
+<script src="assets/vendor/aos/aos.js"></script>
+<script src="assets/vendor/purecounter/purecounter_vanilla.js"></script>
+<script src="assets/vendor/glightbox/js/glightbox.min.js"></script>
+<script src="assets/vendor/swiper/swiper-bundle.min.js"></script>
+<script src="assets/vendor/drift-zoom/Drift.min.js"></script>
 
-        const setBar = (id, value) => {
-          const el = document.getElementById(id);
-          if (!el) return;
-          el.style.width = value + "%";
-          el.textContent = value + "%";
-        };
+<!-- Main JS File -->
+<script src="assets/js/main.js"></script>
 
-        setBar("score-base", base);
-        setBar("score-topic", topic);
-        setBar("score-distance", distance);
-        document.getElementById("score-final").textContent = final + "%";
-      } catch (e) {
-        console.error("load reason error", e);
-        return; // 점수 실패하면 아래 닉네임 로직도 안 돌게 하고 싶으면 이 줄 유지
-      }
+<script type="module">
+const API_BASE = "";
 
-      // 2) 닉네임으로 제목 바꾸기
-      try {
-        const meRes = await fetch(API_BASE + "/user/profile", {
-          headers: { "Authorization": "Bearer " + token },
-        });
-        if (meRes.ok) {
-          const me = await meRes.json();   // { nickname: "콩순이", ... } 형태
-          if (me.nickname) {
-            const titleEl = document.getElementById("match-title");
-            if (titleEl) {
-              titleEl.textContent = `${me.nickname}님 취향과 매칭`;
-            }
-          }
-        }
-      } catch (e) {
-        console.error("load me error", e);
-      }
-    });
-  </script>
+import { goLoginWithReturn } from "./assets/js/mypage_common.js";
+document.addEventListener("DOMContentLoaded", async () => {
+const placeId = PLACE_ID;
 
-  <!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도-->
+const token = localStorage.getItem("access_token");
+
+
+const btn = document.getElementById("btn-save-to-calendar");
+const dateInput = document.getElementById("visit-date");
+
+if (!btn || !dateInput) {
+console.warn("캘린더 저장 UI를 찾을 수 없습니다.");
+return;
+}
+
+btn.addEventListener("click", async () => {
+console.log("버튼 클릭됨!");
+const dateStr = dateInput.value;
+if (!dateStr) {
+alert("날짜를 선택해 주세요.");
+return;
+}
+
+let token = localStorage.getItem("access_token");
+if (!token || token.length < 10) {
+alert("로그인이 필요합니다.");
+goLoginWithReturn();
+return;
+}
+
+// 상세페이지 타이틀 가져오기
+const titleEl = document.querySelector(".heading-title");
+const title = titleEl ? titleEl.textContent.trim() : "여행 일정";
+
+console.log("저장 시도:", title, dateStr);
+
+const res = await fetch(
+API_BASE + `/calendar/places/${placeId}/events2`,
+{
+method: "POST",
+headers: {
+"Authorization": "Bearer " + token,
+"Content-Type": "application/json",
+},
+body: JSON.stringify({
+title: title,
+visit_date: dateStr,
+}),
+}
+);
+
+if (res.ok) {
+alert("캘린더에 저장했습니다.");
+} else {
+const err = await res.json().catch(() => ({}));
+alert("저장 실패: " + (err.detail || res.status));
+}
+});
+
+
+const box = document.getElementById("recommend-reason");
+if (!box) return;
+
+// 1) 추천 점수 가져오기
+try {
+const res = await fetch(API_BASE + `/places/recommend/reason/${placeId}`, {
+headers: { "Authorization": "Bearer " + token },
+});
+
+if (!res.ok) return;
+const data = await res.json();
+if (!data.is_recommended) return;
+
+box.classList.remove("d-none");
+
+const toPercent = v => Math.round((v || 0) * 100);
+const base = toPercent(data.base);
+const topic = toPercent(data.topic);
+const distance = toPercent(data.distance);
+const final = toPercent(data.final);
+
+const setBar = (id, value) => {
+const el = document.getElementById(id);
+if (!el) return;
+el.style.width = value + "%";
+el.textContent = value + "%";
+};
+
+setBar("score-base", base);
+setBar("score-topic", topic);
+setBar("score-distance", distance);
+document.getElementById("score-final").textContent = final + "%";
+} catch (e) {
+console.error("load reason error", e);
+return; // 점수 실패하면 아래 닉네임 로직도 안 돌게 하고 싶으면 이 줄 유지
+}
+
+// 2) 닉네임으로 제목 바꾸기
+try {
+const meRes = await fetch(API_BASE + "/user/profile", {
+headers: { "Authorization": "Bearer " + token },
+});
+if (meRes.ok) {
+const me = await meRes.json(); // { nickname: "콩순이", ... } 형태
+if (me.nickname) {
+const titleEl = document.getElementById("match-title");
+if (titleEl) {
+titleEl.textContent = `${me.nickname}님 취향과 매칭`;
+}
+}
+}
+} catch (e) {
+console.error("load me error", e);
+}
+});
+</script>
+
+<!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도--><!-- 지도-->
 <!-- 지도 스크립트 전체 교체 -->
 <script>
 (function() {
-  function initMap() {
-    console.log('⏳ Kakao SDK 대기 중...');
-    
-    if (typeof kakao === 'undefined' || !kakao.maps) {
-      setTimeout(initMap, 500);
-      return;
-    }
-    
-    var container = document.getElementById('kakaomap');
-    if (!container) {
-      console.error('❌ #kakaomap div를 찾을 수 없습니다');
-      return;
-    }
-    
-    var centerLatLng = new kakao.maps.LatLng({{ place.mapy|default(37.566826) }}, {{ place.mapx|default(126.9786567) }});
-    var map = new kakao.maps.Map(container, {
-      center: centerLatLng,
-      level: 10
-    });
-    
-    // 메인 마커 이미지 (기본 별 아이콘)
-    var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
-    var imageSize = new kakao.maps.Size(24, 35);
-    var imageOption = {offset: new kakao.maps.Point(12, 35)};
-    var mainMarkerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
-    
-    var mainMarker = new kakao.maps.Marker({
-      position: centerLatLng,
-      map: map,
-      title: '{{ place.title }}',
-      image: mainMarkerImage,
-      zIndex: 999
-    });
-    
-    var mainInfowindow = new kakao.maps.InfoWindow({
-      content: `
-        <div style="padding:16px; min-width:180px; text-align:left; border-radius:8px; background:#FFF8E1; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-          <h6 style="margin:0 0 8px 0; font-weight:600; color:#D84315; font-size:15px; border-bottom:2px solid #FF9800; padding-bottom:5px;">📍 현재 위치</h6>
-          <p style="margin:0 0 12px 0; font-size:13px; color:#666; line-height:1.4;">{{ place.addr1 }}</p>
-        </div>
-      `,
-      zIndex: 10000
-    });
-    
-    var mainInfowindowOpened = false;
-    kakao.maps.event.addListener(mainMarker, 'click', function() {
-      if (mainInfowindowOpened) {
-        mainInfowindow.close();
-        mainInfowindowOpened = false;
-      } else {
-        mainInfowindow.open(map, mainMarker);
-        mainInfowindowOpened = true;
-      }
-    });
-    
-    var nearbyPlaces = {{ nearby_places | tojson | safe }};
-    console.log('📍 주변 관광지:', nearbyPlaces.length, '개');
-    
-    var nearbyInfoWindows = [];
-    var nearbyInfoOpenedFlags = [];
-    var bounds = new kakao.maps.LatLngBounds();
-    bounds.extend(centerLatLng);
-    
-    if (nearbyPlaces && nearbyPlaces.length > 0) {
-      nearbyPlaces.forEach(function(p, idx) {
-        if (!p.mapx || !p.mapy || !p.title) return;
-        
-        var pos = new kakao.maps.LatLng(p.mapy, p.mapx);
-        bounds.extend(pos);
-        
-        var nearbyMarker = new kakao.maps.Marker({
-          position: pos,
-          map: map,
-          title: p.title,
-          zIndex: 1
-        });
-        
-        var nearbyInfowindow = new kakao.maps.InfoWindow({
-          content: `
-            <div style="padding:12px; min-width:150px; border-radius:8px; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
-              <h6 style="margin:0 0 5px 0; font-size:14px;">${p.title}</h6>
-              <p style="margin:0 0 8px 0; font-size:12px; color:#666;">${p.addr1 || ''}</p>
-              <a href="/places/detail/${p.contentid}" style="padding:4px 8px; background:#007bff; color:white; text-decoration:none; font-size:11px; border-radius:4px;">상세보기</a>
-            </div>`
-            ,zIndex: 999
-        });
-        
-        nearbyInfoWindows.push(nearbyInfowindow);
-        nearbyInfoOpenedFlags.push(false);
-        
-        kakao.maps.event.addListener(nearbyMarker, 'click', function() {
-          if (nearbyInfoOpenedFlags[idx]) {
-            nearbyInfowindow.close();
-            nearbyInfoOpenedFlags[idx] = false;
-          } else {
-            nearbyInfowindow.open(map, nearbyMarker);
-            nearbyInfoOpenedFlags[idx] = true;
-          }
-        });
-      });
-      
-      map.setBounds(bounds);
-    }
-    
-    // 지도 클릭 시 모든 인포윈도우 닫기
-    kakao.maps.event.addListener(map, 'click', function() {
-      if (mainInfowindowOpened) {
-        mainInfowindow.close();
-        mainInfowindowOpened = false;
-      }
-      nearbyInfoWindows.forEach(function(iw, idx) {
-        if (nearbyInfoOpenedFlags[idx]) {
-          iw.close();
-          nearbyInfoOpenedFlags[idx] = false;
-        }
-      });
-    });
-    
-    console.log('🎉 마커 및 인포윈도우 토글 기능 완전 로드 성공!');
-  }
-  
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', () => setTimeout(initMap, 500));
-  } else {
-    setTimeout(initMap, 500);
-  }
+function initMap() {
+console.log('⏳ Kakao SDK 대기 중...');
+
+if (typeof kakao === 'undefined' || !kakao.maps) {
+setTimeout(initMap, 500);
+return;
+}
+
+var container = document.getElementById('kakaomap');
+if (!container) {
+console.error('❌ #kakaomap div를 찾을 수 없습니다');
+return;
+}
+
+var centerLatLng = new kakao.maps.LatLng({{ place.mapy|default(37.566826) }}, {{ place.mapx|default(126.9786567) }});
+var map = new kakao.maps.Map(container, {
+center: centerLatLng,
+level: 10
+});
+
+// 메인 마커 이미지 (기본 별 아이콘)
+var imageSrc = "https://t1.daumcdn.net/localimg/localimages/07/mapapidoc/markerStar.png";
+var imageSize = new kakao.maps.Size(24, 35);
+var imageOption = {offset: new kakao.maps.Point(12, 35)};
+var mainMarkerImage = new kakao.maps.MarkerImage(imageSrc, imageSize, imageOption);
+
+var mainMarker = new kakao.maps.Marker({
+position: centerLatLng,
+map: map,
+title: '{{ place.title }}',
+image: mainMarkerImage,
+zIndex: 999
+});
+
+var mainInfowindow = new kakao.maps.InfoWindow({
+content: `
+<div style="padding:16px; min-width:180px; text-align:left; border-radius:8px; background:#FFF8E1; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+<h6 style="margin:0 0 8px 0; font-weight:600; color:#D84315; font-size:15px; border-bottom:2px solid #FF9800; padding-bottom:5px;">📍 현재 위치</h6>
+<p style="margin:0 0 12px 0; font-size:13px; color:#666; line-height:1.4;">{{ place.addr1 }}</p>
+</div>
+`,
+zIndex: 10000
+});
+
+var mainInfowindowOpened = false;
+kakao.maps.event.addListener(mainMarker, 'click', function() {
+if (mainInfowindowOpened) {
+mainInfowindow.close();
+mainInfowindowOpened = false;
+} else {
+mainInfowindow.open(map, mainMarker);
+mainInfowindowOpened = true;
+}
+});
+
+var nearbyPlaces = {{ nearby_places | tojson | safe }};
+console.log('📍 주변 관광지:', nearbyPlaces.length, '개');
+
+var nearbyInfoWindows = [];
+var nearbyInfoOpenedFlags = [];
+var bounds = new kakao.maps.LatLngBounds();
+bounds.extend(centerLatLng);
+
+if (nearbyPlaces && nearbyPlaces.length > 0) {
+nearbyPlaces.forEach(function(p, idx) {
+if (!p.mapx || !p.mapy || !p.title) return;
+
+var pos = new kakao.maps.LatLng(p.mapy, p.mapx);
+bounds.extend(pos);
+
+var nearbyMarker = new kakao.maps.Marker({
+position: pos,
+map: map,
+title: p.title,
+zIndex: 1
+});
+
+var nearbyInfowindow = new kakao.maps.InfoWindow({
+content: `
+<div style="padding:12px; min-width:150px; border-radius:8px; background:white; box-shadow:0 2px 10px rgba(0,0,0,0.1);">
+<h6 style="margin:0 0 5px 0; font-size:14px;">${p.title}</h6>
+<p style="margin:0 0 8px 0; font-size:12px; color:#666;">${p.addr1 || ''}</p>
+<a href="/places/detail/${p.contentid}" style="padding:4px 8px; background:#007bff; color:white; text-decoration:none; font-size:11px; border-radius:4px;">상세보기</a>
+</div>`
+,zIndex: 999
+});
+
+nearbyInfoWindows.push(nearbyInfowindow);
+nearbyInfoOpenedFlags.push(false);
+
+kakao.maps.event.addListener(nearbyMarker, 'click', function() {
+if (nearbyInfoOpenedFlags[idx]) {
+nearbyInfowindow.close();
+nearbyInfoOpenedFlags[idx] = false;
+} else {
+nearbyInfowindow.open(map, nearbyMarker);
+nearbyInfoOpenedFlags[idx] = true;
+}
+});
+});
+
+map.setBounds(bounds);
+}
+
+// 지도 클릭 시 모든 인포윈도우 닫기
+kakao.maps.event.addListener(map, 'click', function() {
+if (mainInfowindowOpened) {
+mainInfowindow.close();
+mainInfowindowOpened = false;
+}
+nearbyInfoWindows.forEach(function(iw, idx) {
+if (nearbyInfoOpenedFlags[idx]) {
+iw.close();
+nearbyInfoOpenedFlags[idx] = false;
+}
+});
+});
+
+console.log('🎉 마커 및 인포윈도우 토글 기능 완전 로드 성공!');
+}
+
+if (document.readyState === 'loading') {
+document.addEventListener('DOMContentLoaded', () => setTimeout(initMap, 500));
+} else {
+setTimeout(initMap, 500);
+}
 })();
 </script>
 <script type="module">
-  import { initHeader } from "/assets/js/header.js";
-  import { goLoginWithReturn } from "./assets/js/mypage_common.js";
-  window.addEventListener("DOMContentLoaded", async () => {
-    await initHeader();                 
-  });
+import { initHeader } from "/assets/js/header.js";
+import { goLoginWithReturn } from "./assets/js/mypage_common.js";
+window.addEventListener("DOMContentLoaded", async () => {
+await initHeader();
+});
 </script>
 
 <!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 -->
 <script>
 document.addEventListener("DOMContentLoaded", function() {
-  const token = localStorage.getItem("access_token");
-  
-  let comments = [];
-  let currentUser = null;
-  
-  initComments();
-  
-  async function initComments() {
-    await loadComments();
-    document.getElementById("comment-text").addEventListener("input", onCommentInput);
-    document.getElementById("submit-comment").addEventListener("click", submitComment);
+const token = localStorage.getItem("access_token");
 
-    // token 새로 가져오기 (전역 변수 말고!)
-    const currentToken = localStorage.getItem("access_token");
-    const btn = document.getElementById("submit-comment");
+let comments = [];
+let currentUser = null;
 
-    if (currentToken) {
-      await loadUserProfile();
-      btn.innerHTML = `<i class="bi bi-send"></i> 작성하기`;
-      btn.disabled = false;  // 로그인시 버튼 활성화!
-    } else {
-      btn.disabled = true;
-      btn.innerHTML = `<i class="bi bi-lock"></i> 로그인 후 작성`;
-    }
-  }
+initComments();
 
-  
-  
-  async function loadUserProfile() {
-    try {
-      const res = await fetch(API_BASE + "/user/profile", {
-        headers: { "Authorization": "Bearer " + token }
-      });
-      if (res.ok) currentUser = await res.json();
-    } catch (e) {
-      console.error("프로필 로드 실패:", e);
-    }
-  }
-  
-  async function loadComments() {
-    try {
+async function initComments() {
+await loadComments();
+document.getElementById("comment-text").addEventListener("input", onCommentInput);
+document.getElementById("submit-comment").addEventListener("click", submitComment);
 
-      const headers = {};
-      if (token) {
-        headers["Authorization"] = "Bearer " + token;
-      }
+// token 새로 가져오기 (전역 변수 말고!)
+const currentToken = localStorage.getItem("access_token");
+const btn = document.getElementById("submit-comment");
 
-    const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
-      headers,
-    });
+if (currentToken) {
+await loadUserProfile();
+btn.innerHTML = `<i class="bi bi-send"></i> 작성하기`;
+btn.disabled = false; // 로그인시 버튼 활성화!
+} else {
+btn.disabled = true;
+btn.innerHTML = `<i class="bi bi-lock"></i> 로그인 후 작성`;
+}
+}
 
-    if (res.ok) {
-        comments = await res.json();
-        renderComments();
-      }
-    } catch (e) {
-      console.error("댓글 로드 실패:", e);
-    }
-  }
-  
-  function onCommentInput(e) {
-    const text = e.target.value;
-    const count = text.length;
-    document.getElementById("char-count").textContent = count;
-    
-    const btn = document.getElementById("submit-comment");
-    const token = localStorage.getItem("access_token");
-    
-    if (count > 0 && count <= 500 && token) {  // 🔥 토큰 있어야만 활성화
-      btn.disabled = false;
-      btn.innerHTML = `<i class="bi bi-send"></i> 댓글 작성`;
-    } else {
-      btn.disabled = true;
-      btn.innerHTML = token 
-        ? `<i class="bi bi-send"></i> ${count > 500 ? '너무 깁니다' : '작성하기'}`
-        : `<i class="bi bi-lock"></i> 로그인 후 작성`;
-    }
-  }
-  
-  async function submitComment() {
-    const text = document.getElementById("comment-text").value.trim();
-    if (!text) return;
-    
-    const token = localStorage.getItem("access_token");
-    if (!token) {
-      alert("로그인이 필요합니다.");
-      window.goLoginWithReturn();
-      return;
-    }
 
-    const btn = document.getElementById("submit-comment");
-    const originalHTML = btn.innerHTML;
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>등록중...`;
-    
-    try {
-      const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
-        method: "POST",
-        headers: {
-          "Authorization": "Bearer " + token,
-          "Content-Type": "application/json"
-        },
-        body: JSON.stringify({ content: text })
-      });
 
-      if (res.ok) {
-        document.getElementById("comment-text").value = "";
-        await loadComments(); // 재로드
-      } else {
-        alert("댓글 등록 실패");
-      }
-    } catch (e) {
-      console.error(e);
-      alert("네트워크 오류");
-    } finally {
-      btn.innerHTML = originalHTML;
-      btn.disabled = false;
-    }
-  }
-  
-  function renderComments() {
-    const container = document.getElementById("comments-container");
-    const countEl = document.getElementById("comment-count");
-    
-    countEl.textContent = comments.length;
-    
-    if (comments.length === 0) {
-      container.innerHTML = `
-        <div class="text-center py-5">
-          <i class="bi bi-chat-square-text fs-1 text-muted mb-3"></i>
-          <h5 class="text-muted">첫 번째 댓글을 남겨보세요!</h5>
-        </div>
-      `;
-      return;
-    }
-    
-    container.innerHTML = comments.map(c => createCommentHTML(c)).join("");
-  }
-  
-  function createCommentHTML(comment) {
-    const isMine = currentUser && comment.user_id === currentUser.id;
-    const timeAgo = formatTimeAgo(comment.created_at);
-    
-    return `
-      <div class="comment-item">
-        <div class="comment-header">
-          <div class="comment-avatar">${getInitials(comment.nickname)}</div>
-          <div class="comment-meta">
-            <div class="comment-author">${comment.nickname}</div>
-            <div class="comment-time">${timeAgo}</div>
-          </div>
-          ${isMine ? `
-            <div class="comment-actions">
-              <button class="btn-comment-action" onclick="deleteComment(${comment.id})">
-                <i class="bi bi-trash3 me-1"></i>삭제
-              </button>
-            </div>
-          ` : ''}
-        </div>
-        <div class="comment-content">${comment.content}</div>
-      </div>
-    `;
-  }
-  
-  function getInitials(name) {
-    return name.charAt(0);
-  }
-  
-  function formatTimeAgo(dateStr) {
-    const now = new Date();
-    const date = new Date(dateStr);
+async function loadUserProfile() {
+try {
+const res = await fetch(API_BASE + "/user/profile", {
+headers: { "Authorization": "Bearer " + token }
+});
+if (res.ok) currentUser = await res.json();
+} catch (e) {
+console.error("프로필 로드 실패:", e);
+}
+}
 
-     // UTC → KST 변환 (+9시간)
-    date.setHours(date.getHours() + 9);
-    const diff = now - date;
-    
-    if (diff < 60 * 1000) return "방금 전";
-    if (diff < 60 * 60 * 1000) return `${Math.floor(diff / 60000)}분 전`;
-    if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / 3600000)}시간 전`;
-    return `${Math.floor(diff / 86400000)}일 전`;
-  }
-  
-  window.deleteComment = async (commentId) => {
-    if (!confirm("댓글을 삭제하시겠습니까?")) return;
-    
-    try {
-      const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments/${commentId}`, {
-        method: "DELETE",
-        headers: { "Authorization": "Bearer " + token }
-      });
+async function loadComments() {
+try {
 
-      if (res.ok) {
-        await loadComments();
-      } else {
-        alert("삭제 실패");
-      }
-    } catch (e) {
-      alert("네트워크 오류");
-    }
-  };
+const headers = {};
+if (token) {
+headers["Authorization"] = "Bearer " + token;
+}
+
+const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
+headers,
+});
+
+if (res.ok) {
+comments = await res.json();
+renderComments();
+}
+} catch (e) {
+console.error("댓글 로드 실패:", e);
+}
+}
+
+function onCommentInput(e) {
+const text = e.target.value;
+const count = text.length;
+document.getElementById("char-count").textContent = count;
+
+const btn = document.getElementById("submit-comment");
+const token = localStorage.getItem("access_token");
+
+if (count > 0 && count <= 500 && token) { // 🔥 토큰 있어야만 활성화
+btn.disabled = false;
+btn.innerHTML = `<i class="bi bi-send"></i> 댓글 작성`;
+} else {
+btn.disabled = true;
+btn.innerHTML = token
+? `<i class="bi bi-send"></i> ${count > 500 ? '너무 깁니다' : '작성하기'}`
+: `<i class="bi bi-lock"></i> 로그인 후 작성`;
+}
+}
+
+async function submitComment() {
+const text = document.getElementById("comment-text").value.trim();
+if (!text) return;
+
+const token = localStorage.getItem("access_token");
+if (!token) {
+alert("로그인이 필요합니다.");
+window.goLoginWithReturn();
+return;
+}
+
+const btn = document.getElementById("submit-comment");
+const originalHTML = btn.innerHTML;
+btn.disabled = true;
+btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>등록중...`;
+
+try {
+const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
+method: "POST",
+headers: {
+"Authorization": "Bearer " + token,
+"Content-Type": "application/json"
+},
+body: JSON.stringify({ content: text })
+});
+
+if (res.ok) {
+document.getElementById("comment-text").value = "";
+await loadComments(); // 재로드
+} else {
+alert("댓글 등록 실패");
+}
+} catch (e) {
+console.error(e);
+alert("네트워크 오류");
+} finally {
+btn.innerHTML = originalHTML;
+btn.disabled = false;
+}
+}
+
+function renderComments() {
+const container = document.getElementById("comments-container");
+const countEl = document.getElementById("comment-count");
+
+countEl.textContent = comments.length;
+
+if (comments.length === 0) {
+container.innerHTML = `
+<div class="text-center py-5">
+<i class="bi bi-chat-square-text fs-1 text-muted mb-3"></i>
+<h5 class="text-muted">첫 번째 댓글을 남겨보세요!</h5>
+</div>
+`;
+return;
+}
+
+container.innerHTML = comments.map(c => createCommentHTML(c)).join("");
+}
+
+function createCommentHTML(comment) {
+const isMine = currentUser && comment.user_id === currentUser.id;
+const timeAgo = formatTimeAgo(comment.created_at);
+
+return `
+<div class="comment-item">
+<div class="comment-header">
+<div class="comment-avatar">${getInitials(comment.nickname)}</div>
+<div class="comment-meta">
+<div class="comment-author">${comment.nickname}</div>
+<div class="comment-time">${timeAgo}</div>
+</div>
+${isMine ? `
+<div class="comment-actions">
+<button class="btn-comment-action" onclick="deleteComment(${comment.id})">
+<i class="bi bi-trash3 me-1"></i>삭제
+</button>
+</div>
+` : ''}
+</div>
+<div class="comment-content">${comment.content}</div>
+</div>
+`;
+}
+
+function getInitials(name) {
+return name.charAt(0);
+}
+
+function formatTimeAgo(dateStr) {
+const now = new Date();
+const date = new Date(dateStr);
+
+// UTC → KST 변환 (+9시간)
+date.setHours(date.getHours() + 9);
+const diff = now - date;
+
+if (diff < 60 * 1000) return "방금 전";
+if (diff < 60 * 60 * 1000) return `${Math.floor(diff / 60000)}분 전`;
+if (diff < 24 * 60 * 60 * 1000) return `${Math.floor(diff / 3600000)}시간 전`;
+return `${Math.floor(diff / 86400000)}일 전`;
+}
+
+window.deleteComment = async (commentId) => {
+if (!confirm("댓글을 삭제하시겠습니까?")) return;
+
+try {
+const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments/${commentId}`, {
+method: "DELETE",
+headers: { "Authorization": "Bearer " + token }
+});
+
+if (res.ok) {
+await loadComments();
+} else {
+alert("삭제 실패");
+}
+} catch (e) {
+alert("네트워크 오류");
+}
+};
 });
 </script>
 </body>
