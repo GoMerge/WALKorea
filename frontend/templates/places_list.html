@@ -485,11 +485,10 @@
       section.classList.remove("d-none");
       listEl.innerHTML = "";
 
-      // 닉네임 한 번 가져오기
-      let nickname = "내";
-      try {
-        const meRes = await fetch("/user/profile", {
-          headers: { "Authorization": "Bearer " + token },
+
+        // 3) 취향 추천 리스트 불러오기
+        const res = await fetch("/places/recommend", {
+    headers: { "Authorization": "Bearer " + token },
         });
         if (meRes.ok) {
           const me = await meRes.json();
