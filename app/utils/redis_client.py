@@ -5,11 +5,9 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# 배포환경 자동 감지
-IS_DOCKER = os.getenv("IS_DOCKER", "false").lower() == "true"
-REDIS_HOST = os.getenv("REDIS_HOST", "redis" if IS_DOCKER else "localhost")
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")  # 서버면 redis, 로컬이면 localhost
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_DB = int(os.getenv("REDIS_DB", "0"))
+REDIS_DB   = int(os.getenv("REDIS_DB", "0"))
 
 redis_client = redis.from_url(
     f"redis://{REDIS_HOST}:{REDIS_PORT}",
@@ -28,3 +26,4 @@ async def get_cached(key: str):
     return None
 
 async def delete_cached(key: str):
+    await redis_client.delete(key)
