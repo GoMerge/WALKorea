@@ -442,7 +442,7 @@
     }
   });
 
-  (async () => {
+   (async () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;  // 비로그인 사용자는 추천/좋아요 상태 둘 다 스킵
 
@@ -538,6 +538,10 @@
         `;
         listEl.appendChild(card);
       });
+    } catch (e) {
+      console.error("recommend load error", e);
+    }
+  })();
     } catch (e) {
       console.error("recommend load error", e);
     }
