@@ -2,6 +2,8 @@ let notifCount = 0;
 let ws = null;
 let currentToken = null;
 
+const API_BASE = "";
+
 // 🔥 1. 배지 업데이트 함수 개선 (핵심!)
 function updateBadge(count = notifCount) {
   const badge = document.getElementById("notif-badge");
@@ -28,7 +30,7 @@ export async function loadNotifications() {
   currentToken = token;
   
   try {
-    const res = await fetch("http://127.0.0.1:8000/notifications/", {
+    const res = await fetch(API_BASE + "/notifications/", {
       headers: { "Authorization": `Bearer ${token}` }
     });
     
@@ -135,7 +137,7 @@ export function renderNotificationItem(container, n) {
 
   delBtn.onclick = async () => {
     if (!currentToken) return;
-    const res = await fetch(`http://127.0.0.1:8000/notifications/${n.id}`, {
+    const res = await fetch(`${API_BASE}/notifications/${n.id}`, {
       method: "DELETE",
       headers: { "Authorization": `Bearer ${currentToken}` }
     });
@@ -163,7 +165,7 @@ export async function deleteAllNotifications() {
   
   if (!confirm('모든 알림을 삭제하시겠습니까?')) return;
   
-  const res = await fetch("http://127.0.0.1:8000/notifications/", {
+  const res = await fetch(API_BASE + "/notifications/", {
     method: "DELETE",
     headers: { "Authorization": `Bearer ${currentToken}` }
   });

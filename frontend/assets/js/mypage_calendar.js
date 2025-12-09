@@ -1,6 +1,8 @@
 import { loadProfileWeather } from "./mypage_common.js";
 import { requireLoginForMypage, requireCompletedProfile } from "/assets/js/mypage_common.js";
 
+const API_BASE = "";
+
 let currentYear, currentMonth;
 let eventsCache = {};
 let userBaseAddress = null;
@@ -42,7 +44,7 @@ async function initCalendar() {
     renderCalendar();
  }
 async function loadCalendars() { 
-    const res = await apiFetch("http://127.0.0.1:8000/calendar/", {
+    const res = await apiFetch(API_BASE + "/calendar/", {
       headers: { "Authorization": "Bearer " + getToken() }
     });
     if (!res) return;       
@@ -62,7 +64,7 @@ async function ensureUserCalendarId() {
   if (userCalendarId) return userCalendarId;
 
   // 1) 내 캘린더 목록 조회
-  const res = await fetch("http://127.0.0.1:8000/calendar/", {
+  const res = await fetch(API_BASE + "/calendar/", {
     headers: { "Authorization": "Bearer " + token }
   });
 
@@ -75,7 +77,7 @@ async function ensureUserCalendarId() {
 
   // 2) 없으면 자동으로 하나 생성
   if (!list || list.length === 0) {
-    const createRes = await fetch("http://127.0.0.1:8000/calendar/", {
+    const createRes = await fetch(API_BASE + "/calendar/", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -106,7 +108,7 @@ async function fetchWeatherRecommendations(events) {
   if (!token) return {};
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/calendar/weather/recommend", {
+    const res = await fetch(API_BASE + "/calendar/weather/recommend", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -136,7 +138,7 @@ async function fetchWeatherRecommendations(events) {
 
 async function loadEventsToCalendar(calId) { 
     const token = getToken();
-    const res = await fetch(`http://127.0.0.1:8000/calendar/${calId}/events`, {
+    const res = await fetch( API_BASE + `/calendar/${calId}/events`, {
       headers: { "Authorization": "Bearer " + token }
     });
     if (!res.ok) return;
@@ -298,7 +300,7 @@ async function loadEventsToCalendar(calId) {
       if (!token) return;      
 
       const resFest = await fetch(
-        `http://127.0.0.1:8000/calendar/festivals?year=${currentYear}&month=${currentMonth+1}`,
+         API_BASE + `/calendar/festivals?year=${currentYear}&month=${currentMonth+1}`,
         {
           headers: { "Authorization": "Bearer " + token }  
         }
@@ -405,7 +407,7 @@ async function setupUserRegion() {
   const token = getToken();
   if (!token) return;
 
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+  const res = await fetch(API_BASE + "/user/profile", {
     headers: { Authorization: "Bearer " + token },
   });
   
@@ -437,7 +439,7 @@ async function checkIncomingShares() {
     const token = getToken();
     if (!token) return;
 
-    const res = await fetch("http://127.0.0.1:8000/calendar/share/incoming", {
+    const res = await fetch(API_BASE + "/calendar/share/incoming", {
       headers: { "Authorization": "Bearer " + token }
     });
     if (!res.ok) return;
@@ -448,7 +450,7 @@ async function checkIncomingShares() {
     }
 }
 async function fetchRegionSuggestions(q) {
-    const res = await fetch(`http://127.0.0.1:8000/address/search?q=${encodeURIComponent(q)}`);
+    const res = await fetch( API_BASE + `/address/search?q=${encodeURIComponent(q)}`);
     if (!res.ok) {
       suggestBox.style.display = "none";
       suggestBox.innerHTML = "";
@@ -739,10 +741,10 @@ document.getElementById("event-form").addEventListener("submit", async (e) => {
   const token = getToken();
   let url, method;
   if (editingId) {
-    url = `http://127.0.0.1:8000/calendar/events/${editingId}`;
+    url = API_BASE + `/calendar/events/${editingId}`;
     method = "PUT";
   } else {
-    url = `http://127.0.0.1:8000/calendar/${calId}/events`;
+    url = API_BASE + `/calendar/${calId}/events`;
     method = "POST";
   }
 
@@ -809,7 +811,7 @@ async function deleteEvent(ev) {
     if (!confirm(`'${ev.title}' 일정을 삭제할까요?`)) return;
 
     const token = getToken();
-    const res = await fetch(`http://127.0.0.1:8000/calendar/events/${ev.id}`, {
+    const res = await fetch(API_BASE + `/calendar/events/${ev.id}`, {
       method: "DELETE",
       headers: { "Authorization": "Bearer " + token }
     });
@@ -857,7 +859,7 @@ let shareSourceEvent = null;
 async function loadFollowingForShare() {
     const token = getToken();
     if (!token) return;
-    const res = await fetch("http://127.0.0.1:8000/follow/following", {
+    const res = await fetch(API_BASE + "/follow/following", {
       headers: { "Authorization": "Bearer " + token }
     });
     shareTargetFollowing = res.ok ? await res.json() : [];
@@ -905,7 +907,7 @@ document.getElementById("btn-share-confirm").onclick = async () => {
     if (!targetId || !shareSourceEvent) return;
 
     const token = getToken();
-    const res = await fetch("http://127.0.0.1:8000/calendar/share/request", {
+    const res = await fetch(API_BASE + "/calendar/share/request", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -929,7 +931,7 @@ document.getElementById("btn-share-confirm").onclick = async () => {
 
 async function respondShare(requestId, accept) {
     const token = getToken();
-    const res = await fetch(`http://127.0.0.1:8000/calendar/share/${requestId}/respond`, {
+    const res = await fetch(API_BASE + `/calendar/share/${requestId}/respond`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

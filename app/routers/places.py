@@ -7,7 +7,7 @@ from app.services.places import (
     get_all_places,
     fetch_detail_images,
     fetch_detail_info,
-    build_places_context,
+    build_places_context
 )
 from app.schemas.places import PlaceResponse
 from typing import List

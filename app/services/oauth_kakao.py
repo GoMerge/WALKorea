@@ -8,12 +8,14 @@ from urllib.parse import urlencode
 from app.models.user import User
 from app.utils.auth import create_access_token, create_refresh_token, hash_refresh_token
 
+BACKEND_BASE_URL = "https://walkorea.inhatc.com"
+
 KAKAO_CLIENT_ID = os.getenv("KAKAO_CLIENT_ID")
 KAKAO_CLIENT_SECRET = os.getenv("KAKAO_CLIENT_SECRET")
-KAKAO_REDIRECT_URI = "http://127.0.0.1:8000/auth/oauth/kakao/callback"
+KAKAO_REDIRECT_URI = f"{BACKEND_BASE_URL}/auth/oauth/kakao/callback"
 
-REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile"
-REDIRECT_MAIN = "http://127.0.0.1:8000/"
+REDIRECT_PROFILE = f"{BACKEND_BASE_URL}/set-profile"
+REDIRECT_MAIN = f"{BACKEND_BASE_URL}/"
 
 
 def get_kakao_login_url() -> dict:

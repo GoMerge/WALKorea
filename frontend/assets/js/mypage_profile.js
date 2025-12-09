@@ -2,6 +2,8 @@ import { initHeader } from "/assets/js/header.js";
 import { setupHeaderAndProfile, loadProfileWeather } from "/assets/js/mypage_common.js";
 import { goLoginWithReturn } from "./mypage_common.js";
 
+const API_BASE = "";
+
 function handleUnauthorized(res) {
   if (res.status === 401) {
     localStorage.removeItem("access_token");
@@ -18,7 +20,7 @@ function handleUnauthorized(res) {
 }
 
 async function loadProfile(token) {
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+  const res = await fetch(API_BASE + "/user/profile", {
     headers: { "Authorization": "Bearer " + token }
   });
   if (!res.ok) return;
@@ -47,8 +49,6 @@ async function loadProfile(token) {
   document.getElementById("edit-region-label").value = data.region_name || "";
   document.getElementById("edit-region-id").value    = data.region_id   || "";
 }
-
-const API_BASE = "http://127.0.0.1:8000";
 
 // access_token 없으면 로그인으로 돌리고, 있으면 전체 초기화
 export async function initProfilePage() {
@@ -155,7 +155,7 @@ async function onSubmitProfile(e, token) {
     region_id: document.getElementById("edit-region-id").value || null,
   };
 
-  const res = await fetch("http://127.0.0.1:8000/user/profile", {
+  const res = await fetch(API_BASE + "/user/profile", {
     method: "PUT",  
     headers: {
       "Content-Type": "application/json",
@@ -312,7 +312,7 @@ let selectedDong = null;
 let selectedRegionId = null;
 
 async function loadSidos() {
-  const res = await fetch("http://127.0.0.1:8000/regions/sidos");
+  const res = await fetch(API_BASE + "/regions/sidos");
   if (!res.ok) {
     console.error("sidos load fail", res.status);
     return;
@@ -338,7 +338,7 @@ async function loadSidos() {
 }
 
 async function loadGuguns(sidoId) {
-  const res = await fetch(`http://127.0.0.1:8000/regions/guguns/${sidoId}`);
+  const res = await fetch(API_BASE + `/regions/guguns/${sidoId}`);
   if (!res.ok) return;
   const list = await res.json();
   const ul = document.getElementById("sigungu-list");
@@ -359,7 +359,7 @@ async function loadGuguns(sidoId) {
 }
 
 async function loadDongs(gugunId) {
-  const res = await fetch(`http://127.0.0.1:8000/regions/dongs/${gugunId}`);
+  const res = await fetch(API_BASE + `/regions/dongs/${gugunId}`);
   if (!res.ok) return;
   const list = await res.json();
   const ul = document.getElementById("dong-list");
@@ -410,7 +410,7 @@ async function loadNotifications() {
   if (!token) return;
 
   try {
-    const res = await fetch("http://127.0.0.1:8000/notifications/", {
+    const res = await fetch(API_BASE + "/notifications/", {
       headers: { "Authorization": "Bearer " + token }
     });
     if (!res.ok) return;

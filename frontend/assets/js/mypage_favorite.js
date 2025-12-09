@@ -1,6 +1,8 @@
 import { initHeader } from "./header.js";
 import { setupHeaderAndProfile, loadProfileWeather } from "./mypage_common.js";
 
+const API_BASE = "";
+
 document.addEventListener("DOMContentLoaded", async () => {
   await initHeader();
   const token = localStorage.getItem("access_token");
@@ -18,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadFavorites() {
     try {
-      const res = await fetch("http://127.0.0.1:8000/favorites/places", {
+      const res = await fetch(API_BASE + "/favorites/places", {
         headers: { "Authorization": "Bearer " + token }
       });
       if (!res.ok) throw new Error("failed");
@@ -77,7 +79,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
     const placeId = btn.dataset.placeId;
     try {
-      const res = await fetch(`http://127.0.0.1:8000/favorites/places/${placeId}`, {
+      const res = await fetch(API_BASE + `/favorites/places/${placeId}`, {
         method: "POST",
         headers: { "Authorization": "Bearer " + token }
       });

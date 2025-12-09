@@ -14,10 +14,13 @@ from app.utils.auth import (
 
 GOOGLE_CLIENT_ID = os.getenv("GOOGLE_CLIENT_ID")
 GOOGLE_CLIENT_SECRET = os.getenv("GOOGLE_CLIENT_SECRET")
-REDIRECT_URI = "http://127.0.0.1:8000/auth/oauth/google/callback"
 
-REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile"
-REDIRECT_MAIN = "http://127.0.0.1:8000/"
+BACKEND_BASE_URL = "https://walkorea.inhatc.com" 
+
+REDIRECT_URI    = f"{BACKEND_BASE_URL}/auth/oauth/google/callback"
+REDIRECT_PROFILE = f"{BACKEND_BASE_URL}/set-profile"
+REDIRECT_MAIN    = f"{BACKEND_BASE_URL}/"
+
 
 
 def get_google_login_url() -> dict:

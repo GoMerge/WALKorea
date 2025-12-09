@@ -399,6 +399,8 @@
 
   <!-- 통합 헤더 제어 JS -->
   <script type="module">
+    const API_BASE = "";
+
     import { loadNotifications, initWebsocket, deleteAllNotifications } from '/static/js/notifications.js';
 
     async function initHeader() {
@@ -411,7 +413,7 @@
         
         try {
           // 닉네임 가져오기
-          const res = await fetch("http://127.0.0.1:8000/user/profile", {
+          const res = await fetch(API_BASE + "/user/profile", {
             headers: { "Authorization": "Bearer " + token }
           });
           if (res.ok) {
@@ -482,7 +484,7 @@
       }
 
       try {
-        const res = await fetch(`http://127.0.0.1:8000/favorites/places/${placeId}`, {
+        const res = await fetch(API_BASE + `/favorites/places/${placeId}`, {
           method: "POST",
           headers: { "Authorization": "Bearer " + token },
         });
@@ -514,7 +516,7 @@
 
       try {
         // 1) 내가 좋아요한 place_id 들 가져오기
-        const favRes = await fetch("http://127.0.0.1:8000/favorites/places/ids", {
+        const favRes = await fetch(API_BASE + "/favorites/places/ids", {
           headers: { "Authorization": "Bearer " + token },
         });
         const likedSet = favRes.ok
@@ -535,7 +537,7 @@
         });
 
         // 3) 취향 추천 리스트 불러오기
-        const res = await fetch("http://127.0.0.1:8000/places/recommend", {
+        const res = await fetch(API_BASE + "/places/recommend", {
           headers: { "Authorization": "Bearer " + token },
         });
         if (!res.ok) return;
@@ -550,7 +552,7 @@
         // 닉네임 한 번 가져오기
         let nickname = "내";
         try {
-          const meRes = await fetch("http://127.0.0.1:8000/user/profile", {
+          const meRes = await fetch(API_BASE + "/user/profile", {
             headers: { "Authorization": "Bearer " + token },
           });
           if (meRes.ok) {

@@ -8,12 +8,14 @@ from urllib.parse import urlencode
 from app.models.user import User
 from app.utils.auth import create_access_token, create_refresh_token, hash_refresh_token
 
+BACKEND_BASE_URL = "https://walkorea.inhatc.com"  
+
 NAVER_CLIENT_ID = os.getenv("NAVER_CLIENT_ID")
 NAVER_CLIENT_SECRET = os.getenv("NAVER_CLIENT_SECRET")
-NAVER_REDIRECT_URI = "http://127.0.0.1:8000/auth/oauth/naver/callback"
+NAVER_REDIRECT_URI = f"{BACKEND_BASE_URL}/auth/oauth/naver/callback"
 
-REDIRECT_PROFILE = "http://127.0.0.1:8000/set-profile"
-REDIRECT_MAIN = "http://127.0.0.1:8000/"
+REDIRECT_PROFILE = f"{BACKEND_BASE_URL}/set-profile"
+REDIRECT_MAIN = f"{BACKEND_BASE_URL}/"
 
 
 def get_naver_login_url() -> dict:

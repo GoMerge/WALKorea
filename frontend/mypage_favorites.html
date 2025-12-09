@@ -2,7 +2,7 @@
 <html lang="ko">
 <head>
     <!-- 지도 구현 -->
-  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=55562bb0d8e5870b4ba807c7e9cac258"></script>
+  <script type="text/javascript" src="https://dapi.kakao.com/v2/maps/sdk.js?appkey=fd93df643bf67f10524ef70aafa1a1a6"></script>
   <meta charset="utf-8" />
   <title>WALKorea - 좋아요 한 여행지</title>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -325,6 +325,7 @@
 
 <script type="module" src="assets/js/mypage_favorite.js"></script>
 <script type="module">
+  const API_BASE = "";
   import { loadNotifications, deleteAllNotifications, initWebsocket } from "/assets/js/notifications.js";
   import { initHeader } from "/assets/js/header.js";
   import { setupHeaderAndProfile, loadProfileWeather } from "/assets/js/mypage_common.js";
@@ -347,7 +348,7 @@
     }
 
     try {
-      const res = await fetch("http://127.0.0.1:8000/user/profile", {
+      const res = await fetch(API_BASE + "/user/profile", {
         headers: { "Authorization": "Bearer " + token }
       });
       if (res.ok) {
@@ -391,7 +392,7 @@
     const token = localStorage.getItem("access_token");
     if (token) {
       try {
-        const res = await fetch("http://127.0.0.1:8000/favorites/places", {
+        const res = await fetch(API_BASE + "/favorites/places", {
           headers: { "Authorization": "Bearer " + token }
         });
         if (res.ok) {
