@@ -5,8 +5,6 @@ import {
 } from "/assets/js/mypage_common.js";
 import { loadNotifications } from "/assets/js/notifications.js";
 
-const API_BASE = "";
-
 const token = localStorage.getItem("access_token");
 
 // --- 취향 불러오기 ---
@@ -29,7 +27,7 @@ function handleUnauthorized(res) {
 async function loadPreferences() {
   if (!token) return;
 
-  const res = await fetch(API_BASE + "/user/profile/preferences", {
+  const res = await fetch("http://127.0.0.1:8000/user/profile/preferences", {
     headers: { Authorization: "Bearer " + token }
   });
   if (!res.ok) return;
@@ -118,7 +116,7 @@ async function savePreferences(e) {
     }
   };
 
-  const res = await fetch(API_BASE + "/user/profile/preferences", {
+  const res = await fetch("http://127.0.0.1:8000/user/profile/preferences", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
