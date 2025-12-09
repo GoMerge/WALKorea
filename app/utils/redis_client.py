@@ -4,15 +4,17 @@ import os
 from dotenv import load_dotenv
 
 load_dotenv()
-REDIS_HOST = os.getenv("REDIS_HOST", "127.0.0.1")
-REDIS_PORT = int(os.getenv("REDIS_PORT", 6379))
-REDIS_DB = int(os.getenv("REDIS_DB", 0))
+
+# Docker 환경에서는 기본값을 127.0.0.1이 아니라 "redis" 로
+REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
+REDIS_DB   = int(os.getenv("REDIS_DB", "0"))
 
 redis_client = redis.from_url(
     f"redis://{REDIS_HOST}:{REDIS_PORT}",
     db=REDIS_DB,
     encoding="utf-8",
-    decode_responses=True
+    decode_responses=True,
 )
 
 async def set_cached(key: str, value, expire_seconds: int = 3600):

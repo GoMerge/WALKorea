@@ -21,8 +21,13 @@ ALGORITHM = "HS256"
 ACCESS_TOKEN_EXPIRE_MINUTES = 60
 REFRESH_TOKEN_EXPIRE_DAYS = 7
 
+MAX_PASSWORD_BYTES = 72  # bcrypt 한계
+
 # 비밀번호 해시
 def hash_password(password: str) -> str:
+    # bcrypt 한계 초과 시 400 에러를 던지도록
+    if len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
+        raise ValueError("비밀번호는 72바이트(대략 72자) 이하여야 합니다.")
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
