@@ -151,7 +151,7 @@ def delete_event(
 def share_calendar_event(
     body: ShareRequestCreate, 
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user:User=Depends(get_current_user),
 ):
     # 1) 공유 대상 이벤트 조회
     ev = db.query(CalendarEvent).filter(
@@ -174,6 +174,7 @@ def share_calendar_event(
     # 3) 알림 생성 + WebSocket 전송
     date_str = (ev.start_datetime or ev.start_date).isoformat()
     notify_calendar_shared(
+        db,
         to_user_id=body.target_user_id,
         from_user_nickname=current_user.nickname,
         calendar_title=ev.title, 
@@ -199,7 +200,7 @@ def respond_share_request(
     return {"detail": "처리되었습니다."}
 
 @router.get("/share/incoming")
-def list_incoming_shares(db: Session = Depends(get_db), current_user=Depends(get_current_user)):
+def list_incoming_shares(db: Session = Depends(get_db), current_user:User=Depends(get_current_user)):
     rows = (
         db.query(CalendarShareRequest, CalendarEvent, User)
         .join(CalendarEvent, CalendarShareRequest.event_id == CalendarEvent.id)
@@ -274,7 +275,7 @@ def add_place_to_calendar(
     place_id: int,
     date_str: str, 
     db: Session = Depends(get_db),
-    current_user=Depends(get_current_user),
+    current_user:User=Depends(get_current_user),
 ):
     # 1) 유저 캘린더 찾기
     cal = get_or_create_user_calendar(db, current_user.id)

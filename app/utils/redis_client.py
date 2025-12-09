@@ -28,4 +28,3 @@ async def get_cached(key: str):
     return None
 
 async def delete_cached(key: str):
-    await redis_client.delete(key)
