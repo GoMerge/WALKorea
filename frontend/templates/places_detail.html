@@ -171,7 +171,7 @@
   <base href="/">
   <meta charset="utf-8">
   <meta content="width=device-width, initial-scale=1.0" name="viewport">
-  <title>Property Details - TheProperty Bootstrap Template</title>
+  <title>WALKorea</title>
   <meta name="description" content="">
   <meta name="keywords" content="">
 
@@ -792,6 +792,8 @@
 
 <!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 --><!-- 댓글 -->
 <script>
+  const API_BASE = 'https://walkorea.inhatc.com';
+  const PLACE_ID = {{ place.contentid }}; 
 document.addEventListener("DOMContentLoaded", function() {
   const token = localStorage.getItem("access_token");
   
