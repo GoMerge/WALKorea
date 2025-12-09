@@ -42,6 +42,7 @@ def follow_user(db: Session, follower_id: int, following_id: int) -> Follow:
 
     # DB Notification 생성
     notif = create_notification(
+        db,
         user_id=following_id,
         type_="follow",
         message=msg,

@@ -5,10 +5,11 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-# Docker 환경에서는 기본값을 127.0.0.1이 아니라 "redis" 로
-REDIS_HOST = os.getenv("REDIS_HOST", "redis")
+# 배포환경 자동 감지
+IS_DOCKER = os.getenv("IS_DOCKER", "false").lower() == "true"
+REDIS_HOST = os.getenv("REDIS_HOST", "redis" if IS_DOCKER else "localhost")
 REDIS_PORT = int(os.getenv("REDIS_PORT", "6379"))
-REDIS_DB   = int(os.getenv("REDIS_DB", "0"))
+REDIS_DB = int(os.getenv("REDIS_DB", "0"))
 
 redis_client = redis.from_url(
     f"redis://{REDIS_HOST}:{REDIS_PORT}",

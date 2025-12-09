@@ -401,7 +401,6 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
   <script type="module" src="/assets/js/header.js"></script>
-  <script type="module" src="/assets/js/mypage_favorite.js"></script>
 
   <script>
   // sortSelect 이벤트는 그대로
@@ -485,10 +484,11 @@
       section.classList.remove("d-none");
       listEl.innerHTML = "";
 
-
-        // 3) 취향 추천 리스트 불러오기
-        const res = await fetch("/places/recommend", {
-    headers: { "Authorization": "Bearer " + token },
+      // 닉네임 한 번 가져오기
+      let nickname = "내";
+      try {
+        const meRes = await fetch("/user/profile", {
+          headers: { "Authorization": "Bearer " + token },
         });
         if (meRes.ok) {
           const me = await meRes.json();
@@ -542,10 +542,7 @@
       console.error("recommend load error", e);
     }
   })();
-    } catch (e) {
-      console.error("recommend load error", e);
-    }
-  })();
+</script>
 </script>
   <script>
     (function () {
