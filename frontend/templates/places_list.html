@@ -32,19 +32,20 @@
 </head>
 
 
-<body class="properties-page">
-
-  <!-- 목록 -->
+<body>
   <header id="header" class="header d-flex align-items-center fixed-top">
     <div class="header-container container-fluid container-xl position-relative d-flex align-items-center justify-content-between">
-
-      <a href="index.html" class="logo d-flex align-items-center me-auto me-xl-0">
+      
+      <!-- Logo -->
+      <a href="/" class="logo d-flex align-items-center me-auto me-xl-0">
         <h1 class="sitename">WALKorea</h1>
       </a>
+
+      <!-- Navigation Menu -->
       <nav id="navmenu" class="navmenu">
         <ul>
-          <li><a href="index.html">홈</a></li>
-          <li class="dropdown"><a href="/places/list"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
+          <li class="dropdown">
+            <a href="/"><span>여행정보</span> <i class="bi bi-chevron-down toggle-dropdown"></i></a>
             <ul>
               <li><a href="/places/list?contenttypeid=12&page=1&sort=updated">관광지</a></li>
               <li><a href="/places/list?contenttypeid=14&page=1&sort=updated">문화시설</a></li>
@@ -55,11 +56,8 @@
               <li><a href="/places/list?contenttypeid=28&page=1&sort=updated">레포츠</a></li>
             </ul>
           </li>
-          <li><a href="mypage_favorite.html">마이 Pick!</a></li>
           <li><a href="/places/map_more">지도</a></li>
-
-          <li id="disabled"><a href="mypage_calendar.html">마이페이지</a></li>
-
+          <li><a href="/mypage_calendar">마이페이지</a></li>
         </ul>
       </nav>
 
