@@ -390,54 +390,17 @@
       });
     }
     
-    // 🔥 3. 드롭다운 강제 실행 (핵심!)
-    const notifBtn = document.getElementById('notifDropdown');
-    const dropdown = new bootstrap.Dropdown(notifBtn);
-    
-    notifBtn.addEventListener('click', (e) => {
-      e.preventDefault();
-      e.stopPropagation();
-      dropdown.toggle();  // 강제 토글!
-      
-      // 드롭다운 열릴 때 알림 로드
-      if (notifBtn.getAttribute('aria-expanded') === 'true') {
-        loadNotifications(token);
-      }
-    });
-    
-    // 전체삭제
-    document.getElementById('notif-clear-all').onclick = async () => {
-      if (!confirm('모든 알림을 삭제하시겠습니까?')) return;
-      await fetch(API_BASE + "/notifications/", {
-        method: 'DELETE',
-        headers: { "Authorization": `Bearer ${token}` }
-      });
-      loadNotifications(token);
-    };
-    
-    initFriendsPage();
   });
 
-  async function loadNotifications(token) {
-    const res = await fetch(API_BASE + "/notifications/", {
-      headers: { "Authorization": `Bearer ${token}` }
-    });
-    const notifs = await res.json();
-    
-    const list = document.getElementById('notif-list');
-    const emptyText = document.getElementById('notif-empty-text');
-    
-    if (notifs.length) {
-      list.innerHTML = notifs.map(n => 
-        `<li class="list-group-item py-2 px-3 small">${n.message}</li>`
-      ).join('');
-      emptyText.style.display = 'none';
-    } else {
-      list.innerHTML = '';
-      emptyText.style.display = 'block';
-    }
-  }
 </script>
+<script type="module">
+  import { initFriendsPage } from "/assets/js/friends.js";
+
+  window.addEventListener("DOMContentLoaded", () => {
+    initFriendsPage();   // 친구 페이지 초기화만 담당
+  });
+</script>
+<script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 <script src="assets/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
 </body>
 </html>

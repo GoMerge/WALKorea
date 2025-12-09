@@ -8,24 +8,34 @@ let currentUserId = null;
 let followingIdSet = new Set();
 const token = localStorage.getItem("access_token");
 
-// --- 친구 검색/팔로우/언팔만 이 파일에서 담당 ---
+// --- 친구 검색/팔로우/언팔 ---
 
 async function searchFriendsByNickname(query) {
-  if (!token || !query.trim()) return;
+  console.log("searchFriendsByNickname 호출:", query);
+
+  const ul = document.getElementById("friend-search-result");
+  if (!ul) return;
+
+  ul.innerHTML = "";
+  if (!res.ok) {
+    const li = document.createElement("li");
+    li.className = "list-group-item text-muted small";
+    li.textContent = "검색 결과가 없습니다.";
+    ul.appendChild(li);
+    return;
+}
+  }
 
   const res = await fetch(
-     API_BASE + `/follow/search-by-nickname/?nickname=${encodeURIComponent(query)}`,
+    API_BASE + `/follow/search-by-nickname/?nickname=${encodeURIComponent(query)}`,
     { headers: { "Authorization": "Bearer " + token } }
   );
   if (!res.ok) {
     alert("친구 검색에 실패했습니다.");
     return;
   }
-  const users = await res.json();
 
-  const ul = document.getElementById("friend-search-result");
-  if (!ul) return;
-  ul.innerHTML = "";
+  const users = await res.json();
 
   const filtered = users.filter(u => {
     const uid = u.user_id;
@@ -73,9 +83,9 @@ async function followUser(targetUserId) {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
-      "Authorization": "Bearer " + token
+      "Authorization": "Bearer " + token,
     },
-    body: JSON.stringify({ following_id: targetUserId })
+    body: JSON.stringify({ following_id: targetUserId }),
   });
 
   if (!res.ok) {
@@ -92,9 +102,9 @@ async function unfollowUser(followingId, name) {
   if (!token) return;
   if (!confirm(`'${name}' 팔로우를 취소할까요?`)) return;
 
-  const res = await fetch( API_BASE + `/follow/${followingId}`, {
+  const res = await fetch(API_BASE + `/follow/${followingId}`, {
     method: "DELETE",
-    headers: { "Authorization": "Bearer " + token }
+    headers: { "Authorization": "Bearer " + token },
   });
 
   if (!res.ok) {
@@ -112,11 +122,11 @@ async function loadFollowLists() {
 
   const [followingRes, followerRes] = await Promise.all([
     fetch(API_BASE + "/follow/following", {
-      headers: { "Authorization": "Bearer " + token }
+      headers: { "Authorization": "Bearer " + token },
     }),
     fetch(API_BASE + "/follow/followers", {
-      headers: { "Authorization": "Bearer " + token }
-    })
+      headers: { "Authorization": "Bearer " + token },
+    }),
   ]);
 
   const following = followingRes.ok ? await followingRes.json() : [];
@@ -129,9 +139,9 @@ async function loadFollowLists() {
   rList.innerHTML = "";
 
   const followingCountEl = document.getElementById("following-count");
-  const followerCountEl  = document.getElementById("follower-count");
+  const followerCountEl = document.getElementById("follower-count");
   if (followingCountEl) followingCountEl.textContent = `(${following.length})`;
-  if (followerCountEl)  followerCountEl.textContent  = `(${followers.length})`;
+  if (followerCountEl) followerCountEl.textContent = `(${followers.length})`;
 
   followingIdSet = new Set(following.map(f => f.following_id));
 
@@ -148,8 +158,8 @@ async function loadFollowLists() {
 
     const btn = li.querySelector("button");
     btn.onclick = async () => {
-        if (!confirm(`'${name}' 팔로우를 취소할까요?`)) return;
-        await unfollowUser(f.following_id);
+      if (!confirm(`'${name}' 팔로우를 취소할까요?`)) return;
+      await unfollowUser(f.following_id, name);
     };
 
     fList.appendChild(li);
@@ -169,7 +179,7 @@ async function loadFollowLists() {
   });
 }
 
-// --- 페이지 초기화 (공통 모듈 활용) ---
+// --- 페이지 초기화 ---
 
 export async function initFriendsPage() {
   if (!requireLoginForMypage()) return;
@@ -181,27 +191,23 @@ export async function initFriendsPage() {
     return;
   }
 
-  // 공통 헤더, 마이페이지 공통 설정
   await initHeader();
   await setupHeaderAndProfile();
   await loadProfileWeather();
 
-  // 🔹 현재 유저 id 먼저 세팅
   const meRes = await fetch(API_BASE + "/user/profile", {
     headers: { Authorization: "Bearer " + token },
   });
   if (meRes.ok) {
     const me = await meRes.json();
-    currentUserId = me.id;        // 실제 필드명에 맞춰서 (id 또는 user_id)
+    currentUserId = me.id;
   }
 
-  // 팔로잉/팔로워 + 알림
   await loadFollowLists();
   await loadNotifications();
 
-  // 검색 이벤트 바인딩
   const input = document.getElementById("friend-search-input");
-  const btn   = document.getElementById("friend-search-btn");
+  const btn = document.getElementById("friend-search-btn");
   if (btn && input) {
     btn.addEventListener("click", () => {
       searchFriendsByNickname(input.value);

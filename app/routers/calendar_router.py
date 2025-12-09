@@ -151,7 +151,7 @@ def delete_event(
 def share_calendar_event(
     body: ShareRequestCreate, 
     db: Session = Depends(get_db),
-    current_user:User=Depends(get_current_user),
+    current_user: User = Depends(get_current_user),
 ):
     # 1) 공유 대상 이벤트 조회
     ev = db.query(CalendarEvent).filter(
@@ -171,13 +171,13 @@ def share_calendar_event(
     db.commit()
     db.refresh(req)
 
-    # 3) 알림 생성 + WebSocket 전송
+    # 3) 🔥 알림 생성 + WebSocket 전송
     date_str = (ev.start_datetime or ev.start_date).isoformat()
     notify_calendar_shared(
-        db,
+        db=db,
         to_user_id=body.target_user_id,
         from_user_nickname=current_user.nickname,
-        calendar_title=ev.title, 
+        calendar_title=ev.title,
         date_str=date_str,
         location=ev.location,
     )
