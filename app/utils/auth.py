@@ -27,7 +27,10 @@ MAX_PASSWORD_BYTES = 72  # bcrypt 한계
 def hash_password(password: str) -> str:
     # bcrypt 한계 초과 시 400 에러를 던지도록
     if len(password.encode("utf-8")) > MAX_PASSWORD_BYTES:
-        raise ValueError("비밀번호는 72바이트(대략 72자) 이하여야 합니다.")
+        raise HTTPException(
+            status_code=status.HTTP_400_BAD_REQUEST,
+            detail="비밀번호는 최대 72자 이하로 입력해주세요.",
+        )
     return pwd_context.hash(password)
 
 def verify_password(plain_password: str, hashed_password: str) -> bool:
