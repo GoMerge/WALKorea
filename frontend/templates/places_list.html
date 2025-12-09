@@ -539,7 +539,7 @@
         });
 
         // 3) 취향 추천 리스트 불러오기
-        const res = await fetch(API_BASE + "/places/recommend", {
+        const res = await fetch("/places/recommend", {
           headers: { "Authorization": "Bearer " + token },
         });
         if (!res.ok) return;

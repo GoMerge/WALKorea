@@ -347,7 +347,7 @@
     }
 
     try {
-      const res = await fetch(API_BASE + "/user/profile", {
+      const res = await fetch("/user/profile", { 
         headers: { "Authorization": "Bearer " + token }
       });
       if (res.ok) {
