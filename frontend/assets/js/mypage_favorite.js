@@ -20,7 +20,7 @@ document.addEventListener("DOMContentLoaded", async () => {
 
   async function loadFavorites() {
     try {
-      const res = await fetch(API_BASE + "/favorites/places", {
+       const res = await fetch("/user/profile", {
         headers: { "Authorization": "Bearer " + token }
       });
       if (!res.ok) throw new Error("failed");
