@@ -823,7 +823,7 @@ btn.innerHTML = `<i class="bi bi-lock"></i> 로그인 후 작성`;
 
 async function loadUserProfile() {
 try {
-const res = await fetch(API_BASE + "/user/profile", {
+const res = await fetch("https://walkorea.inhatc.com/user/profile", {
 headers: { "Authorization": "Bearer " + token }
 });
 if (res.ok) currentUser = await res.json();
@@ -840,7 +840,7 @@ if (token) {
 headers["Authorization"] = "Bearer " + token;
 }
 
-const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
+const res = await fetch(`https://walkorea.inhatc.com/places/${PLACE_ID}/comments`, {
 headers,
 });
 
@@ -889,7 +889,7 @@ btn.disabled = true;
 btn.innerHTML = `<span class="spinner-border spinner-border-sm me-2"></span>등록중...`;
 
 try {
-const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments`, {
+const res = await fetch(`https://walkorea.inhatc.com/places/${PLACE_ID}/comments`, {
 method: "POST",
 headers: {
 "Authorization": "Bearer " + token,
@@ -979,7 +979,7 @@ window.deleteComment = async (commentId) => {
 if (!confirm("댓글을 삭제하시겠습니까?")) return;
 
 try {
-const res = await fetch(API_BASE + `/places/${PLACE_ID}/comments/${commentId}`, {
+const res = await fetch(`https://walkorea.inhatc.com/places/${PLACE_ID}/comments/${commentId}`, {
 method: "DELETE",
 headers: { "Authorization": "Bearer " + token }
 });
