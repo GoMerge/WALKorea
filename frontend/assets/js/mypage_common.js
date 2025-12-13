@@ -34,7 +34,7 @@ export function requireLoginForMypage() {
 
 // 공통: 헤더/사이드바 프로필 세팅
 export async function setupHeaderAndProfile() {
-  const token = getToken();
+  const token = localStorage.getItem("access_token");
   const nav = document.querySelector(".navbar-nav");
   const loginLi = document.getElementById("nav-login");
   const signupLi = document.getElementById("nav-signup");
@@ -42,7 +42,7 @@ export async function setupHeaderAndProfile() {
   if (!token) return;
 
   const res = await fetch(API_BASE + "/user/profile", {
-    headers: { "Authorization": "Bearer " + token }
+    headers: { Authorization: "Bearer " + token },
   });
   if (!res.ok) return;
   const user = await res.json();

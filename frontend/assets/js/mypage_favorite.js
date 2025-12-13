@@ -2,8 +2,16 @@ import { initHeader } from "./header.js";
 import { setupHeaderAndProfile, loadProfileWeather } from "./mypage_common.js";
 
 const API_BASE = "";
+let token = null;  // 전역 토큰
 
+// DOM에서 카드/빈 상태 영역 잡기
+const gridEl  = document.getElementById("favorites-grid");
+const emptyEl = document.getElementById("favorites-empty");
+
+// 좋아요 목록 불러오기
 async function loadFavorites() {
+  if (!gridEl || !emptyEl) return;
+
   try {
     const res = await fetch(API_BASE + "/favorites/places", {
       headers: { "Authorization": "Bearer " + token }
@@ -29,7 +37,7 @@ async function loadFavorites() {
           <div class="card border-0">
             <div class="position-relative">
               <img src="${p.firstimage || '/static/no_image.jpg'}"
-                  alt="${p.title}">
+                   alt="${p.title}">
               <button type="button"
                       class="btn btn-light btn-sm position-absolute top-0 end-0 m-2 rounded-circle like-btn"
                       data-place-id="${p.id}"
@@ -54,30 +62,49 @@ async function loadFavorites() {
   }
 }
 
-  // 작은 카드의 하트 클릭 시 좋아요 해제 + 새로고침
-  document.addEventListener("click", async (e) => {
-    const btn = e.target.closest(".like-btn");
-    if (!btn) return;
+// 하트 클릭 시 해제 + 새로고침
+document.addEventListener("click", async (e) => {
+  const btn = e.target.closest(".like-btn");
+  if (!btn) return;
 
-    e.preventDefault();          // 카드 링크 클릭 막기
-    e.stopPropagation();
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "/login";
+    return;
+  }
 
-    const placeId = btn.dataset.placeId;
-    try {
-      const res = await fetch(API_BASE + `/favorites/places/${placeId}`, {
-        method: "POST",
-        headers: { "Authorization": "Bearer " + token }
-      });
-      if (!res.ok) throw new Error();
-      const data = await res.json();
-      if (!data.liked) {
-        await loadFavorites();   // 해제되면 목록 갱신
-      }
-    } catch (e2) {
-      console.error(e2);
-      alert("좋아요 해제에 실패했습니다.");
+  e.preventDefault();   // 카드 링크 클릭 막기
+  e.stopPropagation();
+
+  const placeId = btn.dataset.placeId;
+  try {
+    const res = await fetch(API_BASE + `/favorites/places/${placeId}`, {
+      method: "POST",
+      headers: { "Authorization": "Bearer " + token }
+    });
+    if (!res.ok) throw new Error();
+    const data = await res.json();
+    if (!data.liked) {
+      await loadFavorites();   // 해제되면 목록 갱신
     }
-  });
+  } catch (e2) {
+    console.error(e2);
+    alert("좋아요 해제에 실패했습니다.");
+  }
+});
 
-  loadFavorites();
+// 페이지 진입 시 한 번만 초기화
+document.addEventListener("DOMContentLoaded", async () => {
+  token = localStorage.getItem("access_token");
+  if (!token) {
+    alert("로그인이 필요합니다.");
+    window.location.href = "/login";
+    return;
+  }
 
+  await initHeader();
+  await setupHeaderAndProfile();
+  await loadProfileWeather();
+
+  await loadFavorites();
+});

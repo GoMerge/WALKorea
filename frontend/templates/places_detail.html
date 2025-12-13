@@ -823,7 +823,7 @@ btn.innerHTML = `<i class="bi bi-lock"></i> 로그인 후 작성`;
 
 async function loadUserProfile() {
 try {
-const res = await fetch(API_BASE + "/user/profile", {
+const res = await fetch("https://walkorea.inhatc.com/user/profile", {
 headers: { "Authorization": "Bearer " + token }
 });
 if (res.ok) currentUser = await res.json();

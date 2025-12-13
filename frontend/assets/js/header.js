@@ -15,7 +15,6 @@ export async function initHeader() {
   const headerNickname = document.getElementById("header-nickname");
   const headerInitial  = document.getElementById("header-initial");
 
-  // 헤더 요소가 아예 없는 페이지면 그냥 종료
   if (!headerNickname || !headerInitial) return;
 
   // 비로그인 상태
@@ -27,40 +26,44 @@ export async function initHeader() {
     return;
   }
 
-  // 로그인 사용자 프로필 조회
+  // 🔥 프로필 조회 (한 번만!)
   const res = await fetch(API_BASE + "/user/profile", {
-    headers: { Authorization: "Bearer " + token },
+    headers: { Authorization: `Bearer ${token}` },  // 백틱 통일
   });
+  
   if (!res.ok) {
-    // 토큰 이상 등 → 비로그인으로 처리
     navGuest && navGuest.classList.remove("d-none");
     navUser  && navUser.classList.add("d-none");
-    headerNickname.textContent = "";
-    headerInitial.textContent  = "";
     return;
   }
 
   const user = await res.json();
-
-  const needProfile = !user.nickname;  // 닉네임 없으면 프로필 미완성
+  const needProfile = !user.nickname;
 
   if (needProfile) {
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
     navGuest && navGuest.classList.remove("d-none");
     navUser  && navUser.classList.add("d-none");
-    headerNickname.textContent = "";
-    headerInitial.textContent  = "";
     return;
   }
 
-  // 닉네임 있는 정상 로그인 상태
+  // 정상 로그인 UI
   navGuest && navGuest.classList.add("d-none");
   navUser  && navUser.classList.remove("d-none");
-
   const baseName = user.nickname || user.userid || "사용자";
   headerNickname.textContent = baseName;
   headerInitial.textContent  = baseName[0];
+
+  // 🔥 알림 + WebSocket 초기화 (한 번만!)
+  try {
+    await initNotifications();  // 배지 즉시 업데이트
+    if (user.id) {
+      initWebsocket(user.id);   // 실시간 알림
+    }
+  } catch (e) {
+    console.error('알림 초기화 에러:', e);
+  }
 }
 
 // 이 함수는 다른 파일에서 export 해서 쓰는 게 맞으면 export 붙이기
@@ -73,3 +76,21 @@ export function requireLoginForMypage() {
   }
   return true;
   }
+
+
+  // 로그아웃 버튼 전역 처리
+document.addEventListener("click", (e) => {
+  const logoutBtn = e.target.closest("#nav-logout");
+  if (!logoutBtn) return;
+
+  e.preventDefault();
+  localStorage.removeItem("access_token");
+  localStorage.removeItem("refresh_token");
+  window.location.href = "/login";
+});
+
+
+// 페이지 로드 완료시 헤더 + 알림 자동 초기화
+document.addEventListener('DOMContentLoaded', async () => {
+  await initHeader();  // 헤더 + 알림 모두 초기화
+});

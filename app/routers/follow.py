@@ -37,13 +37,26 @@ def create_follow(
     return follow
 
 
-@router.get("/search-by-nickname/", response_model=list[NicknameSearchResponse])
-def search_users(
+@router.get("/search-by-nickname/")
+def search_by_nickname(
     nickname: str,
     db: Session = Depends(get_db),
+    current_user: User = Depends(get_current_user),
 ):
-    users = get_users_by_nickname_like_or_404(db, nickname)
-    return [NicknameSearchResponse(user_id=u.id, nickname=u.nickname) for u in users]
+    if not nickname.strip():
+        return []
+
+    q = (
+        db.query(User.id.label("user_id"), User.nickname)
+        .filter(User.nickname.contains(nickname))
+        .limit(20)
+        .all()
+    )
+
+    return [
+        {"user_id": row.user_id, "nickname": row.nickname}
+        for row in q
+    ]
 
 
 @router.post("/follow-user/")

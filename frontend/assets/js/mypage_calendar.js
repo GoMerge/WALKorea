@@ -17,10 +17,10 @@ function getToken() { return localStorage.getItem("access_token"); }
 async function apiFetch(url, options = {}) {
   const res = await fetch(url, options);
   if (res.status === 401) {
-    alert("로그인이 만료되었습니다. 다시 로그인해 주세요.");
     localStorage.removeItem("access_token");
     localStorage.removeItem("refresh_token");
-    window.location.href = "/login";
+    alert("로그아웃되었습니다. 다시 로그인해 주세요.");
+    window.location.href = "/";
     return null;
   }
   return res;
@@ -404,29 +404,12 @@ async function loadEventsToCalendar(calId) {
 }
 
 async function setupUserRegion() {
-  const token = getToken();
-  if (!token) return;
+  const user = window.__userProfile;   // 헤더에서 이미 받아둔 프로필
 
-  const res = await fetch(API_BASE + "/user/profile", {
-    headers: { Authorization: "Bearer " + token },
-  });
-  
-  // 토큰 만료 / 인증 실패
-  if (res.status === 401) {
-    localStorage.removeItem("access_token");
-    localStorage.removeItem("refresh_token");
-
-    if (window.location.pathname !== "/") {
-      window.location.href = "/";
-    } else {
-      window.location.reload();
-    }
+  if (!user) {
+    userBaseAddress = null;
     return;
   }
-  
-  if (!res.ok) return;
-
-  const user = await res.json();
 
   if (!user.region_id) {
     userBaseAddress = null;
@@ -434,6 +417,7 @@ async function setupUserRegion() {
     userBaseAddress = user.region_full_name || user.region_name;
   }
 }
+
 
 async function checkIncomingShares() {
     const token = getToken();

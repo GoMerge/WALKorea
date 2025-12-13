@@ -40,3 +40,4 @@ def delete_all_notifications(
         Notification.user_id == current_user.id
     ).delete(synchronize_session=False)
     db.commit()
+

@@ -248,6 +248,29 @@ def respond_share_request_service(
         if not cal:
             raise HTTPException(status_code=400, detail="내 캘린더가 없습니다.")
 
+        # 🔥 동일 일정 존재 여부 체크 (여기 추가)
+        dup_event = (
+            db.query(CalendarEvent)
+            .filter(
+                CalendarEvent.calendar_id == cal.id,
+                CalendarEvent.title == event.title,
+                CalendarEvent.location == event.location,
+                CalendarEvent.start_datetime == event.start_datetime,
+                CalendarEvent.end_datetime == event.end_datetime,
+                CalendarEvent.description == event.description,
+                CalendarEvent.remind_minutes == event.remind_minutes,
+            )
+            .first()
+        )
+
+        if dup_event:
+            # 이미 같은 일정이 있으면 새로 안 만들고 상태만 accepted로
+            req.status = "accepted"
+            req.responded_at = func.now()
+            db.commit()
+            return
+
+        # 🔥 중복 없을 때만 새 이벤트 생성 (기존 shared_event 코드)
         shared_event = CalendarEvent(
             calendar_id=cal.id,
             title=event.title,

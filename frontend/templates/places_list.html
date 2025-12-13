@@ -153,7 +153,7 @@
       <nav class="breadcrumbs">
         <div class="container">
           <ol>
-            <li><a href="index.html">여행정보</a></li>
+            <li><a href="/">여행정보</a></li>
              {% if contenttypeid and contenttypeid|int in page_map %}
             <li class="current">{{ page_map[contenttypeid|int].title }}</li>
              {% else %}
@@ -401,7 +401,6 @@
   <!-- Main JS File -->
   <script src="assets/js/main.js"></script>
   <script type="module" src="/assets/js/header.js"></script>
-  <script type="module" src="/assets/js/mypage_favorite.js"></script>
 
   <script>
   // sortSelect 이벤트는 그대로
@@ -442,7 +441,7 @@
     }
   });
 
-  (async () => {
+   (async () => {
     const token = localStorage.getItem("access_token");
     if (!token) return;  // 비로그인 사용자는 추천/좋아요 상태 둘 다 스킵
 
@@ -485,10 +484,11 @@
       section.classList.remove("d-none");
       listEl.innerHTML = "";
 
-
-        // 3) 취향 추천 리스트 불러오기
-        const res = await fetch("/places/recommend", {
-    headers: { "Authorization": "Bearer " + token },
+      // 닉네임 한 번 가져오기
+      let nickname = "내";
+      try {
+        const meRes = await fetch("/user/profile", {
+          headers: { "Authorization": "Bearer " + token },
         });
         if (meRes.ok) {
           const me = await meRes.json();
@@ -542,6 +542,7 @@
       console.error("recommend load error", e);
     }
   })();
+</script>
 </script>
   <script>
     (function () {
