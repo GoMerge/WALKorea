@@ -9,7 +9,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       # 1. 레포지토리 checkout
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
 
       # 2. 배포용 폴더 준비
       - name: Prepare deploy folder
@@ -20,7 +20,7 @@ jobs:
 
       # 3. SCP로 EC2에 전송
       - name: Copy to EC2
-        uses: appleboy/scp-action@v0.1.7
+        uses: appleboy/scp-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -31,7 +31,7 @@ jobs:
 
       # 4. SSH로 EC2 접속 → Docker Compose 실행
       - name: Deploy on EC2
-        uses: appleboy/ssh-action@v0.1.7
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -49,5 +49,14 @@ jobs:
             export REDIS_PORT=${{ secrets.REDIS_PORT }}
             export REDIS_DB=${{ secrets.REDIS_DB }}   
 
-            docker-compose down
-            docker-compose up -d --build
+            # 강제 정리 
+            docker-compose down --remove-orphans --volumes --timeout 30
+            docker system prune -f --volumes
+            docker network prune -f
+
+            # 재생성 
+            docker-compose up -d --build --force-recreate
+
+            # 배포 완료 확인
+            sleep 5
+            docker ps
