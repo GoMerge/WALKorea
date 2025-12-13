@@ -20,7 +20,7 @@ jobs:
 
       # 3. SCP로 EC2에 전송
       - name: Copy to EC2
-        uses: appleboy/scp-action@v1.0.3
+        uses: appleboy/scp-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
@@ -31,7 +31,7 @@ jobs:
 
       # 4. SSH로 EC2 접속 → Docker Compose 실행
       - name: Deploy on EC2
-        uses: appleboy/ssh-action@v1.0.3
+        uses: appleboy/ssh-action@v0.1.7
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ubuntu
